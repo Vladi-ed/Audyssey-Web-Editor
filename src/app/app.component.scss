@@ -1,0 +1,73 @@
+main {
+  padding: 10px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 25px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.select-file-btn {
+  display: flex;
+  border: 1px solid gray;
+  padding: 10px 15px;
+  border-radius: 4px;
+  margin-top: -2px;
+  /*margin-left: -6px;*/
+  cursor: pointer;
+}
+
+
+
+mat-card {
+  //padding: 20px;
+  margin: 10px;
+
+  mat-card-header {
+    margin-top: -4px;
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+
+  .basic-info {
+    width: min-content;
+  }
+
+  .channel-info {
+    width: 244px;
+
+    .channel-radio-group {
+      display: flex;
+      flex-direction: column;
+      margin: 10px 0;
+    }
+  }
+
+  .curve-points-info {
+    width: min-content;
+    min-width: 244px;
+
+    .curve-points-container {
+      max-height: 432px;
+      overflow-y: auto;
+    }
+
+    .curve-points-text-field {
+      font-size: larger;
+      border: none;
+    }
+  }
+
+
+}
