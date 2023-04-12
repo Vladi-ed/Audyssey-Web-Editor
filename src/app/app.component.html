@@ -63,29 +63,46 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="basic-info">
+    <mat-card class="channel-info">
       <mat-card-header>Channel info</mat-card-header>
       <mat-card-content *ngIf="selectedChannel">
         <mat-form-field appearance="outline">
-          <mat-label>customLevel</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.customLevel">
+          <mat-label>Distance</mat-label>
+          <input matInput [(ngModel)]="selectedChannel.channelReport.distance">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>customDistance</mat-label>
+          <mat-label>Custom Distance</mat-label>
           <input matInput [(ngModel)]="selectedChannel.customDistance">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Crossover</mat-label>
+          <mat-label>Frequency Range (Hz)</mat-label>
+          <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Custom Crossover</mat-label>
           <mat-select [(ngModel)]="selectedChannel.customCrossover">
-            <mat-option [value]="'40'">40</mat-option>
-            <mat-option [value]="'60'">60</mat-option>
-            <mat-option [value]="'80'">80</mat-option>
-            <mat-option [value]="'100'">100</mat-option>
+            <mat-option [value]="' '"></mat-option>
+            <mat-option [value]="'40'">40 Hz</mat-option>
+            <mat-option [value]="'60'">60 Hz</mat-option>
+            <mat-option [value]="'80'">80 Hz</mat-option>
+            <mat-option [value]="'100'">100 Hz</mat-option>
+            <mat-option [value]="'120'">120 Hz</mat-option>
+            <mat-option [value]="'180'">180 Hz</mat-option>
+            <mat-option [value]="'200'">200 Hz</mat-option>
+            <mat-option [value]="'F'">F</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Custom Speaker Type</mat-label>
+          <mat-select [(ngModel)]="selectedChannel.customSpeakerType">
+            <mat-option [value]="'S'">Small</mat-option>
+            <mat-option [value]="'L'">Large</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation">Midrange Compensation</mat-checkbox>
         <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>
+        <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
 
       </mat-card-content>
     </mat-card>
@@ -104,11 +121,29 @@
 
       </mat-card-content>
     </mat-card>
+
+    <mat-card class="curve-points-info">
+      <mat-card-header>Graph settings</mat-card-header>
+      <mat-card-content>
+
+        <mat-checkbox [(ngModel)]="chartLogarithmicScale">Logarithmic Scale</mat-checkbox>
+        <mat-checkbox [(ngModel)]="dataSmoothEnabled">Data Smothing</mat-checkbox>
+        <mat-checkbox [(ngModel)]="graphSmoothEnabled">Graph Smothing</mat-checkbox>
+
+      </mat-card-content>
+    </mat-card>
   </div>
+
   <mat-card>
+    <mat-card-header>Target Curve Points</mat-card-header>
     <mat-card-content>
-      Graph
+      <highcharts-chart style="width: 100%; height: 500px; display: block;"
+        [Highcharts]="highcharts"
+        [options]="chartOptions"
+        [(update)]="chartUpdateFlag"
+      ></highcharts-chart>
     </mat-card-content>
+
   </mat-card>
 
 </main>

@@ -12,10 +12,11 @@ import {FormsModule} from "@angular/forms";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatListModule} from "@angular/material/list";
+import {HighchartsChartModule} from "highcharts-angular";
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -28,7 +29,8 @@ import {MatListModule} from "@angular/material/list";
     FormsModule,
     MatCheckboxModule,
     MatRadioModule,
-    MatListModule
+    MatListModule,
+    HighchartsChartModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
