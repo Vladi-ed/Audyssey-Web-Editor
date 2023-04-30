@@ -6,9 +6,10 @@ import {calculatePoints} from "./helper-functions/calculatePoints";
 
 import * as Highcharts from "highcharts";
 import HC_boost from 'highcharts/modules/boost'
-import {highchartsInit} from "./helper-functions/highchartsInit";
+import {options, seriesOptions} from "./helper-functions/highchartsInit";
 HC_boost(Highcharts);
-Highcharts.setOptions(highchartsInit);
+Highcharts.setOptions(options);
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,43 +17,28 @@ Highcharts.setOptions(highchartsInit);
 })
 export class AppComponent {
   highcharts: typeof Highcharts = Highcharts;
-  chartOptions: Highcharts.Options = {
-    series: [{
-      data: [],
-      type: 'line'
-    },
-      {
-        data: [],
-        dashStyle: 'Dot',
-        lineWidth: 0.7,
-        type: 'spline',
-        name: 'Subwoofer',
-        color: 'black',
+  chartOptions: Highcharts.Options = { series: seriesOptions };
 
-      }
-    ],
-  };
-  // private chartSeries: Highcharts.SeriesOptionsType[] = [];
-  private chartObj?: Highcharts.Chart;
+  // private chartObj?: Highcharts.Chart;
 
   audysseyData: AudysseyRoot = { detectedChannels: [] };
   selectedChannel?: DetectedChannel;
-  protected readonly decodeChannelName = decodeChannelName; // for the template
+  protected readonly decodeChannelName = decodeChannelName; // for the HTML template
   chartLogarithmicScale = true;
   chartUpdateFlag = false;
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
-  addSubwoofer = false;
+
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    this.chartObj = chart;
+    // this.chartObj = chart;
   }
 
-  onUpload(target: FileList | null) {
-    const file = target?.item(0);
-    file?.text().then(fileContent => this.audysseyData = JSON.parse(fileContent));
+  onUpload(files: FileList | null) {
+    files?.item(0)?.text().then(fileContent => this.audysseyData = JSON.parse(fileContent));
   }
 
   updateChart() {
+    console.log('this.selectedChannel', this.selectedChannel)
     const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
 
     const XMin = 10, XMax = 24000;
@@ -64,7 +50,6 @@ export class AppComponent {
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
-      title: {text: 'Hz'},
       type: this.chartLogarithmicScale ? "logarithmic" : "linear",
       plotBands: [{
         from: this.selectedChannel?.frequencyRangeRolloff,
@@ -72,9 +57,7 @@ export class AppComponent {
         color: 'rgba(68, 170, 213, 0.1)',
         label: {
           text: 'Disabled',
-          style: {
-            color: '#606060'
-          }
+          style: { color: '#606060' }
         }
       }]
     };
@@ -86,45 +69,16 @@ export class AppComponent {
       color: 'rgba(160, 160, 160, 0.1)',
       label: {
         text: 'Crossover',
-        style: {
-          color: '#606060'
-        }
+        style: { color: '#606060' }
       }
     })
 
-    this.chartOptions.yAxis = {
-      // min: -20,
-      // max: 25,
-      // crosshair: true,
-      tickInterval: 5,
-      // minorTickInterval: 5
-    };
 
     // @ts-ignore
     this.chartOptions.series[0] = {
       data: selectedChannelData,
-      lineWidth: 0.8,
-      showInNavigator: true,
-      dashStyle: 'Solid',
       type: this.graphSmoothEnabled ? 'spline' : 'line',
-      // allowPointSelect: true,
       name: decodeChannelName(this.selectedChannel?.commandId),
-      zones: [
-        {
-          value: 0,
-          color: '#f7a35c'
-        },
-        {
-          value: 10,
-          color: '#c47f7f'
-        },
-        {
-          value: 30,
-          color: '#ff0000'
-        },
-        {
-          color: '#90ed7d'
-        }],
     };
 
     this.chartUpdateFlag = true;
@@ -133,22 +87,21 @@ export class AppComponent {
   addSubwooferToTheGraph(value: boolean) {
     const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
     const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
+    // if (value) this.chartObj?.addSeries({});
+    // else this.chartObj?.series.at(-1).destroy();
 
-    if (value) this.chartObj?.addSeries({
+    if (this.chartOptions.series)
+    if (value) this.chartOptions.series[1] = {
       data: subDataPoints,
-      dashStyle: 'Dot',
-      lineWidth: 0.7,
       type: 'spline',
       name: 'Subwoofer',
-      color: 'black'
-    });
-    else this.chartObj?.series.pop();
+    };
+    else this.chartOptions.series[1] = {
+      data: [],
+      type: 'spline',
+    }
 
-    // this.chartOptions = {...this.chartOptions, series: this.chartSeries}
-
-    // this.chartUpdateFlag = true;
-    console.log('chartOptions.series', this.chartOptions.series)
-
+    this.chartUpdateFlag = true;
   }
 
 }

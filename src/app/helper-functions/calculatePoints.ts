@@ -15,11 +15,7 @@ export function calculatePoints(responseDataValues?: string[], enableSmoothing =
     Xs[j] = j / count * sample_rate;
   }
 
-  console.log('cValues', cValues);
-
   cValues = fft(cValues);
-  console.log('cValuesFFT', cValues);
-  console.log('magnitude', magnitude(cValues[0]));
 
   let points: number[][] = [];
   let x = 0;
