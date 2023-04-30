@@ -10,6 +10,7 @@
       <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
       <span *ngIf="fileInput.files?.length">{{ fileInput.files?.item(0)?.name }}</span>
+      <span>Target Device: {{audysseyData.targetModelName}}</span>
     </mat-card-content>
   </mat-card>
 
@@ -20,10 +21,6 @@
         <mat-form-field appearance="outline">
           <mat-label>Profile name</mat-label>
           <input matInput [(ngModel)]="audysseyData.title">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Device model</mat-label>
-          <input matInput [(ngModel)]="audysseyData.targetModelName">
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Target curve type</mat-label>
@@ -37,7 +34,7 @@
           <input matInput [(ngModel)]="audysseyData.systemDelay">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>MultiEQ Type</mat-label>
+          <mat-label>Type</mat-label>
           <mat-select [(ngModel)]="audysseyData.enMultEQType">
             <mat-option [value]="0">MultiEQ</mat-option>
             <mat-option [value]="1">MultiEQ XT</mat-option>
@@ -54,12 +51,12 @@
       <mat-card-header>Channel selection</mat-card-header>
       <mat-card-content>
         <label>Pick one of {{ audysseyData.detectedChannels.length }} detected channels:</label>
-        <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group">
+        <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
           <mat-radio-button class="channel-radio-button" *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
             {{ decodeChannelName(channel.commandId) }}
           </mat-radio-button>
         </mat-radio-group>
-        <div *ngIf="selectedChannel">Your selected channel is: {{selectedChannel.commandId }}</div>
+        <div *ngIf="selectedChannel">Your selected channel is: {{selectedChannel.commandId}}</div>
       </mat-card-content>
     </mat-card>
 
@@ -75,8 +72,8 @@
           <input matInput [(ngModel)]="selectedChannel.customDistance">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Frequency Range (Hz)</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff">
+          <mat-label>Correction Range Cutoff (Hz)</mat-label>
+          <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()">
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Custom Crossover</mat-label>
@@ -126,9 +123,11 @@
       <mat-card-header>Graph settings</mat-card-header>
       <mat-card-content>
 
-        <mat-checkbox [(ngModel)]="chartLogarithmicScale">Logarithmic Scale</mat-checkbox>
-        <mat-checkbox [(ngModel)]="dataSmoothEnabled">Data Smothing</mat-checkbox>
-        <mat-checkbox [(ngModel)]="graphSmoothEnabled">Graph Smothing</mat-checkbox>
+        <mat-checkbox [(ngModel)]="chartLogarithmicScale" (change)="updateChart()">Logarithmic Scale</mat-checkbox>
+        <mat-checkbox [(ngModel)]="dataSmoothEnabled"  (change)="updateChart()">Data Smoothing</mat-checkbox>
+        <mat-checkbox [(ngModel)]="graphSmoothEnabled" (change)="updateChart()">Graph Smoothing</mat-checkbox>
+        <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+<!--        <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.value)">Show Correction Range Cutoff</mat-checkbox>-->
 
       </mat-card-content>
     </mat-card>
@@ -141,6 +140,7 @@
         [Highcharts]="highcharts"
         [options]="chartOptions"
         [(update)]="chartUpdateFlag"
+                        [callbackFunction]="chartCallback"
       ></highcharts-chart>
     </mat-card-content>
 

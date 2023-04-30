@@ -1,4 +1,4 @@
-export function decodeChannelName(commandId: string) {
+export function decodeChannelName(commandId?: string) {
   switch (commandId) {
     case 'C' : return 'Center';
     case 'FL' : return 'Front Left';
