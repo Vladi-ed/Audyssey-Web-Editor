@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {AudysseyRoot} from "./interfaces/audyssey-root";
 import {DetectedChannel} from "./interfaces/detected-channel";
 import {decodeChannelName} from "./helper-functions/decodeChannelName";
