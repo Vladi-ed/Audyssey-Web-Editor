@@ -13,8 +13,9 @@ main {
   }
 }
 
-.select-file-btn {
+.file-btn {
   display: flex;
+  align-items: center;
   border: 1px solid gray;
   padding: 10px 15px;
   border-radius: 4px;

@@ -9,6 +9,9 @@ export const options: Highcharts.Options = {
   //   enabled: true,
   //   useGPUTranslations: true
   // },
+  sonification: {
+    duration: 5000
+  },
   accessibility: { enabled: false },
   title: {
     text: 'Measurements graph'

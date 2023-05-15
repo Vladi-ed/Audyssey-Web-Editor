@@ -74,6 +74,7 @@ export class AppComponent {
     })
 
 
+    // adding first graph
     // @ts-ignore
     this.chartOptions.series[0] = {
       data: selectedChannelData,
@@ -104,4 +105,14 @@ export class AppComponent {
     this.chartUpdateFlag = true;
   }
 
+  exportFile() {
+    const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob) // Create an object URL from blob
+
+    const a = document.createElement('a') // Create "a" element
+    a.setAttribute('href', url) // Set "a" element link
+    a.setAttribute('download', this.audysseyData.title + '_' + new Date().toLocaleDateString() + '.ady') // Set download filename
+    a.click() // Start downloading
+    URL.revokeObjectURL(url);
+  }
 }
