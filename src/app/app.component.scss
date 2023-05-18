@@ -4,7 +4,7 @@ main {
 
 .header {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   gap: 25px;
 
@@ -13,15 +13,24 @@ main {
   }
 }
 
-.file-btn {
+.multi-EQ-type {
+  background: white; border: none; appearance: none;
+  font-size: 15px;
+}
+
+.flat-btn {
   display: flex;
   align-items: center;
-  border: 1px solid gray;
-  padding: 10px 15px;
+  border: 1px solid #b0b0b0;
+  padding: 0 16px 1px;
+  height: 46px;
   border-radius: 4px;
-  margin-top: -2px;
+  //margin-top: -1px;
   /*margin-left: -6px;*/
   cursor: pointer;
+}
+.flat-btn:hover {
+  border-color: #545454;
 }
 
 
@@ -51,7 +60,12 @@ mat-card {
     .channel-radio-group {
       display: flex;
       flex-direction: column;
-      margin: 10px 0;
+      margin: 8px 0;
+
+      .channel-radio-button {
+        margin-bottom: -4px;
+        //user-select: none;
+      }
     }
   }
 

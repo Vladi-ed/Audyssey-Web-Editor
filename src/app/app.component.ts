@@ -1,13 +1,17 @@
 import {Component} from '@angular/core';
 import {AudysseyRoot} from "./interfaces/audyssey-root";
 import {DetectedChannel} from "./interfaces/detected-channel";
-import {decodeChannelName} from "./helper-functions/decodeChannelName";
-import {calculatePoints} from "./helper-functions/calculatePoints";
+import {decodeChannelName} from "./helper-functions/decode-channel-name";
+import {calculatePoints} from "./helper-functions/calculate-points";
 
 import * as Highcharts from "highcharts";
 import HC_boost from 'highcharts/modules/boost'
+import Sonification from 'highcharts/modules/sonification';
+import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from "./helper-functions/highchartsInit";
+// Sonification(Highcharts);
 HC_boost(Highcharts);
+// Exporting(Highcharts);
 Highcharts.setOptions(options);
 
 @Component({
@@ -22,6 +26,8 @@ export class AppComponent {
   // private chartObj?: Highcharts.Chart;
 
   audysseyData: AudysseyRoot = { detectedChannels: [] };
+  calculatedChannelsData?: Map<string, number[][]>
+
   selectedChannel?: DetectedChannel;
   protected readonly decodeChannelName = decodeChannelName; // for the HTML template
   chartLogarithmicScale = true;
@@ -30,16 +36,33 @@ export class AppComponent {
   graphSmoothEnabled = false;
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    // this.chartObj = chart;
+    console.log('Graph loaded');
+    this.chartObj = chart;
   }
+  private chartObj: any;
 
-  onUpload(files: FileList | null) {
-    files?.item(0)?.text().then(fileContent => this.audysseyData = JSON.parse(fileContent));
+  async onUpload(files: FileList | null) {
+    const fileContent = await files?.item(0)?.text();
+    if (fileContent) {
+      this.audysseyData = JSON.parse(fileContent);
+
+      if (typeof Worker !== 'undefined') { // if supported
+        const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
+        worker.onmessage = ({ data }) => {
+          console.log(`page got message from web-worker`);
+          this.calculatedChannelsData = data;
+        };
+        worker.postMessage(this.audysseyData.detectedChannels);
+      } else {
+        // Web workers are not supported in this environment.
+        // You should add a fallback so that your program still executes correctly.
+      }
+    }
+
   }
 
   updateChart() {
     console.log('this.selectedChannel', this.selectedChannel)
-    const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
 
     const XMin = 10, XMax = 24000;
 
@@ -73,6 +96,11 @@ export class AppComponent {
       }
     })
 
+    console.time("calculate selected channel");
+
+    // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId)
+    console.timeEnd("calculate selected channel");
 
     // adding first graph
     // @ts-ignore
@@ -85,7 +113,7 @@ export class AppComponent {
     this.chartUpdateFlag = true;
   }
 
-  addSubwooferToTheGraph(value: boolean) {
+  async addSubwooferToTheGraph(value: boolean) {
     const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
     const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
     // if (value) this.chartObj?.addSeries({});
@@ -114,5 +142,9 @@ export class AppComponent {
     a.setAttribute('download', this.audysseyData.title + '_' + new Date().toLocaleDateString() + '.ady') // Set download filename
     a.click() // Start downloading
     URL.revokeObjectURL(url);
+  }
+
+  playChart() {
+    this.chartObj.toggleSonify();
   }
 }

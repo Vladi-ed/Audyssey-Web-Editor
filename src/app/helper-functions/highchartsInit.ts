@@ -1,3 +1,5 @@
+import {Highcharts} from "highcharts/modules/map";
+
 export const options: Highcharts.Options = {
   chart: {
     zooming: {
@@ -5,12 +7,66 @@ export const options: Highcharts.Options = {
     },
     type: 'spline',
   },
-  // boost: {
-  //   enabled: true,
-  //   useGPUTranslations: true
-  // },
+  boost: {
+    useGPUTranslations: true
+  },
+  exporting: {
+    "sourceWidth": 900,
+    menuItemDefinitions: {
+      // Custom definition
+      customBtn1: {
+        onclick: function () {
+          this.toggleSonify()
+        },
+        text: 'Play'
+      },
+      customBtn2: {
+        onclick: function () {
+          this.options.series![0].type = 'spline'
+          this.redraw();
+        },
+        text: 'Graph Smoothing'
+      }
+    },
+    buttons: {
+      contextButton: {
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'customBtn1', 'customBtn2']
+      },
+    },
+    "chartOptions": {
+      "title": {
+        "style": {
+          "fontFamily": "Verdana, sans-serif",
+          "fontSize": "22px"
+        }
+      },
+      "credits": {
+        "enabled": false
+      }
+    }
+  },
   sonification: {
-    duration: 5000
+    duration: 9500,
+    defaultInstrumentOptions: {
+      instrument: 'sine',
+
+      mapping: {
+        volume: 'y',
+        noteDuration: {
+          mapTo: '-x',
+          mapFunction: 'logarithmic',
+        },
+        frequency: {
+          mapTo: 'x',
+          min: 0,
+          max: 23000
+        },
+      }
+    },
+
+    // showCrosshair: false,
+    showTooltip: false,
+
   },
   accessibility: { enabled: false },
   title: {
@@ -55,7 +111,6 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
   {
     data: [],
     type: 'line',
-
     lineWidth: 0.8,
     showInNavigator: true,
     dashStyle: 'Solid',
@@ -81,7 +136,6 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
       },
     ],
     // allowPointSelect: true,
-
   },
   {
     data: [],
