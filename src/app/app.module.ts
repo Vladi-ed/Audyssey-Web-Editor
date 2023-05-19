@@ -13,10 +13,14 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatListModule} from "@angular/material/list";
 import {HighchartsChartModule} from "highcharts-angular";
+import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
+import { PointsConverterPipe } from './target-curve-points/points-converter.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
+    TargetCurvePointsComponent,
+    PointsConverterPipe,
   ],
   imports: [
     BrowserModule,

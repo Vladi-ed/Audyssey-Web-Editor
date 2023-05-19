@@ -2,3 +2,25 @@
 
 
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: gray;}
+
+.flat-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #b0b0b0;
+  padding: 0 16px 1px;
+  height: 46px;
+  border-radius: 4px;
+  background-color: white;
+  //margin-top: -1px;
+  /*margin-left: -6px;*/
+  cursor: pointer;
+}
+.flat-btn:hover {
+  border-color: #545454;
+}
+.flat-btn:disabled {
+  border-color: #f5f5f5;
+  cursor: auto;
+}
+
