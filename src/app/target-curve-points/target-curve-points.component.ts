@@ -29,7 +29,7 @@ export class TargetCurvePointsComponent implements OnChanges {
     this.wasChanged = true;
   }
   removePoint(index: number) {
-    setTimeout(()=> this.inputArr = this.inputArr.filter((_, i) => i != index), 100);
+    setTimeout(()=> this.inputArr = this.inputArr.filter((_, i) => i != index), 50);
     this.wasChanged = true;
   }
 

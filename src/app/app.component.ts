@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import {AudysseyRoot} from "./interfaces/audyssey-root";
+import {AudysseyInterface} from "./interfaces/audyssey-interface";
 import {DetectedChannel} from "./interfaces/detected-channel";
 import {decodeChannelName} from "./helper-functions/decode-channel-name";
-import {calculatePoints} from "./helper-functions/calculate-points";
 
 import * as Highcharts from "highcharts";
 import HC_boost from 'highcharts/modules/boost'
@@ -25,7 +24,7 @@ export class AppComponent {
 
   // private chartObj?: Highcharts.Chart;
 
-  audysseyData: AudysseyRoot = { detectedChannels: [] };
+  audysseyData: AudysseyInterface = { detectedChannels: [] };
   calculatedChannelsData?: Map<string, number[][]>
 
   selectedChannel?: DetectedChannel;
@@ -99,7 +98,7 @@ export class AppComponent {
     console.time("calculate selected channel");
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId)
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
     console.timeEnd("calculate selected channel");
 
     // adding first graph
@@ -114,8 +113,13 @@ export class AppComponent {
   }
 
   async addSubwooferToTheGraph(value: boolean) {
-    const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
-    const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
+    // const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
+    // const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
+    const crossover = this.selectedChannel?.customCrossover;
+    console.log(crossover)
+
+    const subDataPoints = this.calculatedChannelsData?.get('SW1')?.slice(0, 62);
+
     // if (value) this.chartObj?.addSeries({});
     // else this.chartObj?.series.at(-1).destroy();
 

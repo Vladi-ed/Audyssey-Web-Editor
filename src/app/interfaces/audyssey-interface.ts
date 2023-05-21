@@ -1,6 +1,6 @@
 import {DetectedChannel} from "./detected-channel";
 
-export interface AudysseyRoot {
+export interface AudysseyInterface {
   enAmpAssignType?: number
   dynamicVolume?: boolean
   enTargetCurveType?: number
