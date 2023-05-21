@@ -1,7 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
-
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: gray;}
+@font-face {
+  font-family: "Helvetica Neue";
+  size-adjust: 99.4%; // x
+  ascent-override: 94%; // y
+  src: local("Arial");
+}
 
 .flat-btn {
   display: flex;
@@ -15,6 +20,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
   //margin-top: -1px;
   /*margin-left: -6px;*/
   cursor: pointer;
+  user-select: none;
 }
 .flat-btn:hover {
   border-color: #545454;
@@ -23,4 +29,3 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
   border-color: #f5f5f5;
   cursor: auto;
 }
-

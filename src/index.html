@@ -10,6 +10,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+
+    <main style="display: flex; padding: 16px; margin: 20px; align-items: center; gap: 25px; background: white;  border-radius: 4px;">
+      <h1 style="margin: 0;">Audyssey Editor</h1>
+
+      <label class="flat-btn">
+        <svg style="margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M444 816h72V666l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.717 960Q234 960 213 938.85T192 888V264q0-29.7 21.15-50.85Q234.3 192 264 192h312l192 192v504q0 29.7-21.162 50.85Q725.676 960 695.96 960H263.717ZM528 432V264H264v624h432V432H528ZM264 264v189-189 624-624Z"/></svg>
+        Import File
+      </label>
+
+      <span>Loading...</span>
+      <div style="display: flex; width: 300px;">
+        <progress value="5" max="100" style="flex-grow: 1;"></progress>
+      </div>
+
+      <span style="flex-grow: 1"></span>
+
+      <label class="flat-btn" matRipple>
+        <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
+        Export
+      </label>
+    </main>
+    <script>
+      const loadingInterval = setInterval(() => {
+        if (document.body.querySelector('progress')) {
+          document.body.querySelector('progress').value += 1;
+        }
+        else clearInterval(loadingInterval);
+
+      }, 100);
+    </script>
+  </app-root>
 </body>
 </html>

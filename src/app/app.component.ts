@@ -7,10 +7,10 @@ import * as Highcharts from "highcharts";
 import HC_boost from 'highcharts/modules/boost'
 import Sonification from 'highcharts/modules/sonification';
 import Exporting from 'highcharts/modules/exporting';
-import {options, seriesOptions} from "./helper-functions/highchartsInit";
+import {options, seriesOptions} from "./helper-functions/highcharts-options";
 // Sonification(Highcharts);
 HC_boost(Highcharts);
-// Exporting(Highcharts);
+Exporting(Highcharts);
 Highcharts.setOptions(options);
 
 @Component({
@@ -48,8 +48,9 @@ export class AppComponent {
       if (typeof Worker !== 'undefined') { // if supported
         const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
         worker.onmessage = ({ data }) => {
-          console.log(`page got message from web-worker`);
+          console.log(`Got message from Web-Worker`);
           this.calculatedChannelsData = data;
+          if (this.selectedChannel) this.updateChart();
         };
         worker.postMessage(this.audysseyData.detectedChannels);
       } else {

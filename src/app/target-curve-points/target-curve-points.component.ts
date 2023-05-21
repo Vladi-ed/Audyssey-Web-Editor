@@ -26,11 +26,11 @@ export class TargetCurvePointsComponent implements OnChanges {
   }
 
   addPoint() {
-    this.inputArr = [...this.inputArr, '{10, 0}'];
+    this.inputArr = [...this.inputArr, '{20, 0}'];
     this.wasChanged = true;
   }
   removePoint(index: number) {
-    setTimeout(()=> this.inputArr = this.inputArr.filter((_, i) => i != index), 50);
+    setTimeout(()=> this.inputArr = this.inputArr.filter((_, i) => i != index), 150);
     this.wasChanged = true;
   }
 

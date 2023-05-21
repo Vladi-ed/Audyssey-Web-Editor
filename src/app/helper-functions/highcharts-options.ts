@@ -11,7 +11,7 @@ export const options: Highcharts.Options = {
     useGPUTranslations: true
   },
   exporting: {
-    "sourceWidth": 900,
+    sourceWidth: 1920,
     menuItemDefinitions: {
       // Custom definition
       customBtn1: {

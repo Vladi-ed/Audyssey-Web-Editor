@@ -1,17 +1,17 @@
 <main>
   <mat-card>
     <mat-card-content class="header">
-      <h1>Select ADY file</h1>
+      <h1>Audyssey Editor</h1>
 
       <label for="input-file-id" class="flat-btn" matRipple>
 <!--        <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 24 24" width="18" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11z"/></svg>-->
-        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M444 816h72V666l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.717 960Q234 960 213 938.85T192 888V264q0-29.7 21.15-50.85Q234.3 192 264 192h312l192 192v504q0 29.7-21.162 50.85Q725.676 960 695.96 960H263.717ZM528 432V264H264v624h432V432H528ZM264 264v189-189 624-624Z"/></svg>
-        <span style="margin-left: 5px; user-select: none">Import File</span>
+        <svg style="margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M444 816h72V666l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.717 960Q234 960 213 938.85T192 888V264q0-29.7 21.15-50.85Q234.3 192 264 192h312l192 192v504q0 29.7-21.162 50.85Q725.676 960 695.96 960H263.717ZM528 432V264H264v624h432V432H528ZM264 264v189-189 624-624Z"/></svg>
+        Import File
       </label>
       <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
       <span *ngIf="fileInput.files?.length">{{ fileInput.files?.item(0)?.name }}</span>
-      <span>Target Device: {{audysseyData.targetModelName}}</span>
+      <span>Target Device: {{audysseyData.targetModelName || '{ Import ADY file first }'}}</span>
 
       <select [(ngModel)]="audysseyData.enMultEQType" class="multi-EQ-type" disabled>
         <option value="0">MultiEQ</option>
@@ -22,9 +22,8 @@
       <span style="flex-grow: 1"></span>
 
       <label class="flat-btn" matRipple (click)="exportFile()">
-<!--        <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg>-->
-        <svg style="margin-top: 2px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
-        <span style="margin-left: 5px; user-select: none">Export</span>
+        <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
+        Export
       </label>
     </mat-card-content>
   </mat-card>
