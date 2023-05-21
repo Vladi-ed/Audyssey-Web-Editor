@@ -1,0 +1,22 @@
+.container {
+  display: flex; flex-direction: column; max-width: 212px; padding-top: 20px; justify-items: stretch;
+}
+
+.point-row {
+  display: flex;
+  gap: 12px;
+
+  animation: show-row 600ms 100ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
+
+  // Prestate
+  opacity: 75%;
+  // remove transform for just a fade-in
+  transform: rotateX(-10deg);
+  transform-origin: top center;
+}
+@keyframes show-row {
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

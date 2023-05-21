@@ -1,5 +1,5 @@
-<form #pointsForm="ngForm" style="display: flex; flex-direction: column; max-width: 212px; padding-top: 20px; justify-items: stretch">
-  <div *ngFor="let point of (inputArr | convertPoints); let i = index" style="display: flex; gap: 12px">
+<form #pointsForm="ngForm" class="container">
+  <div *ngFor="let point of (inputArr | convertPoints); let i = index" class="point-row">
     <mat-form-field appearance="outline">
       <mat-label>Hz</mat-label>
       <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)" required inputmode="numeric" pattern="[0-9]*[.]?[0-9]+" [name]="'Frequency' + i">

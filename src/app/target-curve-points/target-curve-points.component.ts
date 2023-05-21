@@ -12,6 +12,7 @@ export class TargetCurvePointsComponent implements OnChanges {
 
   ngOnChanges() {
     // @Input() inputArr was changed
+    // changes.prop contains the old and the new value...
     // TODO: make a copy of input array to not mutate it.
     this.wasChanged = false;
   }

@@ -22,7 +22,7 @@ export class AppComponent {
   highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = { series: seriesOptions };
 
-  // private chartObj?: Highcharts.Chart;
+  private chartObj?: Highcharts.Chart;
 
   audysseyData: AudysseyInterface = { detectedChannels: [] };
   calculatedChannelsData?: Map<string, number[][]>
@@ -38,7 +38,7 @@ export class AppComponent {
     console.log('Graph loaded');
     this.chartObj = chart;
   }
-  private chartObj: any;
+
 
   async onUpload(files: FileList | null) {
     const fileContent = await files?.item(0)?.text();
@@ -95,11 +95,8 @@ export class AppComponent {
       }
     })
 
-    console.time("calculate selected channel");
-
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
-    console.timeEnd("calculate selected channel");
 
     // adding first graph
     // @ts-ignore
@@ -112,27 +109,29 @@ export class AppComponent {
     this.chartUpdateFlag = true;
   }
 
-  async addSubwooferToTheGraph(value: boolean) {
+  async addSubwooferToTheGraph(checked: boolean) {
     // const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
     // const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
-    const crossover = this.selectedChannel?.customCrossover;
-    console.log(crossover)
+    // const customCrossover = this.selectedChannel?.customCrossover;
+    // const subCutOff = customCrossover ? Number(customCrossover) / 2.9296875 : 63;
 
-    const subDataPoints = this.calculatedChannelsData?.get('SW1')?.slice(0, 62);
+
+    const subCutOff = parseInt('200 Hz') / 3;
+    const subDataPoints = this.calculatedChannelsData?.get('SW1')?.slice(0, subCutOff);
 
     // if (value) this.chartObj?.addSeries({});
     // else this.chartObj?.series.at(-1).destroy();
 
     if (this.chartOptions.series)
-    if (value) this.chartOptions.series[1] = {
-      data: subDataPoints,
-      type: 'spline',
-      name: 'Subwoofer',
-    };
-    else this.chartOptions.series[1] = {
-      data: [],
-      type: 'spline',
-    }
+      if (checked) this.chartOptions.series[1] = {
+        data: subDataPoints,
+        type: 'spline',
+        name: 'Subwoofer',
+      };
+      else this.chartOptions.series[1] = {
+        data: [],
+        type: 'spline',
+      }
 
     this.chartUpdateFlag = true;
   }
@@ -149,7 +148,7 @@ export class AppComponent {
   }
 
   playChart() {
-    this.chartObj.toggleSonify();
+    this.chartObj?.toggleSonify();
   }
 
   updatePointsForSelectedChannel(points: string[]) {
