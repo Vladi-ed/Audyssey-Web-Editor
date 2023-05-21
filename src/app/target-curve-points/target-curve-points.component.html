@@ -14,7 +14,7 @@
   </div>
 
   <div style="display: flex; justify-items: stretch; gap: 15px">
-    <button matRipple type="button" style="flex-grow: 1" class="flat-btn" (click)="addPoint()">Add new Point</button>
-    <button matRipple type="submit" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid || !wasChanged">Save</button>
+    <button matRipple type="button" style="flex-grow: 1; transition-property: width" class="flat-btn" (click)="addPoint()">Add new Point</button>
+    <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid">Save</button>
   </div>
 </form>
