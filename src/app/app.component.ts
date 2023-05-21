@@ -147,4 +147,12 @@ export class AppComponent {
   playChart() {
     this.chartObj.toggleSonify();
   }
+
+  updatePointsForSelectedChannel(points: string[]) {
+
+    console.log('Received points from Component', points);
+    console.log('Existing points', this.selectedChannel?.customTargetCurvePoints);
+
+    this.selectedChannel!.customTargetCurvePoints = points;
+  }
 }

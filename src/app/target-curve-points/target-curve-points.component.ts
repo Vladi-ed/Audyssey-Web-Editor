@@ -12,21 +12,20 @@ export class TargetCurvePointsComponent implements OnChanges {
 
   ngOnChanges() {
     // @Input() inputArr was changed
+    // TODO: make a copy of input array to not mutate it.
     this.wasChanged = false;
   }
 
   changeItem(point: { Hz: string; vol: string }, index: number) {
     if (!point.vol) point.vol = '0';
+    if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
 
     this.inputArr[index] = '{' + point.Hz + ', ' + point.vol + '}';
-
-    console.log('changeItem', point, this.inputArr);
-    this.wasChanged = true;
+    // this.wasChanged = true;
   }
 
   addPoint() {
     this.inputArr = [...this.inputArr, '{10, 0}'];
-    console.log('addItem', this.inputArr);
     this.wasChanged = true;
   }
   removePoint(index: number) {
@@ -36,12 +35,6 @@ export class TargetCurvePointsComponent implements OnChanges {
 
   save() {
     this.updatePointsEvent.emit(this.inputArr);
-    console.log(this.inputArr)
     this.wasChanged = false;
-  }
-
-
-  test(ev: Event) {
-    console.log(ev)
   }
 }

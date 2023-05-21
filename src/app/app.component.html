@@ -134,7 +134,7 @@
 <!--            <mat-divider></mat-divider>-->
 <!--          </ng-container>-->
 <!--        </mat-list>-->
-        <app-target-curve-points [inputArr]="selectedChannel?.customTargetCurvePoints || []"></app-target-curve-points>
+        <app-target-curve-points [inputArr]="selectedChannel?.customTargetCurvePoints || []" (updatePointsEvent)="updatePointsForSelectedChannel($event)"></app-target-curve-points>
 
       </mat-card-content>
     </mat-card>
