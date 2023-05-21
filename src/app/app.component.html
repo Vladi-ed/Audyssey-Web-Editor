@@ -127,12 +127,6 @@
       <mat-card-content>
         <label>Frequency (Hz), Gain (bB)</label>
 
-<!--        <mat-list class="curve-points-container">-->
-<!--          <ng-container *ngFor="let curvePoint of selectedChannel?.customTargetCurvePoints">-->
-<!--            <mat-list-item><input matInput [value]="curvePoint" class="curve-points-text-field"></mat-list-item>-->
-<!--            <mat-divider></mat-divider>-->
-<!--          </ng-container>-->
-<!--        </mat-list>-->
         <app-target-curve-points [inputArr]="selectedChannel?.customTargetCurvePoints || []" (updatePointsEvent)="updatePointsForSelectedChannel($event)"></app-target-curve-points>
 
       </mat-card-content>

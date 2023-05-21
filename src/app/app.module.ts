@@ -11,7 +11,6 @@ import {MatSelectModule} from "@angular/material/select";
 import {FormsModule} from "@angular/forms";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatRadioModule} from "@angular/material/radio";
-import {MatListModule} from "@angular/material/list";
 import {HighchartsChartModule} from "highcharts-angular";
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
 import { PointsConverterPipe } from './target-curve-points/points-converter.pipe';
@@ -33,7 +32,6 @@ import { PointsConverterPipe } from './target-curve-points/points-converter.pipe
     FormsModule,
     MatCheckboxModule,
     MatRadioModule,
-    MatListModule,
     HighchartsChartModule,
   ],
   providers: [],
