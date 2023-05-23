@@ -81,7 +81,7 @@
           <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="50" max="20000">
         </mat-form-field>
         <mat-form-field appearance="outline">
-          <mat-label>Trim Adjustment</mat-label>
+          <mat-label>Trim Adjustment (dB)</mat-label>
           <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="[0-9]*[.]?[0-9]+">
         </mat-form-field>
         <mat-form-field appearance="outline">

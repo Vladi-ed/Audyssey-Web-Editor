@@ -43,6 +43,8 @@ export class AppComponent {
   async onUpload(files: FileList | null) {
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
+      this.chartObj?.showLoading();
+
       this.audysseyData = JSON.parse(fileContent);
 
       if (typeof Worker !== 'undefined') { // if supported
@@ -51,14 +53,16 @@ export class AppComponent {
           console.log(`Got message from Web-Worker`);
           this.calculatedChannelsData = data;
           if (this.selectedChannel) this.updateChart();
+          this.chartObj?.hideLoading();
         };
         worker.postMessage(this.audysseyData.detectedChannels);
       } else {
         // Web workers are not supported in this environment.
         // You should add a fallback so that your program still executes correctly.
+        alert('Please update your browser');
       }
     }
-
+    else alert('Cannot read the file');
   }
 
   updateChart() {
