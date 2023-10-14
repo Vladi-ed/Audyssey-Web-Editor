@@ -35,7 +35,7 @@ export class AppComponent {
   graphSmoothEnabled = false;
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    console.log('Graph loaded');
+    console.log('Highcharts loaded');
     this.chartObj = chart;
   }
 
@@ -46,6 +46,7 @@ export class AppComponent {
       this.chartObj?.showLoading();
 
       this.audysseyData = JSON.parse(fileContent);
+      console.log(this.audysseyData);
 
       if (typeof Worker !== 'undefined') { // if supported
         const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));

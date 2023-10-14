@@ -39,8 +39,8 @@
         <mat-form-field appearance="outline">
           <mat-label>Target curve type</mat-label>
           <mat-select [(ngModel)]="audysseyData.enTargetCurveType">
-            <mat-option [value]="0">HF Rolloff 1</mat-option>
-            <mat-option [value]="1">HF Rolloff 2</mat-option>
+            <mat-option [value]="1">HF Rolloff 1</mat-option>
+            <mat-option [value]="2">HF Rolloff 2</mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -78,7 +78,7 @@
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Custom Distance</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="50" max="20000">
+          <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="0.1" max="100">
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Trim Adjustment (dB)</mat-label>
