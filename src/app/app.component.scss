@@ -18,10 +18,6 @@ main {
   font-size: 15px;
 }
 
-
-
-
-
 mat-card {
   //padding: 20px;
   margin: 10px;
@@ -34,42 +30,28 @@ mat-card {
 }
 
 .info {
-  display: flex;
-  flex-wrap: wrap;
+  --mat-expansion-header-text-size: 16px;
+  width: 260px;
+  margin: 10px;
+}
 
-  .basic-info {
-    width: min-content;
-  }
+.channel-radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 8px 0;
 
-  .channel-info {
-    width: 244px;
-
-    .channel-radio-group {
-      display: flex;
-      flex-direction: column;
-      margin: 8px 0;
-
-      .channel-radio-button {
+    .channel-radio-button {
         margin-bottom: -4px;
         //user-select: none;
-      }
     }
-  }
+}
 
-  .curve-points-info {
-    width: min-content;
-    min-width: 244px;
+.curve-points-container {
+    max-height: 432px;
+    overflow-y: auto;
+}
 
-    .curve-points-container {
-      max-height: 432px;
-      overflow-y: auto;
-    }
-
-    .curve-points-text-field {
-      font-size: large;
-      border: none;
-    }
-  }
-
-
+.curve-points-text-field {
+    font-size: large;
+    border: none;
 }

@@ -1,5 +1,3 @@
-import {Highcharts} from "highcharts/modules/map";
-
 export const options: Highcharts.Options = {
   chart: {
     zooming: {
@@ -14,33 +12,35 @@ export const options: Highcharts.Options = {
     sourceWidth: 1920,
     menuItemDefinitions: {
       // Custom definition
-      customBtn1: {
+      play: {
         onclick: function () {
           this.toggleSonify()
         },
         text: 'Play'
       },
-      customBtn2: {
-        onclick: function () {
-          this.options.series![0].type = 'spline'
-          this.redraw();
-        },
+      xScale: {
+        text: 'Logarithmic/Linear scale'
+      },
+      dataSmoothing: {
+        text: 'Data Smoothing'
+      },
+      graphSmoothing: {
         text: 'Graph Smoothing'
       }
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'customBtn1', 'customBtn2']
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScale', 'dataSmoothing', 'graphSmoothing']
       },
     },
-    "chartOptions": {
-      "title": {
-        "style": {
+    chartOptions: {
+      title: {
+        style: {
           "fontFamily": "Verdana, sans-serif",
           "fontSize": "22px"
         }
       },
-      "credits": {
+      credits: {
         "enabled": false
       }
     }

@@ -14,6 +14,7 @@ import {MatRadioModule} from "@angular/material/radio";
 import {HighchartsChartModule} from "highcharts-angular";
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
 import { PointsConverterPipe } from './target-curve-points/points-converter.pipe';
+import {MatExpansionModule} from "@angular/material/expansion";
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { PointsConverterPipe } from './target-curve-points/points-converter.pipe
     MatCheckboxModule,
     MatRadioModule,
     HighchartsChartModule,
+    MatExpansionModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

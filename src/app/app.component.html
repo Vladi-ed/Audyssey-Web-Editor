@@ -1,161 +1,189 @@
 <main>
-  <mat-card>
-    <mat-card-content class="header">
-      <h1>Audyssey Editor</h1>
+    <mat-card>
+        <mat-card-content class="header">
+            <h1>Audyssey Editor</h1>
 
-      <label for="input-file-id" class="flat-btn" matRipple>
-<!--        <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 24 24" width="18" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11z"/></svg>-->
-        <svg style="margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M444 816h72V666l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.717 960Q234 960 213 938.85T192 888V264q0-29.7 21.15-50.85Q234.3 192 264 192h312l192 192v504q0 29.7-21.162 50.85Q725.676 960 695.96 960H263.717ZM528 432V264H264v624h432V432H528ZM264 264v189-189 624-624Z"/></svg>
-        Import File
-      </label>
-      <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
+            <label for="input-file-id" class="flat-btn" matRipple>
+                <!--        <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 24 24" width="18" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11z"/></svg>-->
+                <svg style="margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M444 816h72V666l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.717 960Q234 960 213 938.85T192 888V264q0-29.7 21.15-50.85Q234.3 192 264 192h312l192 192v504q0 29.7-21.162 50.85Q725.676 960 695.96 960H263.717ZM528 432V264H264v624h432V432H528ZM264 264v189-189 624-624Z"/></svg>
+                Import File
+            </label>
+            <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
-      <span *ngIf="fileInput.files?.length">{{ fileInput.files?.item(0)?.name }}</span>
-      <span>Target Device: {{audysseyData.targetModelName || '{ Import ADY file first }'}}</span>
+            <span *ngIf="fileInput.files?.length">{{ fileInput.files?.item(0)?.name }}</span>
+            <span>Target Device: {{audysseyData.targetModelName || '{ Import ADY file first }'}}</span>
 
-      <select [(ngModel)]="audysseyData.enMultEQType" class="multi-EQ-type" disabled>
-        <option value="0">MultiEQ</option>
-        <option value="1">MultiEQ XT</option>
-        <option value="2">MultiEQ XT32</option>
-      </select>
+            <select [value]="audysseyData.enMultEQType" class="multi-EQ-type" disabled>
+                <option value="0">MultiEQ</option>
+                <option value="1">MultiEQ XT</option>
+                <option value="2">MultiEQ XT32</option>
+            </select>
 
-      <span style="flex-grow: 1"></span>
+            <span style="flex-grow: 1"></span>
 
-      <label class="flat-btn" matRipple (click)="exportFile()">
-        <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
-        Export
-      </label>
-    </mat-card-content>
-  </mat-card>
-
-  <div class="info">
-    <mat-card class="basic-info">
-      <mat-card-header>Basic info</mat-card-header>
-      <mat-card-content>
-        <mat-form-field appearance="outline">
-          <mat-label>Profile name</mat-label>
-          <input matInput [(ngModel)]="audysseyData.title">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Target curve type</mat-label>
-          <mat-select [(ngModel)]="audysseyData.enTargetCurveType">
-            <mat-option [value]="1">HF Rolloff 1</mat-option>
-            <mat-option [value]="2">HF Rolloff 2</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>System Delay</mat-label>
-          <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>
-        </mat-form-field>
-
-        <mat-checkbox [(ngModel)]="audysseyData.dynamicEq">Dynamic EQ</mat-checkbox>
-        <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume">Dynamic Volume</mat-checkbox>
-
-      </mat-card-content>
+            <label class="flat-btn" matRipple (click)="exportFile()">
+                <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
+                Export
+            </label>
+        </mat-card-content>
     </mat-card>
 
-    <mat-card class="channel-info">
-      <mat-card-header>Channel selection
-        <span *ngIf="selectedChannel" style="margin-left: 10px">({{selectedChannel.commandId}})</span>
-      </mat-card-header>
-      <mat-card-content>
-        <label>Pick one of {{ audysseyData.detectedChannels.length }} channels:</label>
-        <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
-          <mat-radio-button class="channel-radio-button" *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
-            {{ decodeChannelName(channel.commandId) }}
-          </mat-radio-button>
-        </mat-radio-group>
+    <div style="display: flex">
+        <mat-accordion multi class="info">
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Basic info
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
 
-      </mat-card-content>
-    </mat-card>
+                <mat-form-field appearance="outline">
+                    <mat-label>Profile name</mat-label>
+                    <input matInput [(ngModel)]="audysseyData.title">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Target curve type</mat-label>
+                    <mat-select [(ngModel)]="audysseyData.enTargetCurveType">
+                        <mat-option [value]="1">HF Rolloff 1</mat-option>
+                        <mat-option [value]="2">HF Rolloff 2</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>System Delay</mat-label>
+                    <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>
+                </mat-form-field>
 
-    <mat-card class="channel-info">
-      <mat-card-header>Channel info</mat-card-header>
-      <mat-card-content *ngIf="selectedChannel">
-        <mat-form-field appearance="outline">
-          <mat-label>Distance</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.channelReport.distance" readonly>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Custom Distance</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="0.1" max="100">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Trim Adjustment (dB)</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="[0-9]*[.]?[0-9]+">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>High Frequency Rolloff (Hz)</mat-label>
-          <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000">
-        </mat-form-field>
+                <mat-checkbox [(ngModel)]="audysseyData.dynamicEq">Dynamic EQ</mat-checkbox>
+                <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume">Dynamic Volume</mat-checkbox>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Custom Crossover</mat-label>
-          <mat-select [(ngModel)]="selectedChannel.customCrossover">
-            <mat-option [value]="undefined"></mat-option>
-            <mat-option [value]="'40'">40 Hz</mat-option>
-            <mat-option [value]="'60'">60 Hz</mat-option>
-            <mat-option [value]="'80'">80 Hz</mat-option>
-            <mat-option [value]="'90'">90 Hz</mat-option>
-            <mat-option [value]="'100'">100 Hz</mat-option>
-            <mat-option [value]="'110'">110 Hz</mat-option>
-            <mat-option [value]="'120'">120 Hz</mat-option>
-            <mat-option [value]="'150'">150 Hz</mat-option>
-            <mat-option [value]="'200'">200 Hz</mat-option>
-            <mat-option [value]="'250'">250 Hz</mat-option>
-            <mat-option [value]="'F'">Full Band</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Custom Speaker Type</mat-label>
-          <mat-select [(ngModel)]="selectedChannel.customSpeakerType">
-            <mat-option [value]="undefined"></mat-option>
-            <mat-option [value]="'S'">Small</mat-option>
-            <mat-option [value]="'L'">Large</mat-option>
-          </mat-select>
-        </mat-form-field>
+            </mat-expansion-panel>
 
-        <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation">Midrange Compensation</mat-checkbox>
-        <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>
-        <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
 
-      </mat-card-content>
-    </mat-card>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Channel selection <span *ngIf="selectedChannel" style="margin-left: 10px">({{selectedChannel.commandId}})</span>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
 
-    <mat-card class="curve-points-info">
-      <mat-card-header>Target Curve Points</mat-card-header>
-      <mat-card-content>
-        <label>Frequency (Hz), Gain (bB)</label>
+                <label>Pick one of {{ audysseyData.detectedChannels.length }} channels:</label>
+                <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
+                    <mat-radio-button class="channel-radio-button" *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
+                        {{ decodeChannelName(channel.commandId) }}
+                    </mat-radio-button>
+                </mat-radio-group>
 
-        <app-target-curve-points [inputArr]="selectedChannel?.customTargetCurvePoints || []" (updatePointsEvent)="updatePointsForSelectedChannel($event)"></app-target-curve-points>
 
-      </mat-card-content>
-    </mat-card>
+            </mat-expansion-panel>
 
-    <mat-card class="curve-points-info">
-      <mat-card-header>Graph settings</mat-card-header>
-      <mat-card-content>
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Channel info
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
 
-        <mat-checkbox [(ngModel)]="chartLogarithmicScale" (change)="updateChart()">Logarithmic Scale</mat-checkbox>
-        <mat-checkbox [(ngModel)]="dataSmoothEnabled"  (change)="updateChart()">Data Smoothing</mat-checkbox>
-        <mat-checkbox [(ngModel)]="graphSmoothEnabled" (change)="updateChart()">Graph Smoothing</mat-checkbox>
-        <mat-checkbox *ngIf="selectedChannel" #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
-<!--        <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.value)">Show Correction Range Cutoff</mat-checkbox>-->
+                <ng-container *ngIf="selectedChannel">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Distance</mat-label>
+                        <input matInput [value]="selectedChannel.channelReport.distance | number: '1.2-3'" readonly>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Custom Distance</mat-label>
+                        <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="0.1" max="20">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Custom Level</mat-label>
+                        <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Trim Adjustment (dB)</mat-label>
+                        <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="[0-9]*[.]?[0-9]+">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>High Frequency Rolloff (Hz)</mat-label>
+                        <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000">
+                    </mat-form-field>
 
-      </mat-card-content>
-    </mat-card>
-  </div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Custom Crossover</mat-label>
+                        <mat-select [(ngModel)]="selectedChannel.customCrossover">
+                            <mat-option [value]="undefined"></mat-option>
+                            <mat-option [value]="'40'">40 Hz</mat-option>
+                            <mat-option [value]="'60'">60 Hz</mat-option>
+                            <mat-option [value]="'80'">80 Hz</mat-option>
+                            <mat-option [value]="'90'">90 Hz</mat-option>
+                            <mat-option [value]="'100'">100 Hz</mat-option>
+                            <mat-option [value]="'110'">110 Hz</mat-option>
+                            <mat-option [value]="'120'">120 Hz</mat-option>
+                            <mat-option [value]="'150'">150 Hz</mat-option>
+                            <mat-option [value]="'200'">200 Hz</mat-option>
+                            <mat-option [value]="'250'">250 Hz</mat-option>
+                            <mat-option [value]="'F'">Full Band</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Custom Speaker Type</mat-label>
+                        <mat-select [(ngModel)]="selectedChannel.customSpeakerType">
+                            <mat-option [value]="undefined"></mat-option>
+                            <mat-option [value]="'S'">Small</mat-option>
+                            <mat-option [value]="'L'">Large</mat-option>
+                        </mat-select>
+                    </mat-form-field>
 
-  <mat-card>
-    <mat-card-content>
-      <highcharts-chart style="width: 100%; height: 500px; display: block;"
-        [Highcharts]="highcharts"
-        [options]="chartOptions"
-        [(update)]="chartUpdateFlag"
-        [callbackFunction]="chartCallback"
-      />
-    </mat-card-content>
+                    <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation">Midrange Compensation</mat-checkbox>
+                    <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>
+                    <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
 
-  </mat-card>
+                </ng-container>
+
+            </mat-expansion-panel>
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Target Curve Points
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <label>Frequency (Hz), Gain (bB)</label>
+
+                <app-target-curve-points *ngIf="selectedChannel" [(curvePoints)]="selectedChannel.customTargetCurvePoints" />
+
+
+            </mat-expansion-panel>
+
+
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Graph settings
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-checkbox [(ngModel)]="chartLogarithmicScale" (change)="updateChart()">Logarithmic Scale</mat-checkbox>
+                <mat-checkbox [(ngModel)]="dataSmoothEnabled"  (change)="updateChart()">Data Smoothing</mat-checkbox>
+                <mat-checkbox [(ngModel)]="graphSmoothEnabled" (change)="updateChart()">Graph Smoothing</mat-checkbox>
+                <mat-checkbox *ngIf="selectedChannel" #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+                <!--        <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.value)">Show Correction Range Cutoff</mat-checkbox>-->
+
+            </mat-expansion-panel>
+
+        </mat-accordion>
+
+
+
+
+        <mat-card style="flex-grow: 1">
+            <mat-card-content>
+                <highcharts-chart style="width: 100%; height: 80vh; display: block;"
+                                  [Highcharts]="highcharts"
+                                  [options]="chartOptions"
+                                  [(update)]="chartUpdateFlag"
+                                  [callbackFunction]="chartCallback"
+                />
+            </mat-card-content>
+        </mat-card>
+    </div>
 
 </main>

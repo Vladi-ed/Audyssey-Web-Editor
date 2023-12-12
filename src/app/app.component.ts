@@ -8,6 +8,7 @@ import HC_boost from 'highcharts/modules/boost'
 import Sonification from 'highcharts/modules/sonification';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from "./helper-functions/highcharts-options";
+
 // Sonification(Highcharts);
 HC_boost(Highcharts);
 Exporting(Highcharts);
@@ -21,6 +22,7 @@ Highcharts.setOptions(options);
 export class AppComponent {
   highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = { series: seriesOptions };
+  chartUpdateFlag = false;
 
   private chartObj?: Highcharts.Chart;
 
@@ -30,12 +32,26 @@ export class AppComponent {
   selectedChannel?: DetectedChannel;
   protected readonly decodeChannelName = decodeChannelName; // for the HTML template
   chartLogarithmicScale = true;
-  chartUpdateFlag = false;
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     console.log('Highcharts loaded');
+    if (chart.options.exporting?.menuItemDefinitions)
+    {
+      chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
+        this.chartLogarithmicScale = !this.chartLogarithmicScale;
+        this.updateChart();
+      }
+      chart.options.exporting.menuItemDefinitions['graphSmoothing'].onclick = () => {
+        this.graphSmoothEnabled = !this.graphSmoothEnabled;
+        this.updateChart();
+      }
+      chart.options.exporting.menuItemDefinitions['dataSmoothing'].onclick = () => {
+        this.dataSmoothEnabled = !this.dataSmoothEnabled;
+        this.updateChart();
+      }
+    }
     this.chartObj = chart;
   }
 
@@ -153,8 +169,9 @@ export class AppComponent {
     URL.revokeObjectURL(url);
   }
 
-  playChart() {
-    this.chartObj?.toggleSonify();
+  playChart(ev?: Event | Highcharts.Dictionary<any> | undefined) {
+    console.log('playChart', ev)
+    // this.chartObj?.toggleSonify();
   }
 
   updatePointsForSelectedChannel(points: string[]) {
