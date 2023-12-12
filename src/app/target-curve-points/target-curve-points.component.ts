@@ -1,41 +1,50 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+
+function copyArray(arr: string[] | undefined) {
+  if (arr && arr.length) return [...arr];
+  else return [ '{20, 0}', '{20000, 0}' ];
+}
 
 @Component({
   selector: 'app-target-curve-points',
   templateUrl: './target-curve-points.component.html',
   styleUrls: ['./target-curve-points.component.scss']
 })
-export class TargetCurvePointsComponent implements OnChanges {
-  @Input() inputArr = [ '{20, 0}', '{20000, 0}' ];
-  @Output() updatePointsEvent = new EventEmitter<string[]>();
+export class TargetCurvePointsComponent {
+  @Input({transform: copyArray, required: true})
+  curvePoints!: string[];
+
+  @Output()
+  curvePointsChange = new EventEmitter<string[]>();
+
   wasChanged = false;
 
-  ngOnChanges() {
-    // @Input() inputArr was changed
-    // changes.prop contains the old and the new value...
-    // TODO: make a copy of input array to not mutate it.
-    this.wasChanged = false;
-  }
-
   changeItem(point: { Hz: string; vol: string }, index: number) {
+    // TODO: check if it's saving ok in json
     if (!point.vol) point.vol = '0';
     if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
 
-    this.inputArr[index] = '{' + point.Hz + ', ' + point.vol + '}';
-    // this.wasChanged = true;
+    this.curvePoints[index] = '{' + point.Hz + ', ' + point.vol + '}';
+    this.wasChanged = true;
   }
 
   addPoint() {
-    this.inputArr = [...this.inputArr, '{20, 0}'];
-    this.wasChanged = true;
+    const lastPoint = this.curvePoints.at(-1);
+    if (lastPoint) {
+      this.curvePoints = [...this.curvePoints, lastPoint]; // need to create a new array for change detection
+      this.wasChanged = true;
+    }
   }
   removePoint(index: number) {
-    setTimeout(()=> this.inputArr = this.inputArr.filter((_, i) => i != index), 150);
+    setTimeout(
+      () => this.curvePoints = this.curvePoints.filter((_, i) => i != index),
+      150
+    );
     this.wasChanged = true;
   }
 
   save() {
-    this.updatePointsEvent.emit(this.inputArr);
+    this.curvePointsChange.emit(this.curvePoints);
     this.wasChanged = false;
   }
 }
