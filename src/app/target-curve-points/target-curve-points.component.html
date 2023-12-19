@@ -6,7 +6,7 @@
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="18" [name]="'Gain' + i">
+      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
     </mat-form-field>
 
     <button class="remove-btn" matRipple (click)="removePoint(i)">

@@ -1,5 +1,10 @@
-main {
+:host {
+  display: block;
   padding: 10px;
+
+  @media (max-width: 500px) {
+    padding: 0
+  }
 }
 
 .header {
@@ -10,6 +15,22 @@ main {
 
   h1 {
     margin: 0;
+  }
+
+  @media (max-width: 500px) {
+    justify-content: center;
+
+    select, span {
+      display: none;
+    }
+  }
+}
+
+main {
+  display: flex;
+
+  @media (max-width: 500px) {
+    flex-direction: column;
   }
 }
 
@@ -29,16 +50,20 @@ mat-card {
   }
 }
 
-.info {
+.info-panels {
   --mat-expansion-header-text-size: 16px;
   width: 260px;
   margin: 10px;
+
+  @media (max-width: 600px) {
+    width: 95%;
+  }
 }
 
 .channel-radio-group {
     display: flex;
     flex-direction: column;
-    margin: 8px 0;
+    margin-top: -10px;
 
     .channel-radio-button {
         margin-bottom: -4px;
@@ -54,4 +79,14 @@ mat-card {
 .curve-points-text-field {
     font-size: large;
     border: none;
+}
+
+.chart-card {
+  flex-grow: 1;
+
+  @media (max-width: 600px) {
+    .mat-mdc-card-content {
+      padding-left: 0;
+    }
+  }
 }

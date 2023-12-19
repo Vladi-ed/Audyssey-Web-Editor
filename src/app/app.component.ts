@@ -1,13 +1,13 @@
 import {Component} from '@angular/core';
-import {AudysseyInterface} from "./interfaces/audyssey-interface";
-import {DetectedChannel} from "./interfaces/detected-channel";
-import {decodeChannelName} from "./helper-functions/decode-channel-name";
+import {AudysseyInterface} from './interfaces/audyssey-interface';
+import {DetectedChannel} from './interfaces/detected-channel';
+import {decodeChannelName} from './helper-functions/decode-channel-name';
 
-import * as Highcharts from "highcharts";
+import * as Highcharts from 'highcharts';
 import HC_boost from 'highcharts/modules/boost'
 import Sonification from 'highcharts/modules/sonification';
 import Exporting from 'highcharts/modules/exporting';
-import {options, seriesOptions} from "./helper-functions/highcharts-options";
+import {options, seriesOptions} from './helper-functions/highcharts-options';
 
 // Sonification(Highcharts);
 HC_boost(Highcharts);
@@ -57,6 +57,18 @@ export class AppComponent {
 
 
   async onUpload(files: FileList | null) {
+    // @ts-ignore
+    PayPal.Donation.Button({
+      env:'production',
+      hosted_button_id:'EBY6KWECQY2D8',
+      image: {
+        src:'https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif',
+        alt:'Donate with PayPal button',
+        title:'Support my work',
+      }
+    }).render('#donate-button');
+
+
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.chartObj?.showLoading();
@@ -76,7 +88,7 @@ export class AppComponent {
       } else {
         // Web workers are not supported in this environment.
         // You should add a fallback so that your program still executes correctly.
-        alert('Please update your browser');
+        alert('Your browser is not supported. Please use latest Firefox or Chrome browser.');
       }
     }
     else alert('Cannot read the file');
