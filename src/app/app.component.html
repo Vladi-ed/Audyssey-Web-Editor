@@ -9,6 +9,11 @@
         </label>
         <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
+        <ng-container *ngIf="!fileInput.files?.length">
+           or
+            <label class="flat-btn" matRipple (click)="loadExample()">Load Example</label>
+        </ng-container>
+
         <ng-container *ngIf="fileInput.files?.length">
           <span>{{ fileInput.files?.item(0)?.name }}</span>
           <span>Target Device: {{audysseyData.targetModelName || '{ Import ADY file first }'}}</span>
@@ -23,29 +28,25 @@
 
         <span style="flex-grow: 1"></span>
 
-      <a href="https://t.me/vonder" style="display: flex; gap: 6px; text-decoration: none; padding-top: 2px">
-        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 240.1 240.1" height="20" width="20" >
-          <linearGradient id="a" x1="-838" x2="-838" y1="660.6" y2="660.3" gradientTransform="matrix(1000 0 0 -1000 838161 660581)" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#424d58"/>
-            <stop offset="1" stop-color="#272a2f"/>
-          </linearGradient>
-          <circle cx="120.1" cy="120.1" r="120.1" fill="url(#a)" fill-rule="evenodd" clip-rule="evenodd"/>
-          <path fill="#FFF" fill-rule="evenodd" d="M54.3 118.8c35-15.2 58.3-25.3 70-30.2 33.3-13.9 40.3-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3s.4 3.1.2 4.7c-1.8 19-9.6 65.1-13.6 86.3-1.7 9-5 12-8.2 12.3-7 .6-12.3-4.6-19-9-10.6-6.9-16.5-11.2-26.8-18-11.9-7.8-4.2-12.1 2.6-19.1 1.8-1.8 32.5-29.8 33.1-32.3.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-17.9 11.4-50.6 33.5a22.5 22.5 0 0 1-13 4.8 86.6 86.6 0 0 1-18.7-4.4c-7.5-2.4-13.5-3.7-13-7.9.3-2.2 3.3-4.4 8.9-6.7z" clip-rule="evenodd"/>
-        </svg>
-        Get help
-      </a>
+        <a href="https://t.me/vonder" style="display: flex; gap: 6px; text-decoration: none; padding-top: 2px">
+          <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 240.1 240.1" height="20" width="20" >
+            <linearGradient id="a" x1="-838" x2="-838" y1="660.6" y2="660.3" gradientTransform="matrix(1000 0 0 -1000 838161 660581)" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#424d58"/>
+              <stop offset="1" stop-color="#272a2f"/>
+            </linearGradient>
+            <circle cx="120.1" cy="120.1" r="120.1" fill="url(#a)" fill-rule="evenodd" clip-rule="evenodd"/>
+            <path fill="#FFF" fill-rule="evenodd" d="M54.3 118.8c35-15.2 58.3-25.3 70-30.2 33.3-13.9 40.3-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3s.4 3.1.2 4.7c-1.8 19-9.6 65.1-13.6 86.3-1.7 9-5 12-8.2 12.3-7 .6-12.3-4.6-19-9-10.6-6.9-16.5-11.2-26.8-18-11.9-7.8-4.2-12.1 2.6-19.1 1.8-1.8 32.5-29.8 33.1-32.3.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-17.9 11.4-50.6 33.5a22.5 22.5 0 0 1-13 4.8 86.6 86.6 0 0 1-18.7-4.4c-7.5-2.4-13.5-3.7-13-7.9.3-2.2 3.3-4.4 8.9-6.7z" clip-rule="evenodd"/>
+          </svg>
+          Get help
+        </a>
 
+  <!--      <a href="https://www.paypal.com/donate/?hosted_button_id=EBY6KWECQY2D8">-->
+  <!--        <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate">-->
+  <!--      </a>-->
 
-<!--      <a href="https://www.paypal.com/donate/?hosted_button_id=EBY6KWECQY2D8">-->
-<!--        <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate">-->
-<!--      </a>-->
-
-
-      <div id="donate-button-container">
-        <div id="donate-button" style="display: flex"></div>
-      </div>
-
-
+        <div id="donate-button-container">
+          <div id="donate-button" style="display: flex"></div>
+        </div>
 
         <label class="flat-btn" matRipple (click)="exportFile()">
             <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 96 960 960"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
@@ -142,7 +143,7 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Crossover</mat-label>
-                    <mat-select [(ngModel)]="selectedChannel.customCrossover">
+                    <mat-select [(ngModel)]="selectedChannel.customCrossover" (selectionChange)="updateChart()">
                         <mat-option [value]="undefined"></mat-option>
                         <mat-option [value]="'40'">40 Hz</mat-option>
                         <mat-option [value]="'60'">60 Hz</mat-option>

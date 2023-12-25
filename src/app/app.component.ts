@@ -55,7 +55,6 @@ export class AppComponent {
     this.chartObj = chart;
   }
 
-
   async onUpload(files: FileList | null) {
     // @ts-ignore
     PayPal.Donation.Button({
@@ -72,30 +71,34 @@ export class AppComponent {
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.chartObj?.showLoading();
-
       this.audysseyData = JSON.parse(fileContent);
-      console.log(this.audysseyData);
-
-      if (typeof Worker !== 'undefined') { // if supported
-        const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
-        worker.onmessage = ({ data }) => {
-          console.log(`Got message from Web-Worker`);
-          this.calculatedChannelsData = data;
-          if (this.selectedChannel) this.updateChart();
-          this.chartObj?.hideLoading();
-        };
-        worker.postMessage(this.audysseyData.detectedChannels);
-      } else {
-        // Web workers are not supported in this environment.
-        // You should add a fallback so that your program still executes correctly.
-        alert('Your browser is not supported. Please use latest Firefox or Chrome browser.');
-      }
+      this.processDataWithWorker(this.audysseyData);
     }
     else alert('Cannot read the file');
   }
 
+  processDataWithWorker(json: AudysseyInterface) {
+    console.log(json);
+
+    if (typeof Worker !== 'undefined') { // if supported
+      const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
+      worker.onmessage = ({ data }) => {
+        console.log('Got a message from Web-Worker');
+        this.calculatedChannelsData = data;
+        if (!this.selectedChannel) this.selectedChannel = json.detectedChannels[0];
+        this.updateChart();
+        this.chartObj?.hideLoading();
+      };
+      worker.postMessage(json.detectedChannels);
+    } else {
+      // Web workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
+      alert('Your browser is not supported. Please use latest Firefox or Chrome browser.');
+    }
+  }
+
   updateChart() {
-    console.log('this.selectedChannel', this.selectedChannel)
+    console.log('updateChart()')
 
     const XMin = 10, XMax = 24000;
 
@@ -193,4 +196,13 @@ export class AppComponent {
 
     if (this.selectedChannel) this.selectedChannel.customTargetCurvePoints = points;
   }
+
+
+  async loadExample() {
+    const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
+    this.chartObj?.showLoading();
+    this.audysseyData = example;
+    this.processDataWithWorker(example);
+  }
+
 }

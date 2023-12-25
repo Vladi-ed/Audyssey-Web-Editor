@@ -24,6 +24,7 @@ export class TargetCurvePointsComponent {
     if (!point.vol) point.vol = '0';
     if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
 
+    // point.Hz.padEnd(18, '0')
     this.curvePoints[index] = '{' + point.Hz + ', ' + point.vol + '}';
     this.wasChanged = true;
   }
