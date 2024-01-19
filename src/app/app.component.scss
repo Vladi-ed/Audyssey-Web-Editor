@@ -11,17 +11,26 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 25px;
+  column-gap: 24px;
+  row-gap: 10px;
+  padding: 24px;
 
   h1 {
     margin: 0;
   }
 
   @media (max-width: 500px) {
-    justify-content: center;
+    //justify-content: center;
 
     select, span {
       display: none;
+    }
+
+    h1 {
+      margin-top: 5px;
+      margin-bottom: 10px;
+      text-align: center;
+      width: 100%;
     }
   }
 }
@@ -79,6 +88,11 @@ mat-card {
 .curve-points-text-field {
     font-size: large;
     border: none;
+}
+
+.expansion-panel-first-line {
+  margin-top: -4px;
+  margin-bottom: 20px;
 }
 
 .chart-card {

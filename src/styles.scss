@@ -17,8 +17,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
   height: 46px;
   border-radius: 4px;
   background-color: white;
-  //margin-top: -1px;
-  /*margin-left: -6px;*/
   cursor: pointer;
   user-select: none;
 }
@@ -28,4 +26,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
 .flat-btn:disabled {
   border-color: #f5f5f5;
   cursor: auto;
+}
+h1 {
+  font-weight: 700;
 }

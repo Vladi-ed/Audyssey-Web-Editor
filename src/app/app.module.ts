@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatRippleModule} from "@angular/material/core";
@@ -15,12 +14,16 @@ import {HighchartsChartModule} from "highcharts-angular";
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
 import { PointsConverterPipe } from './target-curve-points/points-converter.pipe';
 import {MatExpansionModule} from "@angular/material/expansion";
+import { DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
+import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     TargetCurvePointsComponent,
     PointsConverterPipe,
+    DecodeChannelNamePipe,
+    DecodeEqTypePipe,
   ],
   imports: [
     BrowserModule,

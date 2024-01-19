@@ -1,15 +1,17 @@
 import {Component} from '@angular/core';
 import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
-import {decodeChannelName} from './helper-functions/decode-channel-name';
+import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
+// import Sonification from 'highcharts/modules/sonification';
 import HC_boost from 'highcharts/modules/boost'
-import Sonification from 'highcharts/modules/sonification';
+import Draggable from 'highcharts/modules/draggable-points';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 
 // Sonification(Highcharts);
+Draggable(Highcharts);
 HC_boost(Highcharts);
 Exporting(Highcharts);
 Highcharts.setOptions(options);
@@ -30,7 +32,6 @@ export class AppComponent {
   calculatedChannelsData?: Map<string, number[][]>
 
   selectedChannel?: DetectedChannel;
-  protected readonly decodeChannelName = decodeChannelName; // for the HTML template
   chartLogarithmicScale = true;
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
@@ -56,7 +57,7 @@ export class AppComponent {
   }
 
   async onUpload(files: FileList | null) {
-    // @ts-ignore
+    // @ts-ignore TODO: fix adding more that one button
     PayPal.Donation.Button({
       env:'production',
       hosted_button_id:'EBY6KWECQY2D8',
@@ -85,7 +86,7 @@ export class AppComponent {
       worker.onmessage = ({ data }) => {
         console.log('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
-        if (!this.selectedChannel) this.selectedChannel = json.detectedChannels[0];
+        this.selectedChannel = json.detectedChannels[0];
         this.updateChart();
         this.chartObj?.hideLoading();
       };
@@ -122,7 +123,8 @@ export class AppComponent {
     };
 
     // add Crossover if it's a logarithmic scale
-    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) this.chartOptions.xAxis.plotBands?.push({
+    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale)
+      this.chartOptions.xAxis.plotBands?.push({
       from: XMin,
       to: Number(this.selectedChannel.customCrossover),
       color: 'rgba(160, 160, 160, 0.1)',
@@ -130,7 +132,7 @@ export class AppComponent {
         text: 'Crossover',
         style: { color: '#606060' }
       }
-    })
+    });
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
@@ -143,10 +145,10 @@ export class AppComponent {
       name: decodeChannelName(this.selectedChannel?.commandId),
     };
 
-    this.chartUpdateFlag = true;
+    this.updateTargetCurve();
   }
 
-  async addSubwooferToTheGraph(checked: boolean) {
+  addSubwooferToTheGraph(checked: boolean) {
     // const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
     // const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
     // const customCrossover = this.selectedChannel?.customCrossover;
@@ -173,6 +175,55 @@ export class AppComponent {
     this.chartUpdateFlag = true;
   }
 
+  updateTargetCurve() {
+    let data: any[] = this.audysseyData.enTargetCurveType == 2 ? [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]] :
+      [[20, 0],  [3600, 0], [20000, -6]];
+
+    if (this.selectedChannel?.midrangeCompensation) data.push([1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]);
+
+    function convertToDraggablePoints(arr: string[]): Highcharts.PointOptionsObject[] {
+      return arr.map(point => {
+        const coordinates = point.replace(/[{}]/g, '').split(',');
+        return {
+          x: parseFloat(coordinates[0]),
+          y: parseFloat(coordinates[1]),
+          dragDrop: {draggableY: true, dragMaxY: 12, dragMinY: -12},
+          marker: {enabled: true}
+        }
+      })
+    }
+
+    function convertToNonDraggablePoints(arr: number[][]): Highcharts.PointOptionsObject[] {
+      return arr.map(point => {
+        return {
+          x: point[0],
+          y: point[1],
+          dragDrop: {draggableY: false},
+          marker: {enabled: false, states: {hover: {enabled: false}}},
+        }
+      });
+    }
+
+    if (this.selectedChannel?.customTargetCurvePoints) {
+      data = [
+        ...convertToNonDraggablePoints(data),
+        ...convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints)
+          .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
+      ].sort((a, b) => a.x! - b.x!);
+    }
+    console.log('data', data);
+
+
+    if (this.audysseyData.enTargetCurveType) {
+      this.chartOptions.series![2] = {
+        data,
+        type: 'spline',
+      };
+    }
+
+    this.chartUpdateFlag = true;
+  }
+
   exportFile() {
     const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/json'});
     const url = URL.createObjectURL(blob) // Create an object URL from blob
@@ -189,20 +240,10 @@ export class AppComponent {
     // this.chartObj?.toggleSonify();
   }
 
-  updatePointsForSelectedChannel(points: string[]) {
-
-    console.log('Received points from Component', points);
-    console.log('Existing points', this.selectedChannel?.customTargetCurvePoints);
-
-    if (this.selectedChannel) this.selectedChannel.customTargetCurvePoints = points;
-  }
-
-
   async loadExample() {
-    const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.chartObj?.showLoading();
+    const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.audysseyData = example;
     this.processDataWithWorker(example);
   }
-
 }

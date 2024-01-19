@@ -1,6 +1,6 @@
 {
   "name": "audyssey-editor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -18,7 +18,7 @@
     "@angular/material": "^16.2.8",
     "@angular/platform-browser": "^16.2.9",
     "@angular/platform-browser-dynamic": "^16.2.9",
-    "highcharts": "^11.2.0",
+    "highcharts": "~11.2.0",
     "highcharts-angular": "^4.0.0",
     "mathjs": "^11.11.2",
     "rxjs": "~7.8.1",
