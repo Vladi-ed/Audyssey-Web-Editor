@@ -102,7 +102,7 @@ export const options: Highcharts.Options = {
     headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
     // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
     valueDecimals: 1,
-    valueSuffix: ' Db',
+    valueSuffix: ' dB',
     // shared: true,
   },
   xAxis: {
