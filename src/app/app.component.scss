@@ -19,6 +19,17 @@
     margin: 0;
   }
 
+  .icon-link {
+    display: flex;
+    gap: 8px;
+    text-decoration: none;
+    padding-top: 2px;
+
+    img {
+      height: 20px;
+    }
+  }
+
   @media (max-width: 500px) {
     //justify-content: center;
 

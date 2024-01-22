@@ -1,10 +1,15 @@
-# Audyssey Editor
+# Audyssey Web Editor
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.
+Edit your MultEQ *.ady files, analyze speakers frequency response, adjust target curve and many more.
 
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+This project was made with [Angular](https://github.com/angular/angular-cli) version 16.
 
 ## Live version
-Deployed at https://audyssey.pages.dev
+Available online at https://audyssey.pages.dev
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W6MK9TT)
+
+### Development server
+
+Run `npm install` and `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+

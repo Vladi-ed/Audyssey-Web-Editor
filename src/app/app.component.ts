@@ -57,18 +57,6 @@ export class AppComponent {
   }
 
   async onUpload(files: FileList | null) {
-    // @ts-ignore TODO: fix adding more that one button
-    PayPal.Donation.Button({
-      env:'production',
-      hosted_button_id:'EBY6KWECQY2D8',
-      image: {
-        src:'https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif',
-        alt:'Donate with PayPal button',
-        title:'Support my work',
-      }
-    }).render('#donate-button');
-
-
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.chartObj?.showLoading();
