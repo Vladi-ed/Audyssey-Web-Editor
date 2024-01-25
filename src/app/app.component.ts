@@ -36,6 +36,10 @@ export class AppComponent {
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
 
+  // Whether or not the imported ADY file only uses two digits for crossovers over
+  // 100Hz (e.g. a value of "12" = 120Hz)
+  private twoDigitCrossovers = false;
+
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     console.log('Highcharts loaded');
     if (chart.options.exporting?.menuItemDefinitions)
@@ -61,6 +65,20 @@ export class AppComponent {
     if (fileContent) {
       this.chartObj?.showLoading();
       this.audysseyData = JSON.parse(fileContent);
+
+      // Audyssey appears to store the crossover frequency using two digits
+      // in some cases, so for values > 100 we need to multiply by 10
+      this.audysseyData.detectedChannels.forEach(channelInfo => {
+        if (channelInfo?.customCrossover) {
+          let crossOverFreq = Number(channelInfo.customCrossover);
+          if (crossOverFreq < 40) {
+            this.twoDigitCrossovers = true;
+            crossOverFreq *= 10;
+            channelInfo.customCrossover = `${crossOverFreq}`;
+          }
+        };
+      });
+
       this.processDataWithWorker(this.audysseyData);
     }
     else alert('Cannot read the file');
@@ -213,12 +231,25 @@ export class AppComponent {
   }
 
   exportFile() {
-    const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/json'});
+    let data = this.audysseyData;
+    if (this.twoDigitCrossovers) {
+      // If the ADY file had two-digit crossover frequencies (eg '10' for 100hz) then convert back
+      // when we export
+      data = {
+        ...data, 
+        detectedChannels: data.detectedChannels.map(channel => {
+          const crossOverFreq = Number(channel.customCrossover ?? '0');
+          return crossOverFreq < 100 ? channel : {...channel, customCrossover: `${crossOverFreq / 10}`};
+        })
+      }
+    }
+
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
     const url = URL.createObjectURL(blob) // Create an object URL from blob
 
     const a = document.createElement('a') // Create "a" element
     a.setAttribute('href', url) // Set "a" element link
-    a.setAttribute('download', this.audysseyData.title + '_' + new Date().toLocaleDateString() + '.ady') // Set download filename
+    a.setAttribute('download', data.title + '_' + new Date().toLocaleDateString() + '.ady') // Set download filename
     a.click() // Start downloading
     URL.revokeObjectURL(url);
   }
