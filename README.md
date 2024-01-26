@@ -2,7 +2,7 @@
 
 Edit your MultEQ *.ady files, analyze speakers frequency response, adjust target curve and many more.
 
-This project was made with [Angular](https://github.com/angular/angular-cli) version 16.
+This project was made with [Angular](https://github.com/angular/angular-cli) and [Highcharts](https://editor.highcharts.com/full.html)
 
 ## Live version
 Available online at https://audyssey.pages.dev
