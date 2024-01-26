@@ -39,11 +39,23 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
     if (x == count / 2) break;
   }
 
-  return points;
+  const filteredPoints =  points.filter(function(_, i) {
+    if (i> 2000) return (i % (i/100) === 0);
+    if (i> 1000) return (i % 10 === 0);
+    if (i> 800) return (i % 8 === 0);
+    if (i> 500) return (i % 5 === 0);
+    else return true;
+  });
+
+  // console.log('points', points.length)
+  console.log('filteredPoints', filteredPoints.length)
+
+  return filteredPoints;
 }
 
 
 function LinSpacedFracOctaveSmooth(origArr: any[], frac = 24, smoothStart = 50, startFreq = 1, freqStep = 1 / 48) {
+// function LinSpacedFracOctaveSmooth(origArr: any[], frac = 16, smoothStart = 40, startFreq = 1, freqStep = 1 / 48) {
   const smoothed = origArr.slice(smoothStart);
   const passes = 8;
   // Scale octave frac to allow for number of passes

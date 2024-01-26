@@ -20,8 +20,6 @@ export class TargetCurvePointsComponent {
   wasChanged = false;
 
   changeItem(point: { Hz: string; vol: string }, index: number) {
-    // TODO: check if it's saving ok in json
-    // if (!point.vol) point.vol = '0';
     if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
     if (Number(point.Hz) > 20000) point.Hz = '20000';
     // if (Number(point.Hz) < 20) point.Hz = '20';
@@ -51,5 +49,24 @@ export class TargetCurvePointsComponent {
   save() {
     this.curvePointsChange.emit(this.curvePoints);
     this.wasChanged = false;
+  }
+
+  copyPoints() {
+    // navigator.clipboard.writeText(JSON.stringify(this.curvePoints));
+    sessionStorage.setItem('target curve points', JSON.stringify(this.curvePoints))
+  }
+
+  pastePoints() {
+    try {
+      const newPointsStr = sessionStorage.getItem('target curve points');
+      if (newPointsStr) {
+        const newPoints = JSON.parse(newPointsStr);
+        if (newPoints.length) this.curvePoints = newPoints;
+        this.wasChanged = true;
+      }
+    }
+    catch (e) {
+      console.warn('Cannot paste', e)
+    }
   }
 }

@@ -11,7 +11,7 @@ import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 
 // Sonification(Highcharts);
-Draggable(Highcharts);
+// Draggable(Highcharts);
 HC_boost(Highcharts);
 Exporting(Highcharts);
 Highcharts.setOptions(options);
@@ -164,7 +164,7 @@ export class AppComponent {
   }
 
   updateTargetCurve() {
-    let data: any[] = this.audysseyData.enTargetCurveType == 2 ? [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]] :
+    let data: any[] = this.audysseyData.enTargetCurveType == 1 ? [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]] :
       [[20, 0],  [3600, 0], [20000, -6]];
 
     if (this.selectedChannel?.midrangeCompensation) data.push([1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]);

@@ -29,11 +29,10 @@ export const options: Highcharts.Options = {
     // }
   },
   boost: {
-    allowForce: true,
-   pixelRatio: 1,
-    // seriesThreshold: 1,
-
-    // useGPUTranslations: true
+    // allowForce: true,
+    pixelRatio: 1, // 2 makes that graph sharper but line width become 0.5
+    seriesThreshold: 1,
+    useGPUTranslations: true
   },
   exporting: {
     sourceWidth: 1920,
@@ -146,6 +145,9 @@ export const options: Highcharts.Options = {
   // },
   legend: {
     enabled: false
+  },
+  credits: {
+    enabled: false
   }
 }
 
@@ -155,9 +157,17 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
     name: 'Selected Channel',
     data: [],
     type: 'line',
-    lineWidth: 1,
+    lineWidth: 1, // boost module renders only 1px lineWidth
     showInNavigator: true,
     dashStyle: 'Solid',
+    zoneAxis: 'y',
+    marker: {
+      states: {
+        hover: {
+          enabled: false,
+        }
+      }
+    },
     zones: [
       {
         value: -10,
