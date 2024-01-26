@@ -32,6 +32,7 @@ export class TargetCurvePointsComponent {
   }
 
   addPoint() {
+    this.sortPoints();
     const lastPoint = this.curvePoints.at(-1);
     if (lastPoint) {
       this.curvePoints = [...this.curvePoints, lastPoint]; // need to create a new array for change detection
@@ -47,6 +48,9 @@ export class TargetCurvePointsComponent {
   }
 
   save() {
+    // Need to ensure points are sorted for export at the least, but it's nice
+    // to keep them sorted in the UI as well when users are done editing
+    this.sortPoints();
     this.curvePointsChange.emit(this.curvePoints);
     this.wasChanged = false;
   }
@@ -68,5 +72,13 @@ export class TargetCurvePointsComponent {
     catch (e) {
       console.warn('Cannot paste', e)
     }
+  }
+
+  private sortPoints() {
+    this.curvePoints.sort((a, b) => {
+      const [aFreq] = a.substring(1, a.length - 1).split(', ');
+      const [bFreq] = b.substring(1, b.length - 1).split(', ');
+      return Number(aFreq) - Number(bFreq);
+    });
   }
 }
