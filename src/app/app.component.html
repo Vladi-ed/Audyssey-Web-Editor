@@ -184,7 +184,7 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-            <label>Frequency (Hz), Gain (bB)</label>
+            <label>Frequency (Hz), Gain (dB)</label>
 
             <app-target-curve-points *ngIf="selectedChannel" [(curvePoints)]="selectedChannel.customTargetCurvePoints" (curvePointsChange)="updateChart()" />
 

@@ -2,11 +2,11 @@
   <div *ngFor="let point of (curvePoints | convertPoints); let i = index" class="point-row">
     <mat-form-field appearance="outline" style="margin-right: 12px">
       <mat-label>Hz</mat-label>
-      <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)" required inputmode="numeric" pattern="[0-9]*[.]?[0-9]+" maxlength="18" [name]="'Frequency' + i">
+      <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)" required inputmode="numeric" pattern="[1-9][0-9]*[.]?[0-9]+" maxlength="18" minlength="2" [name]="'Frequency' + i">
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
+      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
     </mat-form-field>
 
     <button class="remove-btn" matRipple (click)="removePoint(i)">

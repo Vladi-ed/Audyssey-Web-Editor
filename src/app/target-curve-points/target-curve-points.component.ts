@@ -21,10 +21,10 @@ export class TargetCurvePointsComponent {
 
   changeItem(point: { Hz: string; vol: string }, index: number) {
     // TODO: check if it's saving ok in json
-    if (!point.vol) point.vol = '0';
+    // if (!point.vol) point.vol = '0';
     if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
     if (Number(point.Hz) > 20000) point.Hz = '20000';
-    if (Number(point.Hz) < 20) point.Hz = '20';
+    // if (Number(point.Hz) < 20) point.Hz = '20';
     if (Number(point.vol) < -12) point.vol = '-12';
     if (Number(point.vol) > 12) point.vol = '12';
 
