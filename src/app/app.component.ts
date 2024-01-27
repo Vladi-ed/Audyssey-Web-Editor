@@ -86,6 +86,29 @@ export class AppComponent {
     }
   }
 
+  private static convertToDraggablePoints(arr: string[]): Highcharts.PointOptionsObject[] {
+    return arr.map(point => {
+      const coordinates = point.replace(/[{}]/g, '').split(',');
+      return {
+        x: parseFloat(coordinates[0]),
+        y: parseFloat(coordinates[1]),
+        dragDrop: {draggableY: true, dragMaxY: 12, dragMinY: -12},
+        marker: {enabled: true}
+      }
+    })
+  }
+
+  private static convertToNonDraggablePoints(arr: Array<[number, number]>): Highcharts.PointOptionsObject[] {
+    return arr.map(point => {
+      return {
+        x: point[0],
+        y: point[1],
+        dragDrop: {draggableY: false},
+        marker: {enabled: false, states: {hover: {enabled: false}}},
+      }
+    });
+  }
+
   updateChart() {
     console.log('updateChart()')
 
@@ -95,32 +118,35 @@ export class AppComponent {
       text: decodeChannelName(this.selectedChannel?.commandId)
     };
 
+    let xAxisBands = [{
+      from: this.selectedChannel?.frequencyRangeRolloff,
+      to: XMax,
+      color: 'rgba(68, 170, 213, 0.1)',
+      label: {
+        text: 'Disabled',
+        style: { color: '#606060' }
+      }
+    }];
+
+    // add Crossover if it's a logarithmic scale
+    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
+      xAxisBands.push({
+        from: XMin,
+        to: Number(this.selectedChannel.customCrossover),
+        color: 'rgba(160, 160, 160, 0.1)',
+        label: {
+          text: 'Crossover',
+          style: { color: '#606060' }
+        }
+      });
+    }
+
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
       type: this.chartLogarithmicScale ? "logarithmic" : "linear",
-      plotBands: [{
-        from: this.selectedChannel?.frequencyRangeRolloff,
-        to: XMax,
-        color: 'rgba(68, 170, 213, 0.1)',
-        label: {
-          text: 'Disabled',
-          style: { color: '#606060' }
-        }
-      }]
+      plotBands: xAxisBands
     };
-
-    // add Crossover if it's a logarithmic scale
-    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale)
-      this.chartOptions.xAxis.plotBands?.push({
-      from: XMin,
-      to: Number(this.selectedChannel.customCrossover),
-      color: 'rgba(160, 160, 160, 0.1)',
-      label: {
-        text: 'Crossover',
-        style: { color: '#606060' }
-      }
-    });
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
@@ -164,43 +190,32 @@ export class AppComponent {
   }
 
   updateTargetCurve() {
-    let data: any[] = this.audysseyData.enTargetCurveType == 1 ? [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]] :
-      [[20, 0],  [3600, 0], [20000, -6]];
+    const ROLLOFF_1_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [20000, -6]];
+    const ROLLOFF_2_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]];
+    const MIDRANGE_COMPENSATION_CONTROL_POINTS: Array<[number, number]> = [[1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]];
+    let targetCurve = this.audysseyData.enTargetCurveType == 2
+      ? ROLLOFF_2_TARGET_CURVE
+      : ROLLOFF_1_TARGET_CURVE;
 
-    if (this.selectedChannel?.midrangeCompensation) data.push([1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]);
-
-    function convertToDraggablePoints(arr: string[]): Highcharts.PointOptionsObject[] {
-      return arr.map(point => {
-        const coordinates = point.replace(/[{}]/g, '').split(',');
-        return {
-          x: parseFloat(coordinates[0]),
-          y: parseFloat(coordinates[1]),
-          dragDrop: {draggableY: true, dragMaxY: 12, dragMinY: -12},
-          marker: {enabled: true}
-        }
-      })
+    if (this.selectedChannel?.midrangeCompensation) {
+      targetCurve = targetCurve.concat(MIDRANGE_COMPENSATION_CONTROL_POINTS);
     }
 
-    function convertToNonDraggablePoints(arr: number[][]): Highcharts.PointOptionsObject[] {
-      return arr.map(point => {
-        return {
-          x: point[0],
-          y: point[1],
-          dragDrop: {draggableY: false},
-          marker: {enabled: false, states: {hover: {enabled: false}}},
-        }
-      });
-    }
-
+    const targetPoints = AppComponent.convertToNonDraggablePoints(targetCurve);
+    let data = targetPoints;
     if (this.selectedChannel?.customTargetCurvePoints) {
+      // if there are custom target curve points, they should override any built-in target curve points
+      const customPoints = AppComponent.convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints);
+      const customFreqs = new Set(customPoints.map(e => e.x));
       data = [
-        ...convertToNonDraggablePoints(data),
-        ...convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints)
-          .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
-      ].sort((a, b) => a.x! - b.x!);
+        ...targetPoints.filter(pt => !customFreqs.has(pt.x)),
+        ...customPoints
+      ];
     }
-    console.log('data', data);
 
+    data = data.sort((a, b) => a.x! - b.x!);
+
+    console.log('data', data);
 
     if (this.audysseyData.enTargetCurveType) {
       this.chartOptions.series![2] = {
