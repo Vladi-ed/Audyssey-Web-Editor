@@ -128,7 +128,7 @@ export class AppComponent {
     // adding first graph
     // @ts-ignore
     this.chartOptions.series[0] = {
-      data: selectedChannelData,
+      data: selectedChannelData ?? [],
       type: this.graphSmoothEnabled ? 'spline' : 'line',
       name: decodeChannelName(this.selectedChannel?.commandId),
     };
