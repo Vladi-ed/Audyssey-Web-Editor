@@ -36,6 +36,25 @@ export class AppComponent {
   dataSmoothEnabled = true;
   graphSmoothEnabled = false;
 
+  // Updates context menu items for the chart based on the option's current state
+  updateChartMenuItems() {
+    this.chartObj?.update({
+      exporting: {
+        menuItemDefinitions: {
+          xScale: {
+            text: `&nbsp;&nbsp; Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
+          },
+          graphSmoothing: {
+            text: `${this.graphSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Graph Smoothing`
+          },
+          dataSmoothing: {
+            text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
+          }
+        }
+      }
+    });
+  }
+
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     console.log('Highcharts loaded');
     if (chart.options.exporting?.menuItemDefinitions)
@@ -43,17 +62,21 @@ export class AppComponent {
       chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
         this.updateChart();
+        this.updateChartMenuItems();
       }
       chart.options.exporting.menuItemDefinitions['graphSmoothing'].onclick = () => {
         this.graphSmoothEnabled = !this.graphSmoothEnabled;
         this.updateChart();
+        this.updateChartMenuItems();
       }
       chart.options.exporting.menuItemDefinitions['dataSmoothing'].onclick = () => {
         this.dataSmoothEnabled = !this.dataSmoothEnabled;
         this.updateChart();
+        this.updateChartMenuItems();
       }
     }
     this.chartObj = chart;
+    this.updateChartMenuItems();
   }
 
   async onUpload(files: FileList | null) {
@@ -68,12 +91,12 @@ export class AppComponent {
 
   processDataWithWorker(json: AudysseyInterface) {
     console.log(json);
-
     if (typeof Worker !== 'undefined') { // if supported
       const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
       worker.onmessage = ({ data }) => {
         console.log('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
+
         this.selectedChannel = json.detectedChannels[0];
         this.updateChart();
         this.chartObj?.hideLoading();
@@ -111,16 +134,17 @@ export class AppComponent {
     };
 
     // add Crossover if it's a logarithmic scale
-    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale)
+    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
       this.chartOptions.xAxis.plotBands?.push({
-      from: XMin,
-      to: Number(this.selectedChannel.customCrossover),
-      color: 'rgba(160, 160, 160, 0.1)',
-      label: {
-        text: 'Crossover',
-        style: { color: '#606060' }
-      }
-    });
+        from: XMin,
+        to: Number(this.selectedChannel.customCrossover),
+        color: 'rgba(160, 160, 160, 0.1)',
+        label: {
+          text: 'Crossover',
+          style: { color: '#606060' }
+        }
+      });
+    }
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);

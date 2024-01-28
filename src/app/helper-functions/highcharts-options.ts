@@ -45,13 +45,13 @@ export const options: Highcharts.Options = {
       //   text: 'Play'
       // },
       xScale: {
-        text: 'Logarithmic/Linear scale'
+        text: '&nbsp;&nbsp;Toggle Logarithmic/Linear scale'
       },
       dataSmoothing: {
-        text: 'Data Smoothing'
+        text: '&nbsp;&nbsp;Data Smoothing'
       },
       graphSmoothing: {
-        text: 'Graph Smoothing'
+        text: '&nbsp;&nbsp;Graph Smoothing'
       }
     },
     buttons: {
