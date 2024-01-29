@@ -10,6 +10,8 @@ import HC_boost from 'highcharts/modules/boost'
 import Draggable from 'highcharts/modules/draggable-points';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
+import {decodeCrossover} from "./helper-functions/decode-crossover";
+import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-functions/convert-draggable-points";
 
 // Sonification(Highcharts);
 // Draggable(Highcharts);
@@ -139,7 +141,7 @@ export class AppComponent {
     if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
       this.chartOptions.xAxis.plotBands?.push({
         from: XMin,
-        to: Number(this.selectedChannel.customCrossover),
+        to: decodeCrossover(this.selectedChannel.customCrossover),
         color: 'rgba(160, 160, 160, 0.1)',
         label: {
           text: 'Crossover',
@@ -195,29 +197,6 @@ export class AppComponent {
 
     if (this.selectedChannel?.midrangeCompensation) data.push([1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]);
 
-    function convertToDraggablePoints(arr: string[]): Highcharts.PointOptionsObject[] {
-      return arr.map(point => {
-        const coordinates = point.replace(/[{}]/g, '').split(',');
-        return {
-          x: parseFloat(coordinates[0]),
-          y: parseFloat(coordinates[1]),
-          dragDrop: {draggableY: true, dragMaxY: 12, dragMinY: -12},
-          marker: {enabled: true}
-        }
-      })
-    }
-
-    function convertToNonDraggablePoints(arr: number[][]): Highcharts.PointOptionsObject[] {
-      return arr.map(point => {
-        return {
-          x: point[0],
-          y: point[1],
-          dragDrop: {draggableY: false},
-          marker: {enabled: false, states: {hover: {enabled: false}}},
-        }
-      });
-    }
-
     if (this.selectedChannel?.customTargetCurvePoints) {
       data = [
         ...convertToNonDraggablePoints(data),
@@ -225,7 +204,7 @@ export class AppComponent {
           .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
       ].sort((a, b) => a.x! - b.x!);
     }
-    DEBUG('data', data);
+    DEBUG('updateTargetCurve() data', data);
 
 
     if (this.audysseyData.enTargetCurveType) {
@@ -239,7 +218,7 @@ export class AppComponent {
   }
 
   exportFile() {
-    const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/ady'});
     const url = URL.createObjectURL(blob) // Create an object URL from blob
 
     const a = document.createElement('a') // Create "a" element

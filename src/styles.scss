@@ -16,11 +16,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
   padding: 0 16px 1px;
   height: 46px;
   border-radius: 4px;
+  color: var(--mat-expansion-header-text-color);
   background-color: white;
   cursor: pointer;
   user-select: none;
+
+  @media (max-width: 500px) {
+    font-size: 14px;
+  }
 }
 .flat-btn:hover {
+  color: black;
   border-color: #545454;
 }
 .flat-btn:disabled {

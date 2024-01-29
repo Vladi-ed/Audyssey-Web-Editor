@@ -6,7 +6,7 @@
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (change)="changeItem(point, i)" required inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
+      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required inputmode="numeric" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
     </mat-form-field>
 
     <button class="remove-btn" matRipple (click)="removePoint(i)">
@@ -17,5 +17,9 @@
   <div style="display: flex; justify-items: stretch; gap: 12px">
     <button matRipple type="button" style="flex-grow: 1; transition-property: width" class="flat-btn" (click)="addPoint()">Add new Point</button>
     <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid">Save</button>
+  </div>
+  <div style="display: flex">
+    <button matRipple class="flat-btn" style="border: none" (click)="copyPoints()">Copy</button>
+    <button matRipple class="flat-btn" style="border: none" (click)="pastePoints()">Paste</button>
   </div>
 </form>

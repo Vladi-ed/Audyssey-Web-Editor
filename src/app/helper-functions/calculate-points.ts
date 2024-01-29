@@ -41,9 +41,10 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   }
 
   const filteredPoints =  points.filter(function(_, i) {
-    if (i> 2000) return (i % (i/100) === 0);
-    if (i> 1000) return (i % 10 === 0);
-    if (i> 800) return (i % 8 === 0);
+    if (i> 2500) return (i % 60 === 0);
+    if (i> 1500) return (i % 25 === 0);
+    if (i> 1000) return (i % 20 === 0);
+    if (i> 800) return (i % 15 === 0);
     if (i> 500) return (i % 5 === 0);
     else return true;
   });

@@ -5,11 +5,11 @@ export const options: Highcharts.Options = {
       type: 'x',
       // key: 'ctrl',
     },
+    panKey: 'shift',
     panning: {
       enabled: true,
       // type: 'x'
     },
-    panKey: 'shift',
     type: 'spline',
     // events: {
     //   // add points on CLick
@@ -56,7 +56,7 @@ export const options: Highcharts.Options = {
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScale', 'dataSmoothing', 'graphSmoothing']
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScale', 'graphSmoothing']
       },
     },
     chartOptions: {
@@ -126,7 +126,6 @@ export const options: Highcharts.Options = {
   },
   // plotOptions: {
   //   series: {
-  //     // states: {hover: {enabled: false, }, },
   //     stickyTracking: false,
   //     marker: {
   //       enabled: false,
@@ -162,6 +161,7 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
     dashStyle: 'Solid',
     zoneAxis: 'y',
     marker: {
+      enabled: false,
       states: {
         hover: {
           enabled: false,
@@ -189,7 +189,6 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
         color: '#c93737'
       },
     ],
-    // allowPointSelect: true,
   },
   {
     name: 'Subwoofer',
@@ -215,12 +214,13 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
 
     dragDrop: {
       draggableY: true,
-      // draggableX: true,
+      draggableX: true,
+      dragMaxY: 12, dragMinY: -12,
       // dragPrecisionX: 10
     },
     stickyTracking: false,
     allowPointSelect: true,
 
-    enableMouseTracking: false
+    enableMouseTracking: false // to disable dragging
   }
 ];
