@@ -18,7 +18,7 @@
     <button matRipple type="button" style="flex-grow: 1; transition-property: width" class="flat-btn" (click)="addPoint()">Add new Point</button>
     <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid">Save</button>
   </div>
-  <div style="display: flex">
+  <div style="display: flex; margin-top: 6px">
     <button matRipple class="flat-btn" style="border: none" (click)="copyPoints()">Copy</button>
     <button matRipple class="flat-btn" style="border: none" (click)="pastePoints()">Paste</button>
   </div>

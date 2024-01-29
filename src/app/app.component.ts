@@ -6,8 +6,8 @@ import {DEBUG} from './helper-functions/debug';
 
 import * as Highcharts from 'highcharts';
 // import Sonification from 'highcharts/modules/sonification';
-import HC_boost from 'highcharts/modules/boost'
-import Draggable from 'highcharts/modules/draggable-points';
+// import HC_boost from 'highcharts/modules/boost'
+// import Draggable from 'highcharts/modules/draggable-points';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
@@ -15,7 +15,7 @@ import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-fu
 
 // Sonification(Highcharts);
 // Draggable(Highcharts);
-HC_boost(Highcharts);
+// HC_boost(Highcharts);
 Exporting(Highcharts);
 Highcharts.setOptions(options);
 
@@ -45,27 +45,27 @@ export class AppComponent {
       exporting: {
         menuItemDefinitions: {
           xScale: {
-            text: `&nbsp;&nbsp; Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
+            text: `Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
           },
           graphSmoothing: {
-            text: `${this.graphSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Graph Smoothing`
+            text: `${this.graphSmoothEnabled ? "✔️" : "☐&nbsp;"} Graph Smoothing`
           },
-          dataSmoothing: {
-            text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
-          }
+          // dataSmoothing: {
+          //   text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
+          // }
         }
       }
     });
   }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    DEBUG('Highcharts loaded');
+    DEBUG('Highcharts callback');
     if (chart.options.exporting?.menuItemDefinitions)
     {
       chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
         this.updateChart();
-        this.updateChartMenuItems();
+        this.updateChartMenuItems(); // TODO: here we are updating graph 2 times
       }
       chart.options.exporting.menuItemDefinitions['graphSmoothing'].onclick = () => {
         this.graphSmoothEnabled = !this.graphSmoothEnabled;
@@ -122,24 +122,20 @@ export class AppComponent {
       text: decodeChannelName(this.selectedChannel?.commandId)
     };
 
-    this.chartOptions.xAxis = {
-      min: XMin,
-      max: XMax,
-      type: this.chartLogarithmicScale ? "logarithmic" : "linear",
-      plotBands: [{
-        from: this.selectedChannel?.frequencyRangeRolloff,
-        to: XMax,
-        color: 'rgba(68, 170, 213, 0.1)',
-        label: {
-          text: 'Disabled',
-          style: { color: '#606060' }
-        }
-      }]
-    };
+    // add frequency Rolloff
+    const xAxisBands = [{
+      from: this.selectedChannel?.frequencyRangeRolloff,
+      to: XMax,
+      color: 'rgba(68, 170, 213, 0.1)',
+      label: {
+        text: 'Disabled',
+        style: { color: '#606060' }
+      }
+    }];
 
     // add Crossover if it's a logarithmic scale
     if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
-      this.chartOptions.xAxis.plotBands?.push({
+      xAxisBands.push({
         from: XMin,
         to: decodeCrossover(this.selectedChannel.customCrossover),
         color: 'rgba(160, 160, 160, 0.1)',
@@ -149,6 +145,13 @@ export class AppComponent {
         }
       });
     }
+
+    this.chartOptions.xAxis = {
+      min: XMin,
+      max: XMax,
+      type: this.chartLogarithmicScale ? "logarithmic" : "linear",
+      plotBands: xAxisBands
+    };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
@@ -162,6 +165,7 @@ export class AppComponent {
     };
 
     this.updateTargetCurve();
+    // this.updateTargetCurve2();
   }
 
   addSubwooferToTheGraph(checked: boolean) {
@@ -212,6 +216,44 @@ export class AppComponent {
         data,
         type: 'spline',
       };
+    }
+
+    this.chartUpdateFlag = true;
+  }
+
+  updateTargetCurve2() {
+    const ROLLOFF_1_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [20000, -6]];
+    const ROLLOFF_2_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]];
+    const MIDRANGE_COMPENSATION_CONTROL_POINTS: Array<[number, number]> = [[1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]];
+    let targetCurve = this.audysseyData.enTargetCurveType == 2
+      ? ROLLOFF_2_TARGET_CURVE
+      : ROLLOFF_1_TARGET_CURVE;
+
+    if (this.selectedChannel?.midrangeCompensation) {
+      targetCurve = targetCurve.concat(MIDRANGE_COMPENSATION_CONTROL_POINTS);
+    }
+
+    const targetPoints = convertToNonDraggablePoints(targetCurve);
+    let data = targetPoints;
+    if (this.selectedChannel?.customTargetCurvePoints) {
+      // if there are custom target curve points, they should override any built-in target curve points
+      const customPoints = convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints);
+      const customFreqs = new Set(customPoints.map(e => e.x));
+      data = [
+        ...targetPoints.filter(pt => !customFreqs.has(pt.x)),
+        ...customPoints
+      ];
+    }
+
+    data = data.sort((a, b) => a.x! - b.x!);
+
+    console.log('data', data);
+
+    if (this.audysseyData.enTargetCurveType) {
+      this.chartOptions.series!.push({
+        data,
+        type: 'spline',
+      });
     }
 
     this.chartUpdateFlag = true;

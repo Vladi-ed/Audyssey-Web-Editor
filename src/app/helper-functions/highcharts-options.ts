@@ -1,4 +1,3 @@
-
 export const options: Highcharts.Options = {
   chart: {
     zooming: {
@@ -45,13 +44,13 @@ export const options: Highcharts.Options = {
       //   text: 'Play'
       // },
       xScale: {
-        text: '&nbsp;&nbsp;Toggle Logarithmic/Linear scale'
+        text: 'Toggle Logarithmic/Linear scale'
       },
       dataSmoothing: {
-        text: '&nbsp;&nbsp;Data Smoothing'
+        text: 'Data Smoothing'
       },
       graphSmoothing: {
-        text: '&nbsp;&nbsp;Graph Smoothing'
+        text: 'Graph Smoothing'
       }
     },
     buttons: {
