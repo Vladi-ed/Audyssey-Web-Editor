@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
 import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
+import {DEBUG} from './helper-functions/debug';
 
 import * as Highcharts from 'highcharts';
 // import Sonification from 'highcharts/modules/sonification';
@@ -56,7 +57,7 @@ export class AppComponent {
   }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    console.log('Highcharts loaded');
+    DEBUG('Highcharts loaded');
     if (chart.options.exporting?.menuItemDefinitions)
     {
       chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
@@ -90,11 +91,12 @@ export class AppComponent {
   }
 
   processDataWithWorker(json: AudysseyInterface) {
-    console.log(json);
+    DEBUG(json);
+
     if (typeof Worker !== 'undefined') { // if supported
       const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
       worker.onmessage = ({ data }) => {
-        console.log('Got a message from Web-Worker');
+        DEBUG('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
 
         this.selectedChannel = json.detectedChannels[0];
@@ -110,7 +112,7 @@ export class AppComponent {
   }
 
   updateChart() {
-    console.log('updateChart()')
+    DEBUG('updateChart()')
 
     const XMin = 10, XMax = 24000;
 
@@ -223,7 +225,7 @@ export class AppComponent {
           .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
       ].sort((a, b) => a.x! - b.x!);
     }
-    console.log('data', data);
+    DEBUG('data', data);
 
 
     if (this.audysseyData.enTargetCurveType) {
@@ -248,7 +250,7 @@ export class AppComponent {
   }
 
   playChart(ev?: Event | Highcharts.Dictionary<any> | undefined) {
-    console.log('playChart', ev)
+    DEBUG('playChart', ev)
     // this.chartObj?.toggleSonify();
   }
 

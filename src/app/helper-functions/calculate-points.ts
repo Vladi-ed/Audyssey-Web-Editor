@@ -1,4 +1,5 @@
 import {abs as magnitude, complex, Complex, fft} from "mathjs";
+import {DEBUG} from "./debug";
 
 export function calculatePoints(responseDataValues: string[], enableSmoothing = true) {
   if (!responseDataValues || !responseDataValues.length) return [];
@@ -48,7 +49,7 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   });
 
   // console.log('points', points.length)
-  console.log('filteredPoints', filteredPoints.length)
+  DEBUG('filteredPoints', filteredPoints.length)
 
   return filteredPoints;
 }
