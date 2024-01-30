@@ -2,12 +2,12 @@ import {Component} from '@angular/core';
 import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
 import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
-import {DEBUG} from './helper-functions/debug';
 
 import * as Highcharts from 'highcharts';
 // import Sonification from 'highcharts/modules/sonification';
 // import HC_boost from 'highcharts/modules/boost'
 // import Draggable from 'highcharts/modules/draggable-points';
+// import Datagrouping from 'highcharts/modules/datagrouping';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
@@ -17,6 +17,7 @@ import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-fu
 // Draggable(Highcharts);
 // HC_boost(Highcharts);
 Exporting(Highcharts);
+// Datagrouping(Highcharts);
 Highcharts.setOptions(options);
 
 @Component({
@@ -59,7 +60,7 @@ export class AppComponent {
   }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    DEBUG('Highcharts callback');
+    console.log('Highcharts callback');
     if (chart.options.exporting?.menuItemDefinitions)
     {
       chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
@@ -93,19 +94,20 @@ export class AppComponent {
   }
 
   processDataWithWorker(json: AudysseyInterface) {
-    DEBUG(json);
+    console.log('File content:', json);
 
     if (typeof Worker !== 'undefined') { // if supported
       const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
+      worker.postMessage(json.detectedChannels);
+
       worker.onmessage = ({ data }) => {
-        DEBUG('Got a message from Web-Worker');
+        console.log('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
 
         this.selectedChannel = json.detectedChannels[0];
         this.updateChart();
         this.chartObj?.hideLoading();
       };
-      worker.postMessage(json.detectedChannels);
     } else {
       // Web workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
@@ -114,7 +116,7 @@ export class AppComponent {
   }
 
   updateChart() {
-    DEBUG('updateChart()')
+    console.log('updateChart()')
 
     const XMin = 10, XMax = 24000;
 
@@ -157,8 +159,7 @@ export class AppComponent {
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
 
     // adding first graph
-    // @ts-ignore
-    this.chartOptions.series[0] = {
+    this.chartOptions.series![0] = {
       data: selectedChannelData ?? [],
       type: this.graphSmoothEnabled ? 'spline' : 'line',
       name: decodeChannelName(this.selectedChannel?.commandId),
@@ -173,7 +174,6 @@ export class AppComponent {
     // const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
     // const customCrossover = this.selectedChannel?.customCrossover;
     // const subCutOff = customCrossover ? Number(customCrossover) / 2.9296875 : 63;
-
 
     const subCutOff = parseInt('200 Hz') / 3;
     const subDataPoints = this.calculatedChannelsData?.get('SW1')?.slice(0, subCutOff);
@@ -208,7 +208,7 @@ export class AppComponent {
           .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
       ].sort((a, b) => a.x! - b.x!);
     }
-    DEBUG('updateTargetCurve() data', data);
+    console.log('updateTargetCurve() data', data);
 
 
     if (this.audysseyData.enTargetCurveType) {
@@ -271,7 +271,7 @@ export class AppComponent {
   }
 
   playChart(ev?: Event | Highcharts.Dictionary<any> | undefined) {
-    DEBUG('playChart', ev)
+    console.log('playChart', ev)
     // this.chartObj?.toggleSonify();
   }
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 function copyArray(arr: string[] | undefined) {
-  if (arr && arr.length) return [...arr];
-  else return [ '{20, 0}', '{20000, 0}' ];
+  if (arr && arr.length) return [...arr]; // make a copy
+  else return [];
 }
 
 @Component({
@@ -32,11 +32,13 @@ export class TargetCurvePointsComponent {
   }
 
   addPoint() {
-    this.sortPoints();
     const lastPoint = this.curvePoints.at(-1);
     if (lastPoint) {
       this.curvePoints = [...this.curvePoints, lastPoint]; // need to create a new array for change detection
       this.wasChanged = true;
+    }
+    else {
+      this.curvePoints =[ '{20, 0}', '{100, 0}', '{20000, 0}' ];
     }
   }
   removePoint(index: number) {

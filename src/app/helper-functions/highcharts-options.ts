@@ -167,6 +167,12 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
         }
       }
     },
+    dataGrouping: {
+      // doesn't work well on logarithmic scale (and module import required)
+      // https://github.com/highcharts/highcharts/issues/20547
+      // enabled: true,
+      groupPixelWidth: 10
+    },
     zones: [
       {
         value: -10,

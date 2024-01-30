@@ -1,5 +1,4 @@
 import {abs as magnitude, complex, Complex, fft} from "mathjs";
-import {DEBUG} from "./debug";
 
 export function calculatePoints(responseDataValues: string[], enableSmoothing = true) {
   if (!responseDataValues || !responseDataValues.length) return [];
@@ -46,11 +45,11 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
     if (i> 1000) return (i % 20 === 0);
     if (i> 800) return (i % 15 === 0);
     if (i> 500) return (i % 5 === 0);
-    else return true;
+    return i >= 4; // remove everything less than 10Hz
   });
 
-  // console.log('points', points.length)
-  DEBUG('filteredPoints', filteredPoints.length)
+  console.log('points', points.length);
+  console.log('filteredPoints', filteredPoints.length);
 
   return filteredPoints;
 }
