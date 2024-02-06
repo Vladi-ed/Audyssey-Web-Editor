@@ -49,7 +49,7 @@ export class AppComponent {
             text: `Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
           },
           graphSmoothing: {
-            text: `${this.graphSmoothEnabled ? "✔️" : "☐&nbsp;"} Graph Smoothing`
+            text: `${this.graphSmoothEnabled ? "✔️" : ""} Graph Smoothing`
           },
           // dataSmoothing: {
           //   text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`

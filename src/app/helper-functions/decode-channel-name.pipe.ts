@@ -19,6 +19,7 @@ export function decodeChannelName(commandId?: string) {
     case 'FHR' : return 'Front Height Right';
     case 'SW1' : return 'Subwoofer';
     case 'SW2' : return 'Subwoofer 2';
+    case 'SWMIX' : return 'Subwoofer Mix';
     default: return commandId || '';
   }
 }

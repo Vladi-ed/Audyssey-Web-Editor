@@ -1,6 +1,6 @@
 import {abs as magnitude, complex, Complex, fft} from "mathjs";
 
-export function calculatePoints(responseDataValues: string[], enableSmoothing = true) {
+export function calculatePoints(responseDataValues: string[], enableSmoothing = true): number[][] {
   if (!responseDataValues || !responseDataValues.length) return [];
 
   let count = responseDataValues.length;
@@ -20,7 +20,6 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   let x = 0;
 
   if (enableSmoothing) {
-
     let smoothed = new Array(count);
     for (let j = 0; j < count; j++) {
       smoothed[j] = magnitude(cValues[j]);
@@ -40,11 +39,11 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   }
 
   const filteredPoints =  points.filter(function(_, i) {
-    if (i> 2500) return (i % 60 === 0);
-    if (i> 1500) return (i % 25 === 0);
-    if (i> 1000) return (i % 20 === 0);
-    if (i> 800) return (i % 15 === 0);
-    if (i> 500) return (i % 5 === 0);
+    if (i > 2500) return (i % 60 === 0);
+    if (i > 1500) return (i % 25 === 0);
+    if (i > 1000) return (i % 20 === 0);
+    if (i > 800) return (i % 15 === 0);
+    if (i > 500) return (i % 5 === 0);
     return i >= 4; // remove everything less than 10Hz
   });
 
