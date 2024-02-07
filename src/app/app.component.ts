@@ -4,7 +4,6 @@ import {DetectedChannel} from './interfaces/detected-channel';
 import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
-// import Sonification from 'highcharts/modules/sonification';
 // import HC_boost from 'highcharts/modules/boost'
 // import Draggable from 'highcharts/modules/draggable-points';
 // import Datagrouping from 'highcharts/modules/datagrouping';
@@ -13,7 +12,6 @@ import {options, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-functions/convert-draggable-points";
 
-// Sonification(Highcharts);
 // Draggable(Highcharts);
 // HC_boost(Highcharts);
 Exporting(Highcharts);
@@ -37,7 +35,7 @@ export class AppComponent {
 
   selectedChannel?: DetectedChannel;
   chartLogarithmicScale = true;
-  dataSmoothEnabled = true;
+  // dataSmoothEnabled = true;
   graphSmoothEnabled = false;
 
   // Updates context menu items for the chart based on the option's current state
@@ -46,7 +44,7 @@ export class AppComponent {
       exporting: {
         menuItemDefinitions: {
           xScale: {
-            text: `Switch To ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
+            text: `Switch to ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
           },
           graphSmoothing: {
             text: `${this.graphSmoothEnabled ? "✔️" : ""} Graph Smoothing`
@@ -60,27 +58,24 @@ export class AppComponent {
   }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    console.log('Highcharts callback');
+    console.log('Highcharts callback one time on graph init');
     if (chart.options.exporting?.menuItemDefinitions)
     {
-      chart.options.exporting.menuItemDefinitions['xScale'].onclick = () => {
+      const scaleBtn = chart.options.exporting.menuItemDefinitions['xScale'];
+      const graphSmoothingBtn = chart.options.exporting.menuItemDefinitions['graphSmoothing'];
+
+      scaleBtn.onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
         this.updateChart();
-        this.updateChartMenuItems(); // TODO: here we are updating graph 2 times
+        this.updateChartMenuItems(); // updateChart() doesn't update menus
       }
-      chart.options.exporting.menuItemDefinitions['graphSmoothing'].onclick = () => {
+      graphSmoothingBtn.onclick = () => {
         this.graphSmoothEnabled = !this.graphSmoothEnabled;
-        this.updateChart();
-        this.updateChartMenuItems();
-      }
-      chart.options.exporting.menuItemDefinitions['dataSmoothing'].onclick = () => {
-        this.dataSmoothEnabled = !this.dataSmoothEnabled;
         this.updateChart();
         this.updateChartMenuItems();
       }
     }
     this.chartObj = chart;
-    this.updateChartMenuItems();
   }
 
   async onUpload(files: FileList | null) {
