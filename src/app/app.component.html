@@ -103,7 +103,9 @@
                 </mat-radio-button>
             </mat-radio-group>
 
-            <mat-checkbox *ngIf="selectedChannel?.commandId !== 'SW1'" #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+          <ng-container *ngIf="calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)">
+            <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+          </ng-container>
 
         </mat-expansion-panel>
 
@@ -170,7 +172,7 @@
                 </mat-form-field>
 
                 <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()">Midrange Compensation</mat-checkbox>
-                <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>
+<!--                <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
                 <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
 
             </ng-container>
@@ -194,8 +196,21 @@
     </mat-accordion>
 
     <mat-card class="chart-card">
+        <mat-card-header>
+            <ng-container *ngIf="selectedChannel">
+              <mat-form-field appearance="outline" style="position: absolute; z-index: 1; margin-top: -3px; margin-left: 12px;">
+  <!--                            <mat-label>Selected channel</mat-label>-->
+                <mat-select [(ngModel)]="selectedChannel" (selectionChange)="updateChart()" >
+                  <mat-option *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
+                    {{ channel.commandId | decodeChannelName }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-container>
+        </mat-card-header>
+
         <mat-card-content>
-            <highcharts-chart style="width: 100%; height: 80vh; display: block;"
+            <highcharts-chart style="width: 100%; height: 80vh; display: block; margin-top: 5px"
                               [Highcharts]="highcharts"
                               [options]="chartOptions"
                               [(update)]="chartUpdateFlag"

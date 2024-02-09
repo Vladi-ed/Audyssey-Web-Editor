@@ -10,7 +10,7 @@ export function convertToDraggablePoints(arr: string[]): Highcharts.PointOptions
   })
 }
 
-export function convertToNonDraggablePoints(arr: Array<[number, number]>): Highcharts.PointOptionsObject[] {
+export function convertToNonDraggablePoints(arr: number[][]): Highcharts.PointOptionsObject[] {
   return arr.map(point => {
     return {
       x: point[0],

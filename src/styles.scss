@@ -36,11 +36,3 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
 h1 {
   font-weight: 700;
 }
-
-// remove graph subtitle and y-axis title on small devices
-.highcharts-subtitle,
-.highcharts-yaxis .highcharts-axis-title {
-  @media (max-width: 900px) {
-    display: none;
-  }
-}

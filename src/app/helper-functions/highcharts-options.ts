@@ -1,4 +1,18 @@
 export const options: Highcharts.Options = {
+  responsive: {
+    rules: [{
+      chartOptions: {
+        chart: { height: 500 },
+        subtitle: { text: '' },
+        yAxis: {
+          enabled: false,
+          labels: { enabled: false },
+          title: { text: '' }
+        }
+      },
+      condition: { maxWidth: 500 }
+    }]
+  },
   chart: {
     zooming: {
       type: 'x',
@@ -43,19 +57,13 @@ export const options: Highcharts.Options = {
       //   },
       //   text: 'Play'
       // },
-      xScale: {
-        text: 'Switch to Linear scale'
-      },
-      dataSmoothing: {
-        text: 'Data Smoothing'
-      },
-      graphSmoothing: {
-        text: 'Graph Smoothing'
-      }
+      xScaleBtn: { text: 'Switch to Linear scale' },
+      dataSmoothingBtn: { text: 'Data Smoothing' },
+      graphSmoothingBtn: { text: 'Graph Smoothing' }
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScale', 'graphSmoothing']
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScaleBtn', 'graphSmoothingBtn']
       },
     },
     chartOptions: {
@@ -65,16 +73,13 @@ export const options: Highcharts.Options = {
           fontSize: '22px'
         }
       },
-      credits: {
-        enabled: false
-      }
+      credits: { enabled: false }
     }
   },
   sonification: {
     duration: 9500,
     defaultInstrumentOptions: {
       instrument: 'sine',
-
       mapping: {
         volume: 'y',
         noteDuration: {
@@ -90,12 +95,8 @@ export const options: Highcharts.Options = {
     },
   },
   accessibility: { enabled: false },
-  title: {
-    text: 'Measurements graph'
-  },
-  subtitle: {
-    text: 'First measurement'
-  },
+  title: { text: 'Measurements graph' },
+  subtitle: { text: 'First measurement' },
   tooltip: {
     headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
     // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
@@ -109,9 +110,6 @@ export const options: Highcharts.Options = {
     type: 'logarithmic',
     title: { text: 'Frequency (Hz)' },
     crosshair: true,
-    accessibility: {
-      description: 'Frequency'
-    },
     // minRange: 1, // Set the minimum range for zooming - not working
   },
   yAxis: {
@@ -119,9 +117,6 @@ export const options: Highcharts.Options = {
     max: 25,
     title: { text: 'Amplitude (dB)' },
     crosshair: true,
-
-    // tickInterval: 5,
-    // minorTickInterval: 5
   },
   // plotOptions: {
   //   series: {
@@ -141,12 +136,8 @@ export const options: Highcharts.Options = {
   //     }
   //   }
   // },
-  legend: {
-    enabled: false
-  },
-  credits: {
-    enabled: false
-  }
+  legend: { enabled: false },
+  credits: { enabled: false }
 }
 
 

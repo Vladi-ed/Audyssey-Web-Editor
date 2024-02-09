@@ -10,7 +10,8 @@ import * as Highcharts from 'highcharts';
 import Exporting from 'highcharts/modules/exporting';
 import {options, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
-import {convertToDraggablePoints, convertToNonDraggablePoints} from "./helper-functions/convert-draggable-points";
+import {exportFile} from "./helper-functions/export-file";
+import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
 
 // Draggable(Highcharts);
 // HC_boost(Highcharts);
@@ -24,14 +25,14 @@ Highcharts.setOptions(options);
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  highcharts: typeof Highcharts = Highcharts;
+  readonly highcharts: typeof Highcharts = Highcharts;
   chartOptions: Highcharts.Options = { series: seriesOptions };
   chartUpdateFlag = false;
 
   private chartObj?: Highcharts.Chart;
 
   audysseyData: AudysseyInterface = { detectedChannels: [] };
-  calculatedChannelsData?: Map<string, number[][]>
+  calculatedChannelsData?: Map<number, number[][]>
 
   selectedChannel?: DetectedChannel;
   chartLogarithmicScale = true;
@@ -41,15 +42,18 @@ export class AppComponent {
   // Updates context menu items for the chart based on the option's current state
   updateChartMenuItems() {
     this.chartObj?.update({
+      xAxis: {
+        type: this.chartLogarithmicScale ? "logarithmic" : "linear",
+      },
       exporting: {
         menuItemDefinitions: {
-          xScale: {
+          xScaleBtn: {
             text: `Switch to ${this.chartLogarithmicScale ? "Linear" : "Logarithmic"} Scale`
           },
-          graphSmoothing: {
+          graphSmoothingBtn: {
             text: `${this.graphSmoothEnabled ? "✔️" : ""} Graph Smoothing`
           },
-          // dataSmoothing: {
+          // dataSmoothingBtn: {
           //   text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
           // }
         }
@@ -61,17 +65,16 @@ export class AppComponent {
     console.log('Highcharts callback one time on graph init');
     if (chart.options.exporting?.menuItemDefinitions)
     {
-      const scaleBtn = chart.options.exporting.menuItemDefinitions['xScale'];
-      const graphSmoothingBtn = chart.options.exporting.menuItemDefinitions['graphSmoothing'];
+      const scaleBtn = chart.options.exporting.menuItemDefinitions['xScaleBtn'];
+      const graphSmoothingBtn = chart.options.exporting.menuItemDefinitions['graphSmoothingBtn'];
 
       scaleBtn.onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
-        this.updateChart();
         this.updateChartMenuItems(); // updateChart() doesn't update menus
       }
       graphSmoothingBtn.onclick = () => {
         this.graphSmoothEnabled = !this.graphSmoothEnabled;
-        this.updateChart();
+        chart.series[0].update({type: this.graphSmoothEnabled ? 'spline' : 'line'});
         this.updateChartMenuItems();
       }
     }
@@ -111,12 +114,15 @@ export class AppComponent {
   }
 
   updateChart() {
-    console.log('updateChart()')
+    // console.log('updateChart()')
 
     const XMin = 10, XMax = 24000;
 
     this.chartOptions.title = {
       text: decodeChannelName(this.selectedChannel?.commandId)
+    };
+    this.chartOptions.subtitle = {
+      style: {color: 'white'}
     };
 
     // add frequency Rolloff
@@ -151,7 +157,7 @@ export class AppComponent {
     };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.commandId);
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.enChannelType);
 
     // adding first graph
     this.chartOptions.series![0] = {
@@ -161,113 +167,44 @@ export class AppComponent {
     };
 
     this.updateTargetCurve();
-    // this.updateTargetCurve2();
   }
 
   addSubwooferToTheGraph(checked: boolean) {
-    // const subDataValues = this.audysseyData.detectedChannels.at(-1)?.responseData[0] || [];
-    // const subDataPoints = calculatePoints(subDataValues, false).slice(0, 62);
-    // const customCrossover = this.selectedChannel?.customCrossover;
-    // const subCutOff = customCrossover ? Number(customCrossover) / 2.9296875 : 63;
-
     const subCutOff = parseInt('200 Hz') / 3;
-    const subDataPoints = this.calculatedChannelsData?.get('SW1')?.slice(0, subCutOff);
+    const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
 
     // if (value) this.chartObj?.addSeries({});
     // else this.chartObj?.series.at(-1).destroy();
 
-    if (this.chartOptions.series)
-      if (checked) this.chartOptions.series[1] = {
-        data: subDataPoints,
-        type: 'spline',
-        name: 'Subwoofer',
-      };
-      else this.chartOptions.series[1] = {
-        data: [],
-        type: 'spline',
-      }
+    if (checked) this.chartOptions.series![1] = {
+      data: subDataPoints?.slice(0, subCutOff),
+      type: 'spline',
+      name: 'Subwoofer',
+    };
+    else this.chartOptions.series![1] = {
+      data: [],
+      type: 'spline',
+    }
 
     this.chartUpdateFlag = true;
   }
 
   updateTargetCurve() {
-    let data: any[] = this.audysseyData.enTargetCurveType == 1 ? [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]] :
-      [[20, 0],  [3600, 0], [20000, -6]];
-
-    if (this.selectedChannel?.midrangeCompensation) data.push([1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]);
-
-    if (this.selectedChannel?.customTargetCurvePoints) {
-      data = [
-        ...convertToNonDraggablePoints(data),
-        ...convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints)
-          .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
-      ].sort((a, b) => a.x! - b.x!);
-    }
-    console.log('updateTargetCurve() data', data);
-
-
-    if (this.audysseyData.enTargetCurveType) {
-      this.chartOptions.series![2] = {
-        data,
-        type: 'spline',
-      };
-    }
-
-    this.chartUpdateFlag = true;
-  }
-
-  updateTargetCurve2() {
-    const ROLLOFF_1_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [20000, -6]];
-    const ROLLOFF_2_TARGET_CURVE: Array<[number, number]>  = [[20, 0],  [3600, 0], [9910, -2],[13300, -2.9], [16380, -4], [20000, -7]];
-    const MIDRANGE_COMPENSATION_CONTROL_POINTS: Array<[number, number]> = [[1000, 0], [1800, -3.6], [2000, -3.63], [3100, 0]];
-    let targetCurve = this.audysseyData.enTargetCurveType == 2
-      ? ROLLOFF_2_TARGET_CURVE
-      : ROLLOFF_1_TARGET_CURVE;
-
-    if (this.selectedChannel?.midrangeCompensation) {
-      targetCurve = targetCurve.concat(MIDRANGE_COMPENSATION_CONTROL_POINTS);
-    }
-
-    const targetPoints = convertToNonDraggablePoints(targetCurve);
-    let data = targetPoints;
-    if (this.selectedChannel?.customTargetCurvePoints) {
-      // if there are custom target curve points, they should override any built-in target curve points
-      const customPoints = convertToDraggablePoints(this.selectedChannel?.customTargetCurvePoints);
-      const customFreqs = new Set(customPoints.map(e => e.x));
-      data = [
-        ...targetPoints.filter(pt => !customFreqs.has(pt.x)),
-        ...customPoints
-      ];
-    }
-
-    data = data.sort((a, b) => a.x! - b.x!);
-
-    console.log('data', data);
-
-    if (this.audysseyData.enTargetCurveType) {
-      this.chartOptions.series!.push({
-        data,
-        type: 'spline',
-      });
-    }
+    this.chartOptions.series![2] = {
+      data: calculateTargetCurve(
+        this.audysseyData.enTargetCurveType!,
+        this.selectedChannel?.midrangeCompensation,
+        this.selectedChannel?.customTargetCurvePoints,
+        this.selectedChannel?.frequencyRangeRolloff
+      ),
+      type: 'spline',
+    };
 
     this.chartUpdateFlag = true;
   }
 
   exportFile() {
-    const blob = new Blob([JSON.stringify(this.audysseyData)], {type: 'application/ady'});
-    const url = URL.createObjectURL(blob) // Create an object URL from blob
-
-    const a = document.createElement('a') // Create "a" element
-    a.setAttribute('href', url) // Set "a" element link
-    a.setAttribute('download', this.audysseyData.title + '_' + new Date().toLocaleDateString() + '.ady') // Set download filename
-    a.click() // Start downloading
-    URL.revokeObjectURL(url);
-  }
-
-  playChart(ev?: Event | Highcharts.Dictionary<any> | undefined) {
-    console.log('playChart', ev)
-    // this.chartObj?.toggleSonify();
+    exportFile(this.audysseyData, this.audysseyData.title, 'ady');
   }
 
   async loadExample() {
