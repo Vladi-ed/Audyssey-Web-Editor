@@ -36,3 +36,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-
 h1 {
   font-weight: 700;
 }
+
+// highcharts
+.tooltip-header {
+  font-weight: 700;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  text-align: center;
+  border: 1.5px solid #555;
+}

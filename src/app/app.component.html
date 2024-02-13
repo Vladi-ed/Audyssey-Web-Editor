@@ -9,7 +9,7 @@
         <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
         <ng-container *ngIf="!audysseyData.targetModelName">
-           or <label class="flat-btn" matRipple (click)="loadExample()">Load Example</label>
+           or <span class="flat-btn" matRipple (click)="loadExample()">Load Example</span>
         </ng-container>
 
         <ng-container *ngIf="fileInput.files?.length">
@@ -198,7 +198,7 @@
     <mat-card class="chart-card">
         <mat-card-header>
             <ng-container *ngIf="selectedChannel">
-              <mat-form-field appearance="outline" style="position: absolute; z-index: 1; margin-top: -3px; margin-left: 12px;">
+              <mat-form-field appearance="outline" style="position: absolute; z-index: 1; margin-top: -3.5px; margin-left: 12px;">
   <!--                            <mat-label>Selected channel</mat-label>-->
                 <mat-select [(ngModel)]="selectedChannel" (selectionChange)="updateChart()" >
                   <mat-option *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">

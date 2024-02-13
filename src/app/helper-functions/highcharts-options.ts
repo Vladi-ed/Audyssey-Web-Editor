@@ -1,8 +1,9 @@
-export const options: Highcharts.Options = {
+import { Point } from "highcharts";
+
+export const initOptions: Highcharts.Options = {
   responsive: {
     rules: [{
       chartOptions: {
-        chart: { height: 500 },
         subtitle: { text: '' },
         yAxis: {
           enabled: false,
@@ -98,11 +99,23 @@ export const options: Highcharts.Options = {
   title: { text: 'Measurements graph' },
   subtitle: { text: 'First measurement' },
   tooltip: {
-    headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
+    // headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
+    headerFormat: '<div class="tooltip-header">{series.name}</div>',
+    pointFormatter: function(this: Point) {
+      const freqStr = this!.x > 1000
+        ? `${(this!.x / 1000).toFixed(2)} kHz`
+        : `${Math.round(this!.x)} Hz`;
+      return `
+          <div style="padding-left: 4px">
+            <div>Frequency: &nbsp;<b>${freqStr}</b></div>
+            <div>Amplitude: <b>${this!.y! > 0 ? "+" : ""}${this!.y!.toFixed(1)} dB</b> <span style="color: ${this!.color}; font-size: 17px">●</span></div>
+          </div>
+            `;
+    },
     // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+    // valueSuffix: ' dB',
     valueDecimals: 1,
-    valueSuffix: ' dB',
-    // shared: true,
+    useHTML: true,
   },
   xAxis: {
     min: 20,

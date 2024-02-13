@@ -8,7 +8,7 @@ import * as Highcharts from 'highcharts';
 // import Draggable from 'highcharts/modules/draggable-points';
 // import Datagrouping from 'highcharts/modules/datagrouping';
 import Exporting from 'highcharts/modules/exporting';
-import {options, seriesOptions} from './helper-functions/highcharts-options';
+import {initOptions, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {exportFile} from "./helper-functions/export-file";
 import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
@@ -17,7 +17,7 @@ import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
 // HC_boost(Highcharts);
 Exporting(Highcharts);
 // Datagrouping(Highcharts);
-Highcharts.setOptions(options);
+Highcharts.setOptions(initOptions);
 
 @Component({
   selector: 'app-root',
@@ -209,6 +209,7 @@ export class AppComponent {
 
   async loadExample() {
     this.chartObj?.showLoading();
+    this.audysseyData.targetModelName = 'Loading...';
     const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.audysseyData = example;
     this.processDataWithWorker(example);
