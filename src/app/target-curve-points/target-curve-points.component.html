@@ -4,9 +4,11 @@
       <mat-label>Hz</mat-label>
       <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)"
              required inputmode="decimal"
-             pattern="^[1-9][0-9]{0,4}[.]?\d+$"
-             maxlength="18" minlength="2" [name]="'Frequency' + i"
+             autocomplete="Frequency"
+             pattern="^([2-9]\d|[1-9]\d{2,3}|1\d{4}|20000)(\.\d+)?$"
+             maxlength="18" [name]="'Frequency' + i"
       >
+<!--      (2[0-9]|[3-9][0-9]|[1-9][0-9]{2,3}|1[0-9]{4}|20000)-->
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Gain</mat-label>

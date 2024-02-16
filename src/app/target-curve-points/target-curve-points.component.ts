@@ -21,8 +21,7 @@ export class TargetCurvePointsComponent {
 
   changeItem(point: { Hz: string; vol: number }, index: number) {
     if (isNaN(Number(point.Hz))) return;
-    if (Number(point.Hz) > 20000) point.Hz = '20000';
-    if (Number(point.Hz) < 20) point.Hz = '20';
+    // if (Number(point.Hz) > 20000) point.Hz = '20000';
 
     // point.Hz.padEnd(18, '0')
     this.curvePoints[index] = '{' + point.Hz + ', ' + point.vol + '}';
@@ -32,11 +31,11 @@ export class TargetCurvePointsComponent {
   addPoint() {
     const lastPoint = this.curvePoints.at(-1);
     if (lastPoint) {
-      this.curvePoints = [...this.curvePoints, lastPoint]; // need to create a new array for change detection
+      this.curvePoints = [...this.curvePoints, '{20000, 0}']; // need to create a new array for change detection
       this.wasChanged = true;
     }
     else {
-      this.curvePoints =[ '{20, 0}', '{100, 0}', '{20000, 0}' ];
+      this.curvePoints = ['{20, 0}', '{100, 0}', '{20000, 0}'];
     }
   }
   removePoint(index: number) {
