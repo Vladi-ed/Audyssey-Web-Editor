@@ -1,6 +1,6 @@
-import { Point } from "highcharts";
+import { Point, SeriesOptionsType, Options } from "highcharts";
 
-export const initOptions: Highcharts.Options = {
+export const initOptions: Options = {
   responsive: {
     rules: [{
       chartOptions: {
@@ -42,12 +42,12 @@ export const initOptions: Highcharts.Options = {
     //   }
     // }
   },
-  boost: {
-    // allowForce: true,
-    pixelRatio: 1, // 2 makes that graph sharper but line width become 0.5
-    seriesThreshold: 1,
-    useGPUTranslations: true
-  },
+  // boost: {
+  //   // allowForce: true,
+  //   pixelRatio: 1, // 2 makes that graph sharper but line width become 0.5
+  //   seriesThreshold: 1,
+  //   useGPUTranslations: true
+  // },
   exporting: {
     sourceWidth: 1920,
     menuItemDefinitions: {
@@ -77,24 +77,24 @@ export const initOptions: Highcharts.Options = {
       credits: { enabled: false }
     }
   },
-  sonification: {
-    duration: 9500,
-    defaultInstrumentOptions: {
-      instrument: 'sine',
-      mapping: {
-        volume: 'y',
-        noteDuration: {
-          mapTo: '-x',
-          mapFunction: 'logarithmic',
-        },
-        frequency: {
-          mapTo: 'x',
-          min: 0,
-          max: 23000
-        },
-      }
-    },
-  },
+  // sonification: {
+  //   duration: 9500,
+  //   defaultInstrumentOptions: {
+  //     instrument: 'sine',
+  //     mapping: {
+  //       volume: 'y',
+  //       noteDuration: {
+  //         mapTo: '-x',
+  //         mapFunction: 'logarithmic',
+  //       },
+  //       frequency: {
+  //         mapTo: 'x',
+  //         min: 0,
+  //         max: 23000
+  //       },
+  //     }
+  //   },
+  // },
   accessibility: { enabled: false },
   title: { text: 'Measurements graph' },
   subtitle: { text: 'First measurement' },
@@ -109,8 +109,7 @@ export const initOptions: Highcharts.Options = {
           <div style="padding-left: 4px">
             <div>Frequency: &nbsp;<b>${freqStr}</b></div>
             <div>Amplitude: <b>${this!.y! > 0 ? "+" : ""}${this!.y!.toFixed(1)} dB</b> <span style="color: ${this!.color}; font-size: 17px">●</span></div>
-          </div>
-            `;
+          </div> `;
     },
     // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
     // valueSuffix: ' dB',
@@ -154,7 +153,7 @@ export const initOptions: Highcharts.Options = {
 }
 
 
-export const seriesOptions: Highcharts.SeriesOptionsType[] = [
+export const seriesOptions: SeriesOptionsType[] = [
   {
     name: 'Selected Channel',
     data: [],
@@ -163,6 +162,7 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
     showInNavigator: true,
     dashStyle: 'Solid',
     zoneAxis: 'y',
+    allowPointSelect: true,
     marker: {
       enabled: false,
       states: {
@@ -223,13 +223,13 @@ export const seriesOptions: Highcharts.SeriesOptionsType[] = [
 
     dragDrop: {
       draggableY: true,
-      draggableX: true,
-      dragMaxY: 12, dragMinY: -12,
-      // dragPrecisionX: 10
+      dragMaxY: 12,
+      dragMinY: -12,
+      dragPrecisionY: 0.1,
+      dragPrecisionX: 1,
     },
     stickyTracking: false,
-    allowPointSelect: true,
 
-    enableMouseTracking: false // to disable dragging
+    // enableMouseTracking: false // to disable dragging
   }
 ];

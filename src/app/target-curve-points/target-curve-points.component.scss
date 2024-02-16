@@ -26,6 +26,20 @@
   width: 30px
 }
 
+.save-btn {
+  border: 1.5px solid #545454;
+  &:disabled {
+    opacity: 0.4;
+    border-width: 1px;
+  }
+}
+.add-btn {
+  flex-grow: 1;
+}
+.copy-paste-btn {
+  border: none;
+}
+
 @keyframes show-row {
   100% {
     opacity: 1;

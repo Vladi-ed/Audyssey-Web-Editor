@@ -5,7 +5,7 @@ import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
 // import HC_boost from 'highcharts/modules/boost'
-// import Draggable from 'highcharts/modules/draggable-points';
+import Draggable from 'highcharts/modules/draggable-points';
 // import Datagrouping from 'highcharts/modules/datagrouping';
 import Exporting from 'highcharts/modules/exporting';
 import {initOptions, seriesOptions} from './helper-functions/highcharts-options';
@@ -13,10 +13,10 @@ import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {exportFile} from "./helper-functions/export-file";
 import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
 
-// Draggable(Highcharts);
-// HC_boost(Highcharts);
-Exporting(Highcharts);
 // Datagrouping(Highcharts);
+// HC_boost(Highcharts);
+Draggable(Highcharts);
+Exporting(Highcharts);
 Highcharts.setOptions(initOptions);
 
 @Component({
@@ -36,15 +36,11 @@ export class AppComponent {
 
   selectedChannel?: DetectedChannel;
   chartLogarithmicScale = true;
-  // dataSmoothEnabled = true;
   graphSmoothEnabled = false;
 
   // Updates context menu items for the chart based on the option's current state
   updateChartMenuItems() {
     this.chartObj?.update({
-      xAxis: {
-        type: this.chartLogarithmicScale ? "logarithmic" : "linear",
-      },
       exporting: {
         menuItemDefinitions: {
           xScaleBtn: {
@@ -53,9 +49,6 @@ export class AppComponent {
           graphSmoothingBtn: {
             text: `${this.graphSmoothEnabled ? "✔️" : ""} Graph Smoothing`
           },
-          // dataSmoothingBtn: {
-          //   text: `${this.dataSmoothEnabled ? "\u2713 " : "&nbsp;&nbsp;"} Data Smoothing`
-          // }
         }
       }
     });
@@ -63,6 +56,38 @@ export class AppComponent {
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     console.log('Highcharts callback one time on graph init');
+
+    // update target curve with draggable points
+    let replacePoint: string;
+    chart.series[2].update({
+      type: 'spline',
+      point: {
+        events: {
+          dragStart: function () {
+            replacePoint = '{' + this.x;
+          },
+          drop: (a) => {
+            // cannot just convert target curve to points because it contains midrange compensation and rolloff
+            // const newPointsArr = chart.series[2].points.map(point => '{' + point.x + ', ' + point.y + '}');
+            // this.selectedChannel!.customTargetCurvePoints = newPointsArr;
+            // console.log('a.newPoint', a.newPoint, newPointsArr);
+
+            const newCurvePoints: string[] = [];
+            this.selectedChannel?.customTargetCurvePoints.forEach((point, i) => {
+              if (point.startsWith(replacePoint)) {
+                newCurvePoints[i] = point.replace(/, ?[-+]?\d*\.?\d+/g, ', '
+                  // @ts-ignore
+                  + a.newPoint.y.toFixed(1));
+              }
+              else newCurvePoints[i] = point;
+            });
+
+            this.selectedChannel!.customTargetCurvePoints = newCurvePoints;
+          }
+        }
+      },
+    });
+
     if (chart.options.exporting?.menuItemDefinitions)
     {
       const scaleBtn = chart.options.exporting.menuItemDefinitions['xScaleBtn'];
@@ -70,6 +95,7 @@ export class AppComponent {
 
       scaleBtn.onclick = () => {
         this.chartLogarithmicScale = !this.chartLogarithmicScale;
+        chart.update({ xAxis: { type: this.chartLogarithmicScale ? "logarithmic" : "linear" }});
         this.updateChartMenuItems(); // updateChart() doesn't update menus
       }
       graphSmoothingBtn.onclick = () => {
@@ -109,7 +135,7 @@ export class AppComponent {
     } else {
       // Web workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
-      alert('Your browser is not supported. Please use latest Firefox or Chrome browser.');
+      alert('Your browser is not supported. Please use latest Firefox or Chrome.');
     }
   }
 
@@ -152,7 +178,6 @@ export class AppComponent {
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
-      type: this.chartLogarithmicScale ? "logarithmic" : "linear",
       plotBands: xAxisBands
     };
 
@@ -192,7 +217,7 @@ export class AppComponent {
   updateTargetCurve() {
     this.chartOptions.series![2] = {
       data: calculateTargetCurve(
-        this.audysseyData.enTargetCurveType!,
+        this.audysseyData.enTargetCurveType,
         this.selectedChannel?.midrangeCompensation,
         this.selectedChannel?.customTargetCurvePoints,
         this.selectedChannel?.frequencyRangeRolloff

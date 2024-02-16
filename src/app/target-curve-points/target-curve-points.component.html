@@ -2,11 +2,15 @@
   <div *ngFor="let point of (curvePoints | convertPoints); let i = index" class="point-row">
     <mat-form-field appearance="outline" style="margin-right: 12px">
       <mat-label>Hz</mat-label>
-      <input matInput [(ngModel)]="point.Hz" (change)="changeItem(point, i)" required inputmode="decimal" pattern="[1-9][0-9]*[.]?[0-9]+" maxlength="18" minlength="2" [name]="'Frequency' + i">
+      <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)"
+             required inputmode="decimal"
+             pattern="^[1-9][0-9]{0,4}[.]?\d+$"
+             maxlength="18" minlength="2" [name]="'Frequency' + i"
+      >
     </mat-form-field>
     <mat-form-field appearance="outline">
       <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required inputmode="decimal" pattern="^-?[0-9]*[.]?[0-9]+" maxlength="20" [name]="'Gain' + i">
+      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required type="number" inputmode="decimal" min="-12" max="12" step="0.1" [name]="'Gain' + i">
     </mat-form-field>
 
     <button class="remove-btn" matRipple (click)="removePoint(i)">
@@ -15,11 +19,15 @@
   </div>
 
   <div style="display: flex; justify-items: stretch; gap: 12px">
-    <button matRipple type="button" style="flex-grow: 1; transition-property: width" class="flat-btn" (click)="addPoint()">Add new Point</button>
-    <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn" (click)="save()" [disabled]="pointsForm.invalid">Save</button>
+    <button matRipple type="button" class="flat-btn add-btn" (click)="addPoint()">
+      Add new Point
+    </button>
+    <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn save-btn" (click)="save()" [disabled]="pointsForm.invalid">
+      Save
+    </button>
   </div>
   <div style="display: flex; margin-top: 6px">
-    <button matRipple class="flat-btn" style="border: none" (click)="copyPoints()">Copy</button>
-    <button matRipple class="flat-btn" style="border: none" (click)="pastePoints()">Paste</button>
+    <button matRipple class="flat-btn copy-paste-btn" (click)="copyPoints()">Copy</button>
+    <button matRipple class="flat-btn copy-paste-btn" (click)="pastePoints()">Paste</button>
   </div>
 </form>

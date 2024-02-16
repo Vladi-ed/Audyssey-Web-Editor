@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 function copyArray(arr: string[] | undefined) {
-  if (arr && arr.length) return [...arr]; // make a copy
+  if (arr?.length) return [...arr]; // make a copy
   else return [];
 }
 
@@ -19,12 +19,10 @@ export class TargetCurvePointsComponent {
 
   wasChanged = false;
 
-  changeItem(point: { Hz: string; vol: string }, index: number) {
-    if (isNaN(Number(point.Hz)) || isNaN(Number(point.vol))) return;
+  changeItem(point: { Hz: string; vol: number }, index: number) {
+    if (isNaN(Number(point.Hz))) return;
     if (Number(point.Hz) > 20000) point.Hz = '20000';
     if (Number(point.Hz) < 20) point.Hz = '20';
-    if (Number(point.vol) < -12) point.vol = '-12';
-    if (Number(point.vol) > 12) point.vol = '12';
 
     // point.Hz.padEnd(18, '0')
     this.curvePoints[index] = '{' + point.Hz + ', ' + point.vol + '}';
@@ -78,8 +76,8 @@ export class TargetCurvePointsComponent {
 
   private sortPoints() {
     this.curvePoints.sort((a, b) => {
-      const [aFreq] = a.substring(1, a.length - 1).split(', ');
-      const [bFreq] = b.substring(1, b.length - 1).split(', ');
+      const [aFreq] = a.substring(1, a.length - 1).split(',');
+      const [bFreq] = b.substring(1, b.length - 1).split(',');
       return Number(aFreq) - Number(bFreq);
     });
   }

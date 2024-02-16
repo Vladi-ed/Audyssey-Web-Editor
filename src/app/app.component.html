@@ -148,7 +148,7 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Crossover</mat-label>
                     <mat-select [(ngModel)]="selectedChannel.customCrossover" (selectionChange)="updateChart()">
-                        <mat-option [value]="undefined"></mat-option>
+                        <mat-option [value]="undefined">Auto</mat-option>
                         <mat-option [value]="'40'">40 Hz</mat-option>
                         <mat-option [value]="'60'">60 Hz</mat-option>
                         <mat-option [value]="'80'">80 Hz</mat-option>
@@ -165,7 +165,7 @@
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Speaker Type</mat-label>
                     <mat-select [(ngModel)]="selectedChannel.customSpeakerType">
-                        <mat-option [value]="undefined"></mat-option>
+                        <mat-option [value]="undefined">Auto</mat-option>
                         <mat-option [value]="'S'">Small</mat-option>
                         <mat-option [value]="'L'">Large</mat-option>
                     </mat-select>
@@ -188,7 +188,11 @@
 
             <label>Frequency (Hz), Gain (dB)</label>
 
-            <app-target-curve-points *ngIf="selectedChannel" [(curvePoints)]="selectedChannel.customTargetCurvePoints" (curvePointsChange)="updateChart()" />
+            <app-target-curve-points
+              *ngIf="selectedChannel"
+              [(curvePoints)]="selectedChannel.customTargetCurvePoints"
+              (curvePointsChange)="updateTargetCurve()"
+            />
 
 
         </mat-expansion-panel>
