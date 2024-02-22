@@ -21,6 +21,7 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   if (enableSmoothing) {
     const smoothY = LinSpacedFracOctaveSmooth(cValues.map(value => magnitude(value)));
 
+    // filtering
     for (let i = 4; i < smoothY.length; i++) {
       if ((i <= 500 || i % 5 === 0) && (i <= 800 || i % 15 === 0) && (i <= smoothY.length/2 || i % 30 === 0)) { // filtering
         points.push([frequencies[i], 20 * Math.log10(smoothY[i])]);
@@ -30,7 +31,7 @@ export function calculatePoints(responseDataValues: string[], enableSmoothing = 
   else for (let cValue of cValues) {
     points.push([frequencies[x++], 20 * Math.log10(magnitude(cValue) as any)]);
   }
-  console.log(points.length, 'points');
+  // console.log(points.length, 'points');
   return points;
 }
 

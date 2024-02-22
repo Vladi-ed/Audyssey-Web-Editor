@@ -151,19 +151,23 @@ export class AppComponent {
       style: {color: 'white'}
     };
 
+    const xAxisBands = [];
+
     // add frequency Rolloff
-    const xAxisBands = [{
-      from: this.selectedChannel?.frequencyRangeRolloff,
-      to: XMax,
-      color: 'rgba(68, 170, 213, 0.1)',
-      label: {
-        text: 'Disabled',
-        style: { color: '#606060' }
-      }
-    }];
+    if (this.selectedChannel?.frequencyRangeRolloff && this.selectedChannel.frequencyRangeRolloff < 20000 ) {
+      xAxisBands.push({
+        from: this.selectedChannel.frequencyRangeRolloff,
+        to: XMax,
+        color: 'rgba(68, 170, 213, 0.1)',
+        label: {
+          text: 'Disabled',
+          style: {color: '#606060'}
+        }
+      });
+    }
 
     // add Crossover if it's a logarithmic scale
-    if (this.selectedChannel?.customCrossover && this.chartLogarithmicScale) {
+    if (this.selectedChannel?.customCrossover && this.selectedChannel.customCrossover != 'F' && this.chartLogarithmicScale) {
       xAxisBands.push({
         from: XMin,
         to: decodeCrossover(this.selectedChannel.customCrossover),
@@ -238,5 +242,29 @@ export class AppComponent {
     const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
     this.audysseyData = example;
     this.processDataWithWorker(example);
+  }
+
+  updateCrossover() {
+    if (this.selectedChannel?.customCrossover) {
+      if (this.selectedChannel.customCrossover === 'F')
+        this.selectedChannel.customSpeakerType = 'L';
+      else
+        this.selectedChannel.customSpeakerType = 'S';
+    }
+    else this.selectedChannel!.customSpeakerType = undefined;
+
+    this.updateChart();
+  }
+
+  updateSpeakerType() {
+    if (this.selectedChannel?.customSpeakerType) {
+      if (this.selectedChannel.customSpeakerType === 'L')
+        this.selectedChannel.customCrossover = 'F'
+      else
+        this.selectedChannel.customCrossover = '80';
+    }
+    else this.selectedChannel!.customCrossover = undefined;
+
+    this.updateChart();
   }
 }
