@@ -7,6 +7,11 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
 
   if (midrangeComp) standardCurve.push([1000, 0], [1800, -3.6], [2000, -3.6], [3100, 0]);
 
+  if (customPoints?.length && customPoints.length > 100) {
+    customPoints.length = 100;
+    alert('There are more than 100 custom target points. Some of them will be hidden on the graph.')
+  }
+
   const customCurve =  [
     ...convertToNonDraggablePoints(standardCurve),
     ...convertToDraggablePoints(customPoints || [])
