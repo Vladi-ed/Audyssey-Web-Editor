@@ -98,9 +98,11 @@
 
 <!--            <label>Pick one of {{ audysseyData.detectedChannels.length }} channels:</label>-->
             <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
-                <mat-radio-button class="channel-radio-button" *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
-                    {{ channel.commandId | decodeChannelName }}
+              @for (channel of audysseyData.detectedChannels; track $index) {
+                <mat-radio-button class="channel-radio-button" [value]="channel">
+                  {{ channel.commandId | decodeChannelName }}
                 </mat-radio-button>
+              }
             </mat-radio-group>
 
           <ng-container *ngIf="calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)">
@@ -205,9 +207,11 @@
               <mat-form-field appearance="outline" style="position: absolute; z-index: 1; margin-top: -3.5px; margin-left: 12px;">
   <!--                            <mat-label>Selected channel</mat-label>-->
                 <mat-select [(ngModel)]="selectedChannel" (selectionChange)="updateChart()" >
-                  <mat-option *ngFor="let channel of audysseyData.detectedChannels" [value]="channel">
-                    {{ channel.commandId | decodeChannelName }}
-                  </mat-option>
+                  @for (channel of audysseyData.detectedChannels; track $index) {
+                    <mat-option [value]="channel">
+                      {{ channel.commandId | decodeChannelName }}
+                    </mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
             </ng-container>

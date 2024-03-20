@@ -1,57 +1,58 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
 
 function copyArray(arr: string[] | undefined) {
-  if (arr?.length) return [...arr]; // make a copy
+  if (arr?.length) return [...arr];
   else return [];
 }
 
 @Component({
   selector: 'app-target-curve-points',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './target-curve-points.component.html',
-  styleUrls: ['./target-curve-points.component.scss']
+  styleUrl: './target-curve-points.component.scss'
 })
 export class TargetCurvePointsComponent {
   @Input({transform: copyArray, required: true})
-  curvePoints!: string[];
-
+  curvePoints!: string[]; // always come an array
   @Output()
   curvePointsChange = new EventEmitter<string[]>();
-
-  wasChanged = false;
+  showSaveBtn = false;
 
   changeItem(point: { Hz: string; vol: number }, index: number) {
-    if (isNaN(Number(point.Hz))) return;
-    // if (Number(point.Hz) > 20000) point.Hz = '20000';
+    const hz = Number(point.Hz);
+    if (isNaN(hz)) return;
+    if (hz > 20000) point.Hz = '20000';
 
     // point.Hz.padEnd(18, '0')
     this.curvePoints[index] = '{' + point.Hz + ', ' + point.vol + '}';
-    this.wasChanged = true;
+    this.showSaveBtn = true;
   }
 
   addPoint() {
     const lastPoint = this.curvePoints.at(-1);
     if (lastPoint) {
-      this.curvePoints = [...this.curvePoints, '{20000, 0}']; // need to create a new array for change detection
-      this.wasChanged = true;
+      this.curvePoints = [...this.curvePoints, '{, 0}']; // need to create a new array for change detection
+      this.showSaveBtn = true;
     }
     else {
-      this.curvePoints = ['{20, 0}', '{100, 0}', '{20000, 0}'];
+      this.curvePoints = ['{, 0}'];
     }
   }
   removePoint(index: number) {
-    setTimeout(
-      () => this.curvePoints = this.curvePoints.filter((_, i) => i != index),
-      150
-    );
-    this.wasChanged = true;
+    this.curvePoints = this.curvePoints.filter((_, i) => i != index);
+    this.showSaveBtn = true;
   }
 
   save() {
     // Need to ensure points are sorted for export at the least, but it's nice
     // to keep them sorted in the UI as well when users are done editing
-    this.sortPoints();
+    if (this.curvePoints.length) {
+      this.sortPoints();
+      if (!this.curvePoints.at(0)?.startsWith('{20,')) this.curvePoints = ['{20, 0}', ...this.curvePoints];
+      if (!this.curvePoints.at(-1)?.startsWith('{20000,')) this.curvePoints.push('{20000, 0}');
+    }
     this.curvePointsChange.emit(this.curvePoints);
-    this.wasChanged = false;
+    this.showSaveBtn = false;
   }
 
   copyPoints() {
@@ -65,7 +66,7 @@ export class TargetCurvePointsComponent {
       if (newPointsStr) {
         const newPoints = JSON.parse(newPointsStr);
         if (newPoints.length) this.curvePoints = newPoints;
-        this.wasChanged = true;
+        this.showSaveBtn = true;
       }
     }
     catch (e) {

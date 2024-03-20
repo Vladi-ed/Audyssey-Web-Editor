@@ -22,7 +22,7 @@ Highcharts.setOptions(initOptions);
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   readonly highcharts: typeof Highcharts = Highcharts;

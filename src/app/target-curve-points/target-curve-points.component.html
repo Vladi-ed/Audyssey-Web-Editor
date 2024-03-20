@@ -1,35 +1,37 @@
 <form #pointsForm="ngForm" class="container">
-  <div *ngFor="let point of (curvePoints | convertPoints); let i = index" class="point-row">
-    <mat-form-field appearance="outline" style="margin-right: 12px">
-      <mat-label>Hz</mat-label>
-      <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)"
-             required inputmode="decimal"
-             autocomplete="Frequency"
-             pattern="^([2-9]\d|[1-9]\d{2,3}|1\d{4}|20000)(\.\d+)?$"
-             maxlength="18" [name]="'Frequency' + i"
-      >
-<!--      (2[0-9]|[3-9][0-9]|[1-9][0-9]{2,3}|1[0-9]{4}|20000)-->
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-      <mat-label>Gain</mat-label>
-      <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required type="number" inputmode="decimal" min="-12" max="12" step="0.1" [name]="'Gain' + i">
-    </mat-form-field>
+  @for (point of (curvePoints | convertPoints); track i; let i = $index) {
+    <div class="point-row">
+      <mat-form-field appearance="outline" style="margin-right: 12px">
+        <mat-label>Hz</mat-label>
+        <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, i)"
+               required inputmode="decimal"
+               autocomplete="Frequency"
+               pattern="^([2-9]\d|[1-9]\d{2,3}|1\d{4}|20000)(\.\d+)?$"
+               maxlength="18" [name]="'Frequency' + i"
+        >
+        <!--      (2[0-9]|[3-9][0-9]|[1-9][0-9]{2,3}|1[0-9]{4}|20000)-->
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Gain</mat-label>
+        <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, i)" required type="number" inputmode="decimal" min="-12" max="12" step="0.1" [name]="'Gain' + i">
+      </mat-form-field>
 
-    <button class="remove-btn" matRipple (click)="removePoint(i)">
-      <svg xmlns="http://www.w3.org/2000/svg" height="55" viewBox="0 96 960 960" width="48"><path d="m361 757 119-121 120 121 47-48-119-121 119-121-47-48-120 121-119-121-48 48 120 121-120 121 48 48ZM261 936q-24 0-42-18t-18-42V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306Zm-438 0v570-570Z"/></svg>
-    </button>
-  </div>
+      <button class="remove-btn" matRipple (click)="removePoint(i)">
+        <svg xmlns="http://www.w3.org/2000/svg" height="55" viewBox="0 96 960 960" width="48"><path d="m361 757 119-121 120 121 47-48-119-121 119-121-47-48-120 121-119-121-48 48 120 121-120 121 48 48ZM261 936q-24 0-42-18t-18-42V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306Zm-438 0v570-570Z"/></svg>
+      </button>
+    </div>
+  }
 
   <div style="display: flex; justify-items: stretch; gap: 12px">
     <button matRipple type="button" class="flat-btn add-btn" (click)="addPoint()">
       Add new Point
     </button>
-    <button matRipple type="submit" *ngIf="wasChanged" class="flat-btn save-btn" (click)="save()" [disabled]="pointsForm.invalid">
+    <button matRipple type="submit" *ngIf="showSaveBtn" class="flat-btn save-btn" (click)="save()" [disabled]="pointsForm.invalid">
       Save
     </button>
   </div>
-  <div style="display: flex; margin-top: 6px">
+  <div style="display: flex; margin-top: 6px; gap: 1px">
     <button matRipple class="flat-btn copy-paste-btn" (click)="copyPoints()">Copy</button>
-    <button matRipple class="flat-btn copy-paste-btn" (click)="pastePoints()">Paste</button>
+    <button matRipple class="flat-btn copy-paste-btn ui-state-disabled" (click)="pastePoints()">Paste</button>
   </div>
 </form>
