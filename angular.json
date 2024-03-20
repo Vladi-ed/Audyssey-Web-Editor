@@ -90,10 +90,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "Audyssey-Editor:build:production"
+              "buildTarget": "Audyssey-Editor:build:production"
             },
             "development": {
-              "browserTarget": "Audyssey-Editor:build:development"
+              "buildTarget": "Audyssey-Editor:build:development"
             }
           },
           "defaultConfiguration": "development"
