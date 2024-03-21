@@ -144,7 +144,8 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>High Frequency Rolloff (Hz)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000">
+                    <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff"
+                           (input)="updateChart()" type="number" min="50" max="20000">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -181,6 +182,8 @@
 
         </mat-expansion-panel>
 
+
+
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>
@@ -188,15 +191,15 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-            <label>Frequency (Hz), Gain (dB)</label>
+            <ng-template matExpansionPanelContent>
+              <label>Frequency (Hz), Gain (dB)</label>
 
-            <app-target-curve-points
-              *ngIf="selectedChannel"
-              [(curvePoints)]="selectedChannel.customTargetCurvePoints"
-              (curvePointsChange)="updateTargetCurve()"
-            />
-
-
+              <app-target-curve-points
+                *ngIf="selectedChannel"
+                [(curvePoints)]="selectedChannel.customTargetCurvePoints"
+                (curvePointsChange)="updateTargetCurve()"
+              />
+            </ng-template>
         </mat-expansion-panel>
 
     </mat-accordion>

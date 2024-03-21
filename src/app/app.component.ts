@@ -182,6 +182,7 @@ export class AppComponent {
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
+      type: 'logarithmic',
       plotBands: xAxisBands
     };
 
@@ -219,7 +220,16 @@ export class AppComponent {
   }
 
   updateTargetCurve() {
-    this.chartOptions.series![2] = {
+    if (this.selectedChannel?.customTargetCurvePoints!.length! > 1000) {
+      this.chartOptions.series![2] = {
+        data: this.selectedChannel?.customTargetCurvePoints.map(point => {
+          const coordinates = point.replace(/[{}]/g, '').split(',');
+          return [parseFloat(coordinates[0]), parseFloat(coordinates[1])]
+        }),
+        type: 'line'
+      }
+    }
+    else this.chartOptions.series![2] = {
       data: calculateTargetCurve(
         this.audysseyData.enTargetCurveType,
         this.selectedChannel?.midrangeCompensation,
