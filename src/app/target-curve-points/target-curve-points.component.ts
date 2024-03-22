@@ -48,7 +48,8 @@ export class TargetCurvePointsComponent {
     // to keep them sorted in the UI as well when users are done editing
     if (this.curvePoints.length) {
       this.sortPoints();
-      if (!this.curvePoints.at(0)?.startsWith('{20,')) this.curvePoints = ['{20, 0}', ...this.curvePoints];
+      const [firstFreq] = this.curvePoints.at(0)!.substring(1).split(',');
+      if (Number(firstFreq) > 20) this.curvePoints = ['{20, 0}', ...this.curvePoints];
       if (!this.curvePoints.at(-1)?.startsWith('{20000,')) this.curvePoints.push('{20000, 0}');
     }
     this.curvePointsChange.emit(this.curvePoints);
@@ -76,8 +77,8 @@ export class TargetCurvePointsComponent {
 
   private sortPoints() {
     this.curvePoints.sort((a, b) => {
-      const [aFreq] = a.substring(1, a.length - 1).split(',');
-      const [bFreq] = b.substring(1, b.length - 1).split(',');
+      const [aFreq] = a.substring(1).split(',');
+      const [bFreq] = b.substring(1).split(',');
       return Number(aFreq) - Number(bFreq);
     });
   }
