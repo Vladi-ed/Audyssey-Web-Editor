@@ -8,13 +8,13 @@
         </label>
         <input #fileInput id="input-file-id" hidden type="file" onclick="this.value=null" (change)="onUpload(fileInput.files)" accept=".ady"/>
 
-        <ng-container *ngIf="!audysseyData.targetModelName">
-           or <span class="flat-btn" matRipple (click)="loadExample()">Load Example</span>
-        </ng-container>
+        @if (!audysseyData.targetModelName) {
+          or <span class="flat-btn" matRipple (click)="loadExample()">Load Example</span>
+        }
 
-        <ng-container *ngIf="fileInput.files?.length">
+        @if (fileInput.files?.length) {
           <span>{{ fileInput.files?.item(0)?.name }}</span>
-        </ng-container>
+        }
 
         <span style="flex-grow: 1"></span>
 
@@ -35,14 +35,6 @@
           <span style="color:#323842">Donate</span>
         </a>
 
-  <!--      <a href="https://www.paypal.com/donate/?hosted_button_id=EBY6KWECQY2D8">-->
-  <!--        <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate">-->
-  <!--      </a>-->
-
-<!--        <div id="donate-button-container">-->
-<!--          <div id="donate-button" style="display: flex"></div>-->
-<!--        </div>-->
-
         <label class="flat-btn" matRipple (click)="exportFile()">
             <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 96 960 960"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
             Export
@@ -59,13 +51,13 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-            <div class="expansion-panel-first-line">
-              System: {{audysseyData.enMultEQType | decodeEqType}}
-            </div>
+            @if (fileInput.files?.length) {
+                <div class="expansion-panel-first-line"  style="margin-bottom: 14px">Device: {{audysseyData.targetModelName}}</div>
+            }
 
-          <ng-container *ngIf="fileInput.files?.length">
-            <div class="expansion-panel-first-line">Device: {{audysseyData.targetModelName}}</div>
-          </ng-container>
+            <div class="expansion-panel-first-line">
+                System: {{audysseyData.enMultEQType | decodeEqType}}
+            </div>
 
             <mat-form-field appearance="outline">
                 <mat-label>Profile name</mat-label>
@@ -95,7 +87,6 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-<!--            <label>Pick one of {{ audysseyData.detectedChannels.length }} channels:</label>-->
             <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
               @for (channel of audysseyData.detectedChannels; track $index) {
                 <mat-radio-button class="channel-radio-button" [value]="channel">
@@ -104,9 +95,9 @@
               }
             </mat-radio-group>
 
-          <ng-container *ngIf="calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)">
-            <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
-          </ng-container>
+            @if (calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)) {
+                <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+            }
 
         </mat-expansion-panel>
 
@@ -115,14 +106,16 @@
                 <mat-panel-title style="white-space: nowrap">
                     Channel info
                 </mat-panel-title>
-              <mat-panel-description>
-                <span *ngIf="selectedChannel" style="margin-left: 10px">({{selectedChannel.commandId}})</span>
-              </mat-panel-description>
+                <mat-panel-description>
+                  @if (selectedChannel) {
+                    <span style="margin-left: 10px">({{selectedChannel.commandId}})</span>
+                  }
+                </mat-panel-description>
             </mat-expansion-panel-header>
 
-            <ng-container *ngIf="selectedChannel">
+            @if (selectedChannel) {
                 <div class="expansion-panel-first-line">
-                  Name: {{ selectedChannel.commandId | decodeChannelName }}
+                    Name: {{ selectedChannel.commandId | decodeChannelName }}
                 </div>
 
                 <mat-form-field appearance="outline">
@@ -142,9 +135,8 @@
                     <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
-                    <mat-label>High Frequency Rolloff (Hz)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff"
-                           (input)="updateChart()" type="number" min="50" max="20000">
+                  <mat-label>High Frequency Rolloff (Hz)</mat-label>
+                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -174,14 +166,10 @@
                 </mat-form-field>
 
                 <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()">Midrange Compensation</mat-checkbox>
-<!--                <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
+                <!-- <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
                 <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
-
-            </ng-container>
-
+            }
         </mat-expansion-panel>
-
-
 
         <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -193,21 +181,20 @@
             <ng-template matExpansionPanelContent>
               <label>Frequency (Hz), Gain (dB)</label>
 
-              <app-target-curve-points
-                *ngIf="selectedChannel"
-                [(curvePoints)]="selectedChannel.customTargetCurvePoints"
-                (curvePointsChange)="updateTargetCurve()"
-              />
+              @if (selectedChannel) {
+                <app-target-curve-points
+                      [(curvePoints)]="selectedChannel.customTargetCurvePoints"
+                      (curvePointsChange)="updateTargetCurve()"
+                />
+              }
             </ng-template>
         </mat-expansion-panel>
-
     </mat-accordion>
 
     <mat-card class="chart-card">
         <mat-card-header>
-            <ng-container *ngIf="selectedChannel">
+            @if (selectedChannel) {
               <mat-form-field appearance="outline" style="position: absolute; z-index: 1; margin-top: -3.5px; margin-left: 12px;">
-  <!--                            <mat-label>Selected channel</mat-label>-->
                 <mat-select [(ngModel)]="selectedChannel" (selectionChange)="updateChart()" >
                   @for (channel of audysseyData.detectedChannels; track $index) {
                     <mat-option [value]="channel">
@@ -216,11 +203,11 @@
                   }
                 </mat-select>
               </mat-form-field>
-            </ng-container>
+            }
         </mat-card-header>
 
         <mat-card-content>
-            <highcharts-chart style="width: 100%; height: 80vh; display: block; margin-top: 5px"
+            <highcharts-chart style="width: 100%; height: 80vh; max-height: 80vw; display: block; margin-top: 5px"
                               [Highcharts]="highcharts"
                               [options]="chartOptions"
                               [(update)]="chartUpdateFlag"

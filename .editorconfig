@@ -9,8 +9,12 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.ts]
-quote_type = single
+ij_typescript_force_quote_style = true
+ij_typescript_spaces_within_imports = true
 
 [*.md]
 max_line_length = off
 trim_trailing_whitespace = false
+
+[*.html]
+indent_size = 4

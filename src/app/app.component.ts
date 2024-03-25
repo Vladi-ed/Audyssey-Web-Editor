@@ -134,7 +134,6 @@ export class AppComponent {
       };
     } else {
       // Web workers are not supported in this environment.
-      // You should add a fallback so that your program still executes correctly.
       alert('Your browser is not supported. Please use latest Firefox or Chrome.');
     }
   }
