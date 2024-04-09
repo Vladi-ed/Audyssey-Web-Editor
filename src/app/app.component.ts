@@ -181,7 +181,7 @@ export class AppComponent {
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
-      type: 'logarithmic',
+      type: this.chartLogarithmicScale ? "logarithmic" : "linear",
       plotBands: xAxisBands
     };
 
