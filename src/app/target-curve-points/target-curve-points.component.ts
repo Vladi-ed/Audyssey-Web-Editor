@@ -1,4 +1,5 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 
 function copyArray(arr: string[] | undefined) {
   if (arr?.length) return [...arr];
@@ -17,6 +18,8 @@ export class TargetCurvePointsComponent {
   @Output()
   curvePointsChange = new EventEmitter<string[]>();
   showSaveBtn = false;
+  @ViewChild(CdkVirtualScrollViewport)
+  scrollViewport: CdkVirtualScrollViewport | undefined;
 
   changeItem(point: { Hz: string; vol: number }, index: number) {
     const hz = Number(point.Hz);
@@ -31,13 +34,16 @@ export class TargetCurvePointsComponent {
   addPoint() {
     const lastPoint = this.curvePoints.at(-1);
     if (lastPoint) {
-      this.curvePoints = [...this.curvePoints, '{, 0}']; // need to create a new array for change detection
+      this.curvePoints = [...this.curvePoints, '{20000, 0}']; // need to create a new array for change detection
+      this.scrollViewport?.scrollTo({ bottom: -25, behavior: 'smooth' });
+
       this.showSaveBtn = true;
     }
     else {
       this.curvePoints = ['{, 0}'];
     }
   }
+
   removePoint(index: number) {
     this.curvePoints = this.curvePoints.filter((_, i) => i != index);
     this.showSaveBtn = true;
@@ -48,7 +54,7 @@ export class TargetCurvePointsComponent {
     // to keep them sorted in the UI as well when users are done editing
     if (this.curvePoints.length) {
       this.sortPoints();
-      const [firstFreq] = this.curvePoints.at(0)!.substring(1).split(',');
+      const [firstFreq] = this.curvePoints[0].substring(1).split(',');
       if (Number(firstFreq) > 20) this.curvePoints = ['{20, 0}', ...this.curvePoints];
       if (!this.curvePoints.at(-1)?.startsWith('{20000,')) this.curvePoints.push('{20000, 0}');
     }
@@ -81,5 +87,21 @@ export class TargetCurvePointsComponent {
       const [bFreq] = b.substring(1).split(',');
       return Number(aFreq) - Number(bFreq);
     });
+  }
+
+  changeItemString(point: string, index: number) {
+
+    console.log('point', point, 'index', index);
+
+    const regex = /\{([2-9]\d|[1-9]\d{2,3}|1\d{4}|20000)(\.\d+)?, -?(\d+(\.\d+)?)}/;
+
+    if (regex.test(point)) {
+      console.log('matches');
+      this.curvePoints[index] = point;
+      this.showSaveBtn = true;
+    } else {
+      // this.curvePoints[index] = "{20000, 0}";
+      this.showSaveBtn = false;
+    }
   }
 }

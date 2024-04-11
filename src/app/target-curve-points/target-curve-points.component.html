@@ -29,9 +29,11 @@
         }
     } @else {
         <cdk-virtual-scroll-viewport itemSize="25" class="virtual-scroll-container">
-            <div *cdkVirtualFor="let point of curvePoints; let i = index">
-                <input [value]="point" [name]="'curvePoint' + i" style="width: 100%">
-                <button class="remove-btn" style="height: 25px" (click)="removePoint(i)">
+            <div *cdkVirtualFor="let point of curvePoints; let i = index" >
+                <input #inputPoint
+                       [value]="point"
+                       (input)="changeItemString(inputPoint.value, i)">
+                <button class="remove-btn" (click)="removePoint(i)">
                     ✖
                 </button>
             </div>
