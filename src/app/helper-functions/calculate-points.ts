@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as FFT from 'fft.js'
+import FFT from 'fft.js'
 import { LinSpacedFracOctaveSmooth } from "./afr-line-smoothing";
 
 export function calculatePoints(responseData: string[]) {

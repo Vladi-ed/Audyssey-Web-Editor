@@ -18,6 +18,7 @@
     "@angular/material": "^17.3.0",
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
+    "fft.js": "^4.0.4",
     "highcharts": "~11.4.0",
     "highcharts-angular": "^4.0.0",
     "mathjs": "^12.4.1",
