@@ -17,6 +17,8 @@ export function decodeChannelName(commandId?: string) {
     case 'SRA' : return 'Surround Right';
     case 'FHL' : return 'Front Height Left';
     case 'FHR' : return 'Front Height Right';
+    case 'RHL' : return 'Rear Height Left';
+    case 'RHR' : return 'Rear Height Right';
     case 'SW1' : return 'Subwoofer';
     case 'SW2' : return 'Subwoofer 2';
     case 'SWMIX' : return 'Subwoofer Mix';

@@ -41,7 +41,7 @@ export function calculatePoints(responseData: string[]) {
     }
   }
 
-  console.log(points.length, 'points');
+  // console.log(points.length, 'points');
   // console.log('fft points', pointsSmooth);
 
   return pointsSmooth;
