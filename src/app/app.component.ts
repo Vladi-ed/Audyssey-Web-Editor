@@ -123,34 +123,27 @@ export class AppComponent {
     if (typeof Worker !== 'undefined') { // if supported
       const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
       worker.postMessage(json.detectedChannels);
+      console.log('detectedChannels', json.detectedChannels.map(channel => ({id: channel.enChannelType, name: channel.commandId})));
 
       worker.onmessage = ({ data }) => {
-        console.log('Got a message from Web-Worker');
+        // console.log('Got a message from Web-Worker');
         this.calculatedChannelsData = data;
 
         this.selectedChannel = json.detectedChannels[0];
         this.updateChart();
         this.chartObj?.hideLoading();
       };
-    } else {
-      // Web workers are not supported in this environment.
-      alert('Your browser is not supported. Please use latest Firefox or Chrome.');
-    }
+    } else alert('Your browser is not supported. Please use latest Firefox or Chrome.');
   }
 
   updateChart() {
     // console.log('updateChart()')
 
     const XMin = 10, XMax = 24000;
-
-    this.chartOptions.title = {
-      text: decodeChannelName(this.selectedChannel?.commandId)
-    };
-    this.chartOptions.subtitle = {
-      style: {color: 'white'}
-    };
-
     const xAxisBands = [];
+
+    this.chartOptions.title = { text: decodeChannelName(this.selectedChannel?.commandId) };
+    this.chartOptions.subtitle = { style: {color: 'white'} };
 
     // add frequency Rolloff
     if (this.selectedChannel?.frequencyRangeRolloff && this.selectedChannel.frequencyRangeRolloff < 20000 ) {
@@ -181,15 +174,17 @@ export class AppComponent {
     this.chartOptions.xAxis = {
       min: XMin,
       max: XMax,
-      type: this.chartLogarithmicScale ? "logarithmic" : "linear",
+      type: this.chartLogarithmicScale ? 'logarithmic' : 'linear',
       plotBands: xAxisBands
     };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
     const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.enChannelType);
+    console.log("this.calculatedChannelsData", this.calculatedChannelsData);
 
     // adding first graph
-    this.chartOptions.series![0] = {
+    const measurement = 0;
+    this.chartOptions.series![measurement] = {
       data: selectedChannelData ?? [],
       type: this.graphSmoothEnabled ? 'spline' : 'line',
       name: decodeChannelName(this.selectedChannel?.commandId),
@@ -201,16 +196,17 @@ export class AppComponent {
   addSubwooferToTheGraph(checked: boolean) {
     const subCutOff = parseInt('200 Hz') / 3;
     const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
+    const subwoofer = 1;
 
     // if (value) this.chartObj?.addSeries({});
     // else this.chartObj?.series.at(-1).destroy();
 
-    if (checked) this.chartOptions.series![1] = {
+    if (checked) this.chartOptions.series![subwoofer] = {
       data: subDataPoints?.slice(0, subCutOff),
       type: 'spline',
       name: 'Subwoofer',
     };
-    else this.chartOptions.series![1] = {
+    else this.chartOptions.series![subwoofer] = {
       data: [],
       type: 'spline',
     }
@@ -219,9 +215,11 @@ export class AppComponent {
   }
 
   updateTargetCurve() {
+    const targetCurve = 2;
+
     // condition for Audessey One modified files
     if (this.selectedChannel?.customTargetCurvePoints && this.selectedChannel.customTargetCurvePoints.length > 1000) {
-      this.chartOptions.series![2] = {
+      this.chartOptions.series![targetCurve] = {
         data: this.selectedChannel.customTargetCurvePoints.map(point => {
           const coordinates = point.replace(/[{}]/g, '').split(',');
           return [parseFloat(coordinates[0]), parseFloat(coordinates[1])]
@@ -229,7 +227,7 @@ export class AppComponent {
         type: 'line'
       }
     }
-    else this.chartOptions.series![2] = {
+    else this.chartOptions.series![targetCurve] = {
       data: calculateTargetCurve(
         this.audysseyData.enTargetCurveType,
         this.selectedChannel?.midrangeCompensation,

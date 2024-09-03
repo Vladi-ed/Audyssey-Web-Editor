@@ -31,7 +31,7 @@
         </a>
 
         <a href='https://ko-fi.com/vladi_ed' class="icon-link" target='_blank' title="Support me">
-          <img src='https://storage.ko-fi.com/cdn/cup-border.png' alt='Buy Me a Coffee' />
+          <img src='assets/cup-border.webp' alt='Buy Me a Coffee' />
           <span style="color:#323842">Donate</span>
         </a>
 
@@ -88,7 +88,7 @@
             </mat-expansion-panel-header>
 
             <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
-              @for (channel of audysseyData.detectedChannels; track $index) {
+              @for (channel of audysseyData.detectedChannels; track channel.enChannelType) {
                 <mat-radio-button class="channel-radio-button" [value]="channel">
                   {{ channel.commandId | decodeChannelName }}
                 </mat-radio-button>

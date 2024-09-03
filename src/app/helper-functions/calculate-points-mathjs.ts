@@ -1,7 +1,7 @@
 import {complex, Complex, fft as fourierTransform} from 'mathjs';
 import { LinSpacedFracOctaveSmooth } from "./afr-line-smoothing";
 
-function calculatePointsMathJs(responseDataValues: string[], enableSmoothing = true): number[][] {
+export function calculatePointsMathJs(responseDataValues: string[], enableSmoothing = true): number[][] {
   if (!responseDataValues || !responseDataValues.length) return [];
 
   const count = responseDataValues.length;

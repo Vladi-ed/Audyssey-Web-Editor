@@ -10,8 +10,9 @@ addEventListener('message', ({ data }) => {
   const map  = new Map<number, number[][]>();
 
   data.forEach((channel: DetectedChannel) => {
-    // console.log(channel.commandId);
-    map.set(channel.enChannelType, calculatePoints(channel.responseData[0]));
+    // console.log('channel', channel.commandId);
+    const firstMeasurement = 0;
+    map.set(channel.enChannelType, calculatePoints(channel.responseData[firstMeasurement]));
   });
 
   console.timeEnd("Calculate AllChannels in background");
