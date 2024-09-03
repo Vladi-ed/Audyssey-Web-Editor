@@ -25,7 +25,7 @@ Highcharts.setOptions(initOptions);
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  readonly highcharts: typeof Highcharts = Highcharts;
+  readonly highcharts = Highcharts as any;
   chartOptions: Highcharts.Options = { series: seriesOptions };
   chartUpdateFlag = false;
 
@@ -55,7 +55,7 @@ export class AppComponent {
   }
 
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-    console.log('Highcharts callback one time on graph init');
+    // console.log('Highcharts callback one time on graph init');
 
     // update target curve with draggable points
     let replacePoint: string;
@@ -179,13 +179,12 @@ export class AppComponent {
     };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.enChannelType);
-    console.log("this.calculatedChannelsData", this.calculatedChannelsData);
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.enChannelType) ?? [];
 
     // adding first graph
     const measurement = 0;
     this.chartOptions.series![measurement] = {
-      data: selectedChannelData ?? [],
+      data: [...selectedChannelData],
       type: this.graphSmoothEnabled ? 'spline' : 'line',
       name: decodeChannelName(this.selectedChannel?.commandId),
     };
