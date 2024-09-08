@@ -1,75 +1,91 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <!-- HTML Meta Tags -->
-  <title>Audyssey Web Editor</title>
-  <meta name="description" property="og:description" content="Edit your MultEQ *.ady files online, analyze speakers frequency response, adjust target curve and many more.">
-  <meta name="author" content="Vladi Ed">
-  <meta name="google-site-verification" content="eVUHy9JMiGLzjskCzAvHokXXUuczxNLGEq6-yGQeYoA" />
+    <meta charset="utf-8">
+    <!-- HTML Meta Tags -->
+    <title>Audyssey Web Editor</title>
+    <link rel="canonical" href="https://audyssey.pages.dev" />
+    <meta content="Edit your MultEQ *.ady files online, analyze speakers frequency response, adjust target curve and many more." name="description"
+          property="og:description">
+    <meta content="Vladi Ed" name="author">
+    <meta content="eVUHy9JMiGLzjskCzAvHokXXUuczxNLGEq6-yGQeYoA" name="google-site-verification"/>
 
-  <!-- Facebook Meta Tags -->
-  <meta property="og:url" content="https://audyssey.pages.dev/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Audyssey Web Editor">
-  <meta property="og:image" content="https://audyssey.pages.dev/assets/web-editor-preview.png">
-  <meta property="og:image:alt" content="https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/Edit%20your%20ADY%20%20files%20online/Audyssey%20Web%20Editor/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fdocuments%2F6f6fc4ee-a1e2-44f9-9c1b-78b64329e92b.png%3Ftoken%3DF48M4aao8b0ix2e3NLveBttb_0fhdyX3YgmmhqjujXQ%26height%3D649%26width%3D959%26expires%3D33241736070/og.png">
+    <!-- Facebook Meta Tags -->
+    <meta content="https://audyssey.pages.dev" property="og:url">
+    <meta content="website" property="og:type">
+    <meta content="Audyssey Web Editor" property="og:title">
+    <meta content="https://audyssey.pages.dev/assets/web-editor-preview.png" property="og:image">
+    <meta content="https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/Edit%20your%20ADY%20%20files%20online/Audyssey%20Web%20Editor/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fdocuments%2F6f6fc4ee-a1e2-44f9-9c1b-78b64329e92b.png%3Ftoken%3DF48M4aao8b0ix2e3NLveBttb_0fhdyX3YgmmhqjujXQ%26height%3D649%26width%3D959%26expires%3D33241736070/og.png"
+          property="og:image:alt">
 
-  <!-- Twitter Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta property="twitter:domain" content="audyssey.pages.dev">
-  <meta property="twitter:url" content="https://audyssey.pages.dev/">
-  <meta name="twitter:title" content="Audyssey Web Editor">
-  <meta name="twitter:description" content="MultEQ Web Editor">
-  <!--
-    You can generate this image URL dynamically: https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/{site_text}/{title_text}/{image_url}/og.png
-    Replace the variables in the brackets with your own values and use this URL in the image tag below this comment. Ensure values are URL encoded.
-    For more information, read: https://www.opengraph.xyz/blog/how-to-implement-dynamic-open-graph-images
-  -->
-  <meta name="twitter:image" content="https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/Edit%20your%20ADY%20%20files%20online/Audyssey%20Web%20Editor/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fdocuments%2F6f6fc4ee-a1e2-44f9-9c1b-78b64329e92b.png%3Ftoken%3DF48M4aao8b0ix2e3NLveBttb_0fhdyX3YgmmhqjujXQ%26height%3D649%26width%3D959%26expires%3D33241736070/og.png">
+    <!-- Twitter Meta Tags -->
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="audyssey.pages.dev" property="twitter:domain">
+    <meta content="https://audyssey.pages.dev" property="twitter:url">
+    <meta content="Audyssey Web Editor" name="twitter:title">
+    <meta content="MultEQ Web Editor" name="twitter:description">
+    <!--
+      You can generate this image URL dynamically: https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/{site_text}/{title_text}/{image_url}/og.png
+      Replace the variables in the brackets with your own values and use this URL in the image tag below this comment. Ensure values are URL encoded.
+      For more information, read: https://www.opengraph.xyz/blog/how-to-implement-dynamic-open-graph-images
+    -->
+    <meta content="https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/Edit%20your%20ADY%20%20files%20online/Audyssey%20Web%20Editor/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fdocuments%2F6f6fc4ee-a1e2-44f9-9c1b-78b64329e92b.png%3Ftoken%3DF48M4aao8b0ix2e3NLveBttb_0fhdyX3YgmmhqjujXQ%26height%3D649%26width%3D959%26expires%3D33241736070/og.png"
+          name="twitter:image">
+    <meta name="keywords" content="Audyssey, MultEQ, editor, target curve, home theatre, receiver, audio">
 
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <base href="/">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <app-root>
+<app-root>
     <!--Preloading-->
-    <header>
-      <h1 style="margin: 0">Audyssey Editor</h1>
-      <div>
-        <span>Loading...</span>
-        <div class="progress-container">
-          <progress value="5" max="100" style="flex-grow: 1"></progress>
+    <header itemscope>
+        <h1 style="margin: 0" itemprop="headline">Audyssey Editor</h1>
+        <div>
+            <span>Loading...</span>
+            <div class="progress-container">
+                <progress max="100" style="flex-grow: 1" value="5"></progress>
+            </div>
         </div>
-      </div>
 
-      <div style="width: 200px"></div>
+        <div style="width: 200px"></div>
     </header>
+    <h2 style="color: gray" itemprop="description">
+        Edit your MultEQ files online, analyze speakers frequency response, adjust target curve and many more.
+    </h2>
+
     <style>
-      header {
-        display: flex; padding: 21px 24px; margin: 20px; align-items: center; gap: 24px; background: white;  border-radius: 4px; justify-content: space-between;
-        @media (max-width: 500px) {
-          flex-direction: column;
-          margin: 10px;
+        header {
+            display: flex;
+            padding: 21px 24px;
+            margin: 20px;
+            align-items: center;
+            gap: 24px;
+            background: white;
+            border-radius: 4px;
+            justify-content: space-between;
+            @media (max-width: 500px) {
+                flex-direction: column;
+                margin: 10px;
+            }
         }
-      }
-      .progress-container {
-        display: flex; width: 300px;
-      }
+        .progress-container {
+            display: flex;
+            width: 300px;
+        }
     </style>
     <script>
-      const loadingInterval = setInterval(() => {
-        if (document.body.querySelector('progress')) {
-          document.body.querySelector('progress').value += 1;
-        }
-        else clearInterval(loadingInterval);
+        const loadingInterval = setInterval(() => {
+            if (document.body.querySelector('progress')) {
+                document.body.querySelector('progress').value += 1;
+            } else clearInterval(loadingInterval);
 
-      }, 100);
+        }, 100);
     </script>
-  </app-root>
+</app-root>
 
 </body>
 </html>
