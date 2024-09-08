@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'convertPoints' })
+@Pipe({ name: 'convertPoints', standalone: true })
 export class PointsConverterPipe implements PipeTransform {
 
   transform(inputArr: string[]): { Hz: string, vol: number }[] {

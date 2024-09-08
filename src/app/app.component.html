@@ -87,13 +87,13 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-            <mat-radio-group [(ngModel)]="selectedChannel" class="channel-radio-group" (change)="updateChart()">
-              @for (channel of audysseyData.detectedChannels; track channel.enChannelType) {
-                <mat-radio-button class="channel-radio-button" [value]="channel">
-                  {{ channel.commandId | decodeChannelName }}
-                </mat-radio-button>
-              }
-            </mat-radio-group>
+            @defer (on idle) {
+                <app-channel-selector
+                    [detectedChannels]="audysseyData.detectedChannels"
+                    [(selectedChannel)]="selectedChannel"
+                    (selectedChannelChange)="updateChart()"
+                />
+            }
 
             @if (calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)) {
                 <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>

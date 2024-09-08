@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
-import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { FormsModule } from "@angular/forms";
+import { MatFormField, MatLabel } from "@angular/material/form-field";
+import { PointsConverterPipe } from "./points-converter.pipe";
+import { MatInput } from "@angular/material/input";
+import { MatRipple } from "@angular/material/core";
 
 function copyArray(arr: string[] | undefined) {
   if (arr?.length) return [...arr];
@@ -9,8 +14,19 @@ function copyArray(arr: string[] | undefined) {
 @Component({
   selector: 'app-target-curve-points',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './target-curve-points.component.html',
-  styleUrl: './target-curve-points.component.scss'
+  templateUrl: "./target-curve-points.component.html",
+  styleUrl: "./target-curve-points.component.scss",
+  imports: [
+    FormsModule,
+    MatFormField,
+    PointsConverterPipe,
+    MatInput,
+    MatLabel,
+    MatRipple,
+    CdkVirtualScrollViewport,
+    CdkVirtualForOf
+  ],
+  standalone: true
 })
 export class TargetCurvePointsComponent {
   @Input({transform: copyArray, required: true})

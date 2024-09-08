@@ -1,0 +1,10 @@
+.channel-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: -10px;
+
+  .channel-radio-button {
+    margin-bottom: -2px;
+    //user-select: none;
+  }
+}

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'decodeEqType' })
+@Pipe({ name: 'decodeEqType', standalone: true })
 export class DecodeEqTypePipe implements PipeTransform {
 
   transform(value: number | undefined): string {

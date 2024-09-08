@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({ name: 'decodeChannelName' })
+@Pipe({ name: 'decodeChannelName', standalone: true })
 export class DecodeChannelNamePipe implements PipeTransform {
 
   transform(value: string): string {
