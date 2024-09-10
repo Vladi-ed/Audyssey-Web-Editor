@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
-import {decodeChannelName} from './helper-functions/decode-channel-name.pipe';
+import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
 // import HC_boost from 'highcharts/modules/boost'
@@ -12,6 +12,19 @@ import {initOptions, seriesOptions} from './helper-functions/highcharts-options'
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {exportFile} from "./helper-functions/export-file";
 import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
+import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
+import { MatRipple, MatOption } from '@angular/material/core';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelContent } from '@angular/material/expansion';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatSelect } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { ChannelSelectorComponent } from './channel-selector/channel-selector.component';
+import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { DecimalPipe } from '@angular/common';
+import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 
 // Datagrouping(Highcharts);
 // HC_boost(Highcharts);
@@ -20,9 +33,11 @@ Exporting(Highcharts);
 Highcharts.setOptions(initOptions);
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+    standalone: true,
+    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe]
 })
 export class AppComponent {
   readonly highcharts = Highcharts as any;
