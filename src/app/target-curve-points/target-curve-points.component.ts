@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input, output, ViewChild } from "@angular/core";
 import { CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
 import { MatFormField, MatLabel } from "@angular/material/form-field";
@@ -30,9 +30,9 @@ function copyArray(arr: string[] | undefined) {
 })
 export class TargetCurvePointsComponent {
   @Input({transform: copyArray, required: true})
-  curvePoints!: string[]; // always come an array
-  @Output()
-  curvePointsChange = new EventEmitter<string[]>();
+  curvePoints!: string[]; // always come as array
+  curvePointsChange = output<string[]>();
+
   showSaveBtn = false;
   @ViewChild(CdkVirtualScrollViewport)
   scrollViewport: CdkVirtualScrollViewport | undefined;
