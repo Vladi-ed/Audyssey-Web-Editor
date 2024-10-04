@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, output, ViewChild } from "@angular/core";
-import { CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { FormsModule } from "@angular/forms";
 import { MatFormField, MatLabel } from "@angular/material/form-field";
 import { PointsConverterPipe } from "./points-converter.pipe";
@@ -24,7 +24,8 @@ function copyArray(arr: string[] | undefined) {
     MatLabel,
     MatRipple,
     CdkVirtualScrollViewport,
-    CdkVirtualForOf
+    CdkVirtualForOf,
+    CdkFixedSizeVirtualScroll
   ],
   standalone: true
 })
