@@ -4,10 +4,10 @@ import {DetectedChannel} from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
 
 import * as Highcharts from 'highcharts';
-// import HC_boost from 'highcharts/modules/boost'
-import Draggable from 'highcharts/modules/draggable-points';
-// import Datagrouping from 'highcharts/modules/datagrouping';
-import Exporting from 'highcharts/modules/exporting';
+import 'highcharts/modules/draggable-points';
+// import 'highcharts/modules/boost'
+// import 'highcharts/modules/datagrouping';
+import 'highcharts/modules/exporting';
 import {initOptions, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {exportFile} from "./helper-functions/export-file";
@@ -26,10 +26,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 
-// Datagrouping(Highcharts);
-// HC_boost(Highcharts);
-Draggable(Highcharts);
-Exporting(Highcharts);
 Highcharts.setOptions(initOptions);
 
 @Component({
