@@ -3,11 +3,11 @@ import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
 
-import * as Highcharts from 'highcharts';
-import 'highcharts/modules/draggable-points';
+import Highcharts from 'highcharts/esm/highcharts';
+import 'highcharts/esm/modules/draggable-points';
 // import 'highcharts/modules/boost'
 // import 'highcharts/modules/datagrouping';
-import 'highcharts/modules/exporting';
+import 'highcharts/esm/modules/exporting';
 import {initOptions, seriesOptions} from './helper-functions/highcharts-options';
 import {decodeCrossover} from "./helper-functions/decode-crossover";
 import {exportFile} from "./helper-functions/export-file";
