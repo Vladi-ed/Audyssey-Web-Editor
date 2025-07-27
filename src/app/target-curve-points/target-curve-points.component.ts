@@ -73,7 +73,9 @@ export class TargetCurvePointsComponent {
       this.sortPoints();
       const [firstFreq] = this.curvePoints[0].substring(1).split(',');
       if (Number(firstFreq) > 20) this.curvePoints = ['{20, 0}', ...this.curvePoints];
-      if (!this.curvePoints.at(-1)?.startsWith('{20000,')) this.curvePoints.push('{20000, 0}');
+
+      const [lastFreq] = this.curvePoints.at(-1)!.substring(1).split(',');
+      if (Number(lastFreq) < 20000) this.curvePoints.push('{20000, 0}');
     }
     this.curvePointsChange.emit(this.curvePoints);
     this.showSaveBtn = false;

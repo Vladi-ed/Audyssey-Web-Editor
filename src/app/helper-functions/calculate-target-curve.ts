@@ -11,12 +11,12 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
     ...convertToNonDraggablePoints(standardCurve),
     ...convertToDraggablePoints(customPoints || [])
       .filter(point => !(point.y == 0 && (point.x == 20 || point.x == 20000))),
-  ].sort((a, b) => a.x! - b.x!);
+  ].sort((a, b) => (a.x as number) - (b.x as number));
 
 
   // remove target curve points after the frequency Limit
   if (frequencyLimit && frequencyLimit < 20000) {
-    const lastPoint = customCurve.findIndex(point => point.x! > frequencyLimit);
+    const lastPoint = customCurve.findIndex(point => (point.x as number) > frequencyLimit);
     return customCurve.slice(0, lastPoint + 1);
   }
 

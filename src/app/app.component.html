@@ -208,11 +208,11 @@
         </mat-card-header>
 
         <mat-card-content>
-            <highcharts-chart style="width: 100%; height: 80vh; max-height: 80vw; display: block; margin-top: 5px"
-                              [Highcharts]="highcharts"
-                              [options]="chartOptions"
-                              [(update)]="chartUpdateFlag"
-                              [callbackFunction]="chartCallback"
+            <highcharts-chart
+                  [Highcharts]="highcharts"
+                  [options]="chartOptions"
+                  [(update)]="chartUpdateFlag"
+                  [callbackFunction]="chartCallback"
             />
         </mat-card-content>
     </mat-card>

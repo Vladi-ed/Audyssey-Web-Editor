@@ -19,6 +19,7 @@ export const initOptions: Options = {
       type: 'x',
       // key: 'ctrl',
     },
+    spacingTop: 15,
     panKey: 'shift',
     panning: {
       enabled: true,
