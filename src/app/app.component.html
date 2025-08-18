@@ -75,12 +75,12 @@
 <!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
 <!--            </mat-form-field>-->
 
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltipShowDelay="400" matTooltip="Dynamic EQ boosting bass and treble at lower volume levels to compensate human hearing">
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltip="Dynamic EQ boosting bass and treble at lower volume levels to compensate human hearing">
                 Dynamic EQ</mat-checkbox>
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltipShowDelay="400" matTooltip="Dynamic Volume automatically adjusts the volume level of audio content to minimize large differences between quiet and loud sounds">
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltip="Dynamic Volume automatically adjusts the volume level of audio content to minimize large differences between quiet and loud sounds">
                 Dynamic Volume</mat-checkbox>
             @if (audysseyData.lfcSupport) {
-                <mat-checkbox [(ngModel)]="audysseyData.lfc" matTooltipShowDelay="400" matTooltip="Reduce the bass below 100 Hz for neighbors comfort">
+                <mat-checkbox [(ngModel)]="audysseyData.lfc" matTooltip="Reduce the bass below 100 Hz for neighbors comfort">
                     Audyssey LFC
                 </mat-checkbox>
             }
@@ -123,16 +123,16 @@
             </mat-expansion-panel-header>
 
             @if (selectedChannel) {
-                <div class="expansion-panel-first-line">
+                <div class="expansion-panel-first-line" style="margin-bottom: 14px">
                     Name: {{ selectedChannel.commandId | decodeChannelName }}
                 </div>
 
+                <div class="expansion-panel-first-line" [matTooltip]="(selectedChannel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'">
+                    Distance: {{ selectedChannel.channelReport.distance | number: '1.2-3' }}m
+                </div>
+
                 <mat-form-field appearance="outline">
-                    <mat-label>Distance</mat-label>
-                    <input matInput [value]="selectedChannel.channelReport.distance | number: '1.2-3'" readonly>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Custom Distance</mat-label>
+                    <mat-label>Custom Distance (m)</mat-label>
                     <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="0.1" max="20">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
@@ -141,7 +141,7 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Trim Adjustment (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+" matTooltip="Level adjustment relative to the default">
+                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+" matTooltip="Level adjustment relative to the default value">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>High Frequency Rolloff (Hz)</mat-label>
@@ -174,7 +174,7 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Feature that adds a slight dip in the frequency response around 2kHz to address potential harshness that can arise from some speakers crossover design">
+                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Add a dip in the frequency response to address potential harshness that can arise from some speakers crossover design">
                     Midrange Compensation</mat-checkbox>
                 <!-- <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
                 <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>

@@ -25,10 +25,11 @@ import { TargetCurvePointsComponent } from './target-curve-points/target-curve-p
 import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
-import { MatTooltip } from '@angular/material/tooltip';
+import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from "@angular/material/tooltip";
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
 import { validateAdy } from "./helper-functions/validate-ady";
+import { tooltipOptions } from "./helper-functions/tooltip-options";
 
 Highcharts.setOptions(initOptions);
 
@@ -37,6 +38,7 @@ Highcharts.setOptions(initOptions);
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     standalone: true,
+    providers: [{provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions}],
     imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip, MatSnackBarModule]
 })
 export class AppComponent {
