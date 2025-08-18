@@ -5,16 +5,15 @@ import { DecodeChannelNamePipe } from "../helper-functions/decode-channel-name.p
 import { DetectedChannel } from "../interfaces/detected-channel";
 
 @Component({
-  selector: 'app-channel-selector',
-  standalone: true,
-  imports: [
-    MatRadioGroup,
-    FormsModule,
-    MatRadioButton,
-    DecodeChannelNamePipe,
-  ],
-  templateUrl: './channel-selector.component.html',
-  styleUrl: './channel-selector.component.scss'
+    selector: 'app-channel-selector',
+    imports: [
+        MatRadioGroup,
+        FormsModule,
+        MatRadioButton,
+        DecodeChannelNamePipe,
+    ],
+    templateUrl: './channel-selector.component.html',
+    styleUrl: './channel-selector.component.scss'
 })
 export class ChannelSelectorComponent {
   detectedChannels = input.required<DetectedChannel[]>();

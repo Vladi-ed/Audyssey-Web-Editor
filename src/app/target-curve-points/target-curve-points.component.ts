@@ -12,22 +12,21 @@ function copyArray(arr: string[] | undefined) {
 }
 
 @Component({
-  selector: 'app-target-curve-points',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: "./target-curve-points.component.html",
-  styleUrl: "./target-curve-points.component.scss",
-  imports: [
-    FormsModule,
-    MatFormField,
-    PointsConverterPipe,
-    MatInput,
-    MatLabel,
-    MatRipple,
-    CdkVirtualScrollViewport,
-    CdkVirtualForOf,
-    CdkFixedSizeVirtualScroll
-  ],
-  standalone: true
+    selector: 'app-target-curve-points',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    templateUrl: "./target-curve-points.component.html",
+    styleUrl: "./target-curve-points.component.scss",
+    imports: [
+        FormsModule,
+        MatFormField,
+        PointsConverterPipe,
+        MatInput,
+        MatLabel,
+        MatRipple,
+        CdkVirtualScrollViewport,
+        CdkVirtualForOf,
+        CdkFixedSizeVirtualScroll
+    ]
 })
 export class TargetCurvePointsComponent {
   @Input({transform: copyArray, required: true})
