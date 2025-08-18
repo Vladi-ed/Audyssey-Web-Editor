@@ -8,10 +8,12 @@ import 'highcharts/esm/modules/draggable-points';
 // import 'highcharts/modules/boost'
 // import 'highcharts/modules/datagrouping';
 import 'highcharts/esm/modules/exporting';
-import {initOptions, seriesOptions} from './helper-functions/highcharts-options';
-import {decodeCrossover} from "./helper-functions/decode-crossover";
-import {exportFile} from "./helper-functions/export-file";
-import {calculateTargetCurve} from "./helper-functions/calculate-target-curve";
+import { HighchartsChartModule } from 'highcharts-angular';
+import { initOptions, seriesOptions } from "./helper-functions/highcharts-options";
+import { tooltipOptions } from "./helper-functions/material-options";
+import { decodeCrossover } from "./helper-functions/decode-crossover";
+import { exportFile } from "./helper-functions/export-file";
+import { calculateTargetCurve } from "./helper-functions/calculate-target-curve";
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
 import { MatRipple, MatOption } from '@angular/material/core';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelContent } from '@angular/material/expansion';
@@ -22,14 +24,12 @@ import { MatSelect } from '@angular/material/select';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ChannelSelectorComponent } from './channel-selector/channel-selector.component';
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
-import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from "@angular/material/tooltip";
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from "@angular/material/snack-bar";
 import { version } from '../../package.json';
 import { validateAdy } from "./helper-functions/validate-ady";
-import { tooltipOptions } from "./helper-functions/material-options";
 
 Highcharts.setOptions(initOptions);
 
@@ -143,7 +143,7 @@ export class AppComponent {
       const validationError = validateAdy(this.audysseyData);
       if (validationError) {
         this.chartObj?.hideLoading();
-        this.snackBar.open(validationError, 'Dismiss', {verticalPosition: "top"});
+        this.snackBar.open(validationError, 'Dismiss'); // , {verticalPosition: "top"}
         return;
       }
 
