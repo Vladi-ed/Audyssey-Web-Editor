@@ -13,12 +13,12 @@
         }
 
         @if (fileInput.files?.length) {
-          <span>{{ fileInput.files?.item(0)?.name }}</span>
+          <span>{{ fileInput.files!.item(0)?.name }}</span>
         }
 
         <span style="flex-grow: 1"></span>
 
-        <a href="https://t.me/vonder" class="icon-link" title="Contact me in Telegram" target='_blank'>
+        <a href="https://t.me/vonder" class="icon-link" target='_blank' matTooltip="Contact me in Telegram">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240.1 240.1" width="20" >
             <linearGradient id="a" x1="-838" x2="-838" y1="660.6" y2="660.3" gradientTransform="matrix(1000 0 0 -1000 838161 660581)" gradientUnits="userSpaceOnUse">
               <stop offset="0" stop-color="#424d58"/>
@@ -30,12 +30,12 @@
           <span style="color:#323842">Contact</span>
         </a>
 
-        <a href='https://ko-fi.com/vladi_ed' class="icon-link" target='_blank' title="Support me">
+        <a href='https://ko-fi.com/vladi_ed' class="icon-link" target='_blank' matTooltip="Support my work">
           <img src='assets/cup-border.webp' alt='Buy Me a Coffee' />
           <span style="color:#323842">Donate</span>
         </a>
 
-        <label class="flat-btn" matRipple (click)="exportFile()">
+        <label class="flat-btn" matRipple (click)="exportFile()" matTooltip="Save to a new .ady file">
             <svg style="margin-top: 2px; margin-right: 5px" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 96 960 960"><path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/></svg>
             Export
         </label>
@@ -61,22 +61,29 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Profile name</mat-label>
-                <input matInput [(ngModel)]="audysseyData.title">
+                <input matInput [(ngModel)]="audysseyData.title" matTooltip="Internal name. Not the same as file name.">
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Target curve type</mat-label>
-                <mat-select [(ngModel)]="audysseyData.enTargetCurveType" (selectionChange)="updateTargetCurve()">
+                <mat-select [(ngModel)]="audysseyData.enTargetCurveType" (selectionChange)="updateTargetCurve()" matTooltip="High frequency rolloff">
                     <mat-option [value]="1">HF Rolloff 1</mat-option>
                     <mat-option [value]="2">HF Rolloff 2</mat-option>
                 </mat-select>
             </mat-form-field>
-            <mat-form-field appearance="outline">
-                <mat-label>System Delay</mat-label>
-                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>
-            </mat-form-field>
+<!--            <mat-form-field appearance="outline">-->
+<!--                <mat-label>System Delay</mat-label>-->
+<!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
+<!--            </mat-form-field>-->
 
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px">Dynamic EQ</mat-checkbox>
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume">Dynamic Volume</mat-checkbox>
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltipShowDelay="400" matTooltip="Dynamic EQ boosting bass and treble at lower volume levels to compensate human hearing">
+                Dynamic EQ</mat-checkbox>
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltipShowDelay="400" matTooltip="Dynamic Volume automatically adjusts the volume level of audio content to minimize large differences between quiet and loud sounds">
+                Dynamic Volume</mat-checkbox>
+            @if (audysseyData.lfcSupport) {
+                <mat-checkbox [(ngModel)]="audysseyData.lfc" matTooltipShowDelay="400" matTooltip="Reduce the bass below 100 Hz for neighbors comfort">
+                    Audyssey LFC
+                </mat-checkbox>
+            }
 
         </mat-expansion-panel>
 
@@ -95,8 +102,10 @@
                 />
             }
 
-            @if (calculatedChannelsData?.has(42) || calculatedChannelsData?.has(54)) {
-                <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)">Add subwoofer</mat-checkbox>
+            @if (calculatedChannelsData && (calculatedChannelsData.has(42) || calculatedChannelsData.has(54))) {
+                <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)" matTooltip="Add subwoofer overlay to the graph">
+                    Add subwoofer
+                </mat-checkbox>
             }
 
         </mat-expansion-panel>
@@ -128,20 +137,20 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Level (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12">
+                    <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12" matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty.">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Trim Adjustment (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+">
+                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+" matTooltip="Level adjustment relative to the default">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>High Frequency Rolloff (Hz)</mat-label>
-                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000">
+                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000" matTooltip="HF Rolloff start frequency">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Crossover</mat-label>
-                    <mat-select [(ngModel)]="selectedChannel.customCrossover" (selectionChange)="updateCrossover()">
+                    <mat-select [(ngModel)]="selectedChannel.customCrossover" (selectionChange)="updateCrossover()" matTooltip="Low frequency crossover to a subwoofer. If you want to use the default crossover, set Auto.">
                         <mat-option [value]="undefined">Auto</mat-option>
                         <mat-option [value]="'40'">40 Hz</mat-option>
                         <mat-option [value]="'60'">60 Hz</mat-option>
@@ -158,14 +167,15 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Speaker Type</mat-label>
-                    <mat-select [(ngModel)]="selectedChannel.customSpeakerType" (selectionChange)="updateSpeakerType()">
+                    <mat-select [(ngModel)]="selectedChannel.customSpeakerType" (selectionChange)="updateSpeakerType()" matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. If you want to use the default type, choose Auto.">
                         <mat-option [value]="undefined">Auto</mat-option>
                         <mat-option [value]="'S'">Small</mat-option>
                         <mat-option [value]="'L'">Large</mat-option>
                     </mat-select>
                 </mat-form-field>
 
-                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()">Midrange Compensation</mat-checkbox>
+                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Feature that adds a slight dip in the frequency response around 2kHz to address potential harshness that can arise from some speakers crossover design">
+                    Midrange Compensation</mat-checkbox>
                 <!-- <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
                 <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
             }
@@ -179,7 +189,9 @@
             </mat-expansion-panel-header>
 
             <ng-template matExpansionPanelContent>
-              <label>Frequency (Hz), Gain (dB)</label>
+              <label matTooltip="20Hz and 20kHz are added automatically for compatibility">
+                  Frequency (Hz), Gain (dB)
+              </label>
 
             @defer (when selectedChannel) {
                 <app-target-curve-points
