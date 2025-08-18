@@ -28,6 +28,7 @@ import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
+import { validateAdy } from "./helper-functions/validate-ady";
 
 Highcharts.setOptions(initOptions);
 
@@ -138,37 +139,19 @@ export class AppComponent {
         this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss', { duration: 5000 });
         return;
       }
+
+      const validationError = validateAdy(this.audysseyData);
+      if (validationError) {
+        this.chartObj?.hideLoading();
+        this.snackBar.open(validationError, 'Dismiss');
+        return;
+      }
+
       this.processDataWithWorker(this.audysseyData);
     }
     else {
       this.chartObj?.hideLoading();
       this.snackBar.open('Cannot read the file.', 'Dismiss', { duration: 5000 });
-    }
-
-
-    try {
-      const file = files?.item(0);
-      if (!file) {
-        this.snackBar.open('No file selected.', 'Dismiss', { duration: 3000 });
-        return;
-      }
-      const fileContent = await file.text();
-      if (!fileContent) {
-        this.snackBar.open('Cannot read the file.', 'Dismiss', { duration: 4000 });
-        return;
-      }
-      this.chartObj?.showLoading();
-      try {
-        this.audysseyData = JSON.parse(fileContent);
-      } catch (e) {
-        this.chartObj?.hideLoading();
-        this.snackBar.open('Invalid file format. Expecting .ady JSON.', 'Dismiss', { duration: 5000 });
-        return;
-      }
-      this.processDataWithWorker(this.audysseyData);
-    } catch (err) {
-      this.chartObj?.hideLoading();
-      this.snackBar.open('Unexpected error while reading the file.', 'Dismiss', { duration: 5000 });
     }
   }
 
