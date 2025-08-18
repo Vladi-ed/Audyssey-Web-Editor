@@ -25,7 +25,8 @@ import { TargetCurvePointsComponent } from './target-curve-points/target-curve-p
 import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
-import { MatTooltip } from "@angular/material/tooltip";
+import { MatTooltip } from '@angular/material/tooltip';
+import { version } from '../../package.json';
 
 Highcharts.setOptions(initOptions);
 
@@ -38,6 +39,7 @@ Highcharts.setOptions(initOptions);
 })
 export class AppComponent {
   readonly highcharts = Highcharts as any;
+  readonly appVersion = version;
   chartOptions: Highcharts.Options = { series: seriesOptions };
   chartUpdateFlag = false;
 
@@ -94,7 +96,9 @@ export class AppComponent {
               else newCurvePoints[i] = point;
             });
 
-            this.selectedChannel!.customTargetCurvePoints = newCurvePoints;
+            if (this.selectedChannel) {
+              this.selectedChannel.customTargetCurvePoints = newCurvePoints;
+            }
           }
         }
       },
@@ -151,8 +155,12 @@ export class AppComponent {
   updateChart() {
     // console.log('updateChart()')
 
+    if (!this.selectedChannel) {
+      return; // Guard when no channel is selected
+    }
+
     const XMin = 10, XMax = 24000;
-    const xAxisBands = [];
+    const xAxisBands = [] as any[];
 
     this.chartOptions.title = { text: decodeChannelName(this.selectedChannel?.commandId) };
     this.chartOptions.subtitle = { style: {color: 'white'} };
@@ -191,7 +199,7 @@ export class AppComponent {
     };
 
     // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel!.enChannelType) ?? [];
+    const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel.enChannelType) ?? [];
 
     // adding first graph
     const measurement = 0;
@@ -228,8 +236,15 @@ export class AppComponent {
   updateTargetCurve() {
     const targetCurve = 2;
 
+    if (!this.selectedChannel) {
+      // no selected channel, clear target curve
+      this.chartOptions.series![targetCurve] = { data: [], type: 'spline' };
+      this.chartUpdateFlag = true;
+      return;
+    }
+
     // condition for Audessey One modified files
-    if (this.selectedChannel?.customTargetCurvePoints && this.selectedChannel.customTargetCurvePoints.length > 1000) {
+    if (this.selectedChannel.customTargetCurvePoints && this.selectedChannel.customTargetCurvePoints.length > 1000) {
       this.chartOptions.series![targetCurve] = {
         data: this.selectedChannel.customTargetCurvePoints.map(point => {
           const coordinates = point.replace(/[{}]/g, '').split(',');
@@ -241,9 +256,9 @@ export class AppComponent {
     else this.chartOptions.series![targetCurve] = {
       data: calculateTargetCurve(
         this.audysseyData.enTargetCurveType,
-        this.selectedChannel?.midrangeCompensation,
-        this.selectedChannel?.customTargetCurvePoints,
-        this.selectedChannel?.frequencyRangeRolloff
+        this.selectedChannel.midrangeCompensation,
+        this.selectedChannel.customTargetCurvePoints,
+        this.selectedChannel.frequencyRangeRolloff
       ),
       type: 'spline',
     };
@@ -264,25 +279,29 @@ export class AppComponent {
   }
 
   updateCrossover() {
-    if (this.selectedChannel?.customCrossover) {
+    if (!this.selectedChannel) return;
+
+    if (this.selectedChannel.customCrossover) {
       if (this.selectedChannel.customCrossover === 'F')
         this.selectedChannel.customSpeakerType = 'L';
       else
         this.selectedChannel.customSpeakerType = 'S';
     }
-    else this.selectedChannel!.customSpeakerType = undefined;
+    else this.selectedChannel.customSpeakerType = undefined;
 
     this.updateChart();
   }
 
   updateSpeakerType() {
-    if (this.selectedChannel?.customSpeakerType) {
+    if (!this.selectedChannel) return;
+
+    if (this.selectedChannel.customSpeakerType) {
       if (this.selectedChannel.customSpeakerType === 'L')
         this.selectedChannel.customCrossover = 'F'
       else
         this.selectedChannel.customCrossover = '80';
     }
-    else this.selectedChannel!.customCrossover = undefined;
+    else this.selectedChannel.customCrossover = undefined;
 
     this.updateChart();
   }
