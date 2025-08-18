@@ -26,6 +26,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MatTooltip } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
 
 Highcharts.setOptions(initOptions);
@@ -35,7 +36,7 @@ Highcharts.setOptions(initOptions);
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     standalone: true,
-  imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
+    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip, MatSnackBarModule]
 })
 export class AppComponent {
   readonly highcharts = Highcharts as any;
@@ -44,6 +45,8 @@ export class AppComponent {
   chartUpdateFlag = false;
 
   private chartObj?: Highcharts.Chart;
+
+  constructor(private snackBar: MatSnackBar) {}
 
   audysseyData: AudysseyInterface = { detectedChannels: [] };
   calculatedChannelsData?: Map<number, number[][]>
@@ -124,13 +127,49 @@ export class AppComponent {
   }
 
   async onUpload(files: FileList | null) {
+
     const fileContent = await files?.item(0)?.text();
     if (fileContent) {
       this.chartObj?.showLoading();
-      this.audysseyData = JSON.parse(fileContent);
+      try {
+        this.audysseyData = JSON.parse(fileContent);
+      } catch (e) {
+        this.chartObj?.hideLoading();
+        this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss', { duration: 5000 });
+        return;
+      }
       this.processDataWithWorker(this.audysseyData);
     }
-    else alert('Cannot read the file');
+    else {
+      this.chartObj?.hideLoading();
+      this.snackBar.open('Cannot read the file.', 'Dismiss', { duration: 5000 });
+    }
+
+
+    try {
+      const file = files?.item(0);
+      if (!file) {
+        this.snackBar.open('No file selected.', 'Dismiss', { duration: 3000 });
+        return;
+      }
+      const fileContent = await file.text();
+      if (!fileContent) {
+        this.snackBar.open('Cannot read the file.', 'Dismiss', { duration: 4000 });
+        return;
+      }
+      this.chartObj?.showLoading();
+      try {
+        this.audysseyData = JSON.parse(fileContent);
+      } catch (e) {
+        this.chartObj?.hideLoading();
+        this.snackBar.open('Invalid file format. Expecting .ady JSON.', 'Dismiss', { duration: 5000 });
+        return;
+      }
+      this.processDataWithWorker(this.audysseyData);
+    } catch (err) {
+      this.chartObj?.hideLoading();
+      this.snackBar.open('Unexpected error while reading the file.', 'Dismiss', { duration: 5000 });
+    }
   }
 
   processDataWithWorker(json: AudysseyInterface) {
@@ -149,13 +188,26 @@ export class AppComponent {
         this.updateChart();
         this.chartObj?.hideLoading();
       };
-    } else alert('Your browser is not supported. Please use latest Firefox or Chrome.');
+
+      worker.onerror = (e) => {
+        console.error('Worker error', e);
+        this.chartObj?.hideLoading();
+        this.snackBar.open('Background processing error. Please try again.', 'Dismiss', { duration: 5000 });
+      };
+    } else {
+      this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Dismiss', { duration: 6000 });
+    }
   }
 
   updateChart() {
     // console.log('updateChart()')
 
     if (!this.selectedChannel) {
+      // Clear key series to avoid stale chart when no selection
+      // this.chartOptions.series = this.chartOptions.series || [];
+      // this.chartOptions.series[0] = { data: [], type: this.graphSmoothEnabled ? 'spline' : 'line', name: '' };
+      // this.chartOptions.series[2] = { data: [], type: 'spline' };
+      // this.chartUpdateFlag = true;
       return; // Guard when no channel is selected
     }
 
