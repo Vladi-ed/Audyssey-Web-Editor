@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component, inject } from "@angular/core";
 import {AudysseyInterface} from './interfaces/audyssey-interface';
 import {DetectedChannel} from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
@@ -26,10 +26,10 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from "@angular/material/tooltip";
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from "@angular/material/snack-bar";
 import { version } from '../../package.json';
 import { validateAdy } from "./helper-functions/validate-ady";
-import { tooltipOptions } from "./helper-functions/tooltip-options";
+import { tooltipOptions } from "./helper-functions/material-options";
 
 Highcharts.setOptions(initOptions);
 
@@ -38,8 +38,8 @@ Highcharts.setOptions(initOptions);
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     standalone: true,
-    providers: [{provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions}],
-    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip, MatSnackBarModule]
+    providers: [{provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions}, {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { verticalPosition: 'top' }}],
+    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
   readonly highcharts = Highcharts as any;
@@ -48,8 +48,7 @@ export class AppComponent {
   chartUpdateFlag = false;
 
   private chartObj?: Highcharts.Chart;
-
-  constructor(private snackBar: MatSnackBar) {}
+  private snackBar = inject(MatSnackBar);
 
   audysseyData: AudysseyInterface = { detectedChannels: [] };
   calculatedChannelsData?: Map<number, number[][]>
@@ -77,7 +76,7 @@ export class AppComponent {
   chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
     // console.log('Highcharts callback one time on graph init');
 
-    // update target curve with draggable points
+    // update the target curve with draggable points
     let replacePoint: string;
     chart.series[2].update({
       type: 'spline',
@@ -138,14 +137,14 @@ export class AppComponent {
         this.audysseyData = JSON.parse(fileContent);
       } catch (e) {
         this.chartObj?.hideLoading();
-        this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss', { duration: 5000 });
+        this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss');
         return;
       }
 
       const validationError = validateAdy(this.audysseyData);
       if (validationError) {
         this.chartObj?.hideLoading();
-        this.snackBar.open(validationError, 'Dismiss');
+        this.snackBar.open(validationError, 'Dismiss', {verticalPosition: "top"});
         return;
       }
 
@@ -153,7 +152,7 @@ export class AppComponent {
     }
     else {
       this.chartObj?.hideLoading();
-      this.snackBar.open('Cannot read the file.', 'Dismiss', { duration: 5000 });
+      this.snackBar.open('Cannot read the file.', 'Dismiss');
     }
   }
 
@@ -177,10 +176,10 @@ export class AppComponent {
       worker.onerror = (e) => {
         console.error('Worker error', e);
         this.chartObj?.hideLoading();
-        this.snackBar.open('Background processing error. Please try again.', 'Dismiss', { duration: 5000 });
+        this.snackBar.open('Background processing error.', 'Dismiss', { duration: 5000 });
       };
     } else {
-      this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Dismiss', { duration: 6000 });
+      this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Dismiss');
     }
   }
 
@@ -280,7 +279,7 @@ export class AppComponent {
       return;
     }
 
-    // condition for Audessey One modified files
+    // condition for Audyssey One modified files
     if (this.selectedChannel.customTargetCurvePoints && this.selectedChannel.customTargetCurvePoints.length > 1000) {
       this.chartOptions.series![targetCurve] = {
         data: this.selectedChannel.customTargetCurvePoints.map(point => {
