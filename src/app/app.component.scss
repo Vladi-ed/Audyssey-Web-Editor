@@ -112,19 +112,19 @@ mat-card {
     margin-bottom: 2px;
   }
 
-  ::ng-deep .mdc-text-field--outlined {
-    //--mdc-outlined-text-field-outline-width: 0;
-    --mdc-outlined-text-field-focus-outline-width: 1px;
-    --mdc-outlined-text-field-outline-color: white;
-    //--mdc-outlined-text-field-focus-outline-width: 1px;
-    --mat-select-trigger-text-weight: 700;
-    --mat-select-enabled-trigger-text-color: transparent;
-    --mat-select-trigger-text-size: 20px;
+  //--mat-form-field-outlined-outline-width: 0;
+  --mat-form-field-outlined-focus-outline-width: 1px;
+  --mat-form-field-outlined-outline-color: white;
+  //--mat-form-field-outlined-focus-outline-width: 1px;
+  --mat-select-trigger-text-weight: 700;
+  --mat-select-enabled-trigger-text-color: transparent;
+  --mat-select-trigger-text-size: 20px;
 
+  ::ng-deep .mdc-text-field--outlined {
     .mat-mdc-form-field-infix {
       width: 190px;
     }
-    //background-color: white;
+
     text-align: center;
   }
 

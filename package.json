@@ -1,6 +1,6 @@
 {
   "name": "audyssey-editor",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "author": "Vladi Ed",
   "scripts": {
     "ng": "ng",
@@ -10,12 +10,12 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^20.1.7",
-    "@angular/cdk": "^19.2.19",
+    "@angular/cdk": "^20.1.6",
     "@angular/common": "^20.1.7",
     "@angular/compiler": "^20.1.7",
     "@angular/core": "^20.1.7",
     "@angular/forms": "^20.1.7",
-    "@angular/material": "^19.2.19",
+    "@angular/material": "^20.1.6",
     "@angular/platform-browser": "^20.1.7",
     "@angular/platform-browser-dynamic": "^20.1.7",
     "fft.js": "^4.0.4",
