@@ -1,6 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: gray;}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: gray;
+  --mat-snack-bar-button-color: white;
+}
+
 @font-face {
   font-family: "Helvetica Neue";
   size-adjust: 99.4%; // x
@@ -49,4 +55,8 @@ h1 {
 
 .draggable-cursor {
   cursor: ns-resize;
+}
+
+.mdc-button.mat-mdc-snack-bar-action {
+  border: 1px solid gray;
 }

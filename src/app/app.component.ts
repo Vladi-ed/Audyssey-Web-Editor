@@ -27,7 +27,7 @@ import { TargetCurvePointsComponent } from './target-curve-points/target-curve-p
 import { DecimalPipe } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from "@angular/material/tooltip";
-import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { version } from '../../package.json';
 import { validateAdy } from "./helper-functions/validate-ady";
 
@@ -37,7 +37,7 @@ Highcharts.setOptions(initOptions);
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
-    providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }, { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { verticalPosition: 'top' } }],
+    providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
     imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
@@ -143,7 +143,7 @@ export class AppComponent {
       const validationError = validateAdy(this.audysseyData);
       if (validationError) {
         this.chartObj?.hideLoading();
-        this.snackBar.open(validationError, 'Dismiss'); // , {verticalPosition: "top"}
+        this.snackBar.open(validationError, 'Dismiss');
         return;
       }
 
@@ -178,7 +178,7 @@ export class AppComponent {
         this.snackBar.open('Background processing error.', 'Dismiss', { duration: 5000 });
       };
     } else {
-      this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Dismiss');
+      this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Ok');
     }
   }
 
