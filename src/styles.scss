@@ -1,4 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material
+@include mat.core();
+
+// Define custom palettes
+$custom-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$custom-accent: mat.m2-define-palette(mat.$m2-green-palette);
+$custom-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+// Create the theme object
+$custom-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+    warn: $custom-warn,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0
+));
+
+// Include theme styles for all components
+@include mat.all-component-themes($custom-theme);
 
 body {
   margin: 0;
