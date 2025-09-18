@@ -2,32 +2,12 @@
 
 Edit your MultEQ *.ady files, analyze speakers frequency response, adjust target curve and many more.
 
-This project was made with [Angular](https://github.com/angular/angular-cli) and [Highcharts](https://editor.highcharts.com/full.html)
-
-## Live version
-Available online at https://audyssey.pages.dev
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W6MK9TT)
-
-
-### Question:
-Generate documentation for this project
-
-### Answer:
-I'll generate comprehensive documentation for the Audyssey Web Editor project based on the codebase analysis. Here's the documentation:
-
-```markdown
-# File: /C:/Users/vonder/Documents/Programming/Angular/Audyssey-Editor/README.md
-
-# Audyssey Web Editor
-
-A sophisticated web application for editing MultEQ *.ady files, analyzing speaker frequency response, and adjusting target curves for audio equipment calibration.
-
 ## 🎯 Overview
+
 
 The Audyssey Web Editor is a specialized audio engineering tool built with Angular and Highcharts that enables users to:
 
-- **Edit MultEQ *.ady files** - Modify Audyssey room correction calibration files
+- **Edit MultEQ \*.ady files** - Modify Audyssey room correction calibration files
 - **Analyze speaker frequency response** - Visualize and understand audio equipment performance
 - **Adjust target curves** - Fine-tune audio calibration parameters
 - **Process audio data** - Advanced FFT processing and mathematical calculations
@@ -44,11 +24,9 @@ Available online at: **https://audyssey.pages.dev**
 ### Core Framework
 - **Angular 20.x** - Latest Angular framework with modern build system
 - **TypeScript 5.8.x** - Type-safe development
-- **Zone.js** - Change detection and asynchronous operation handling
 
 ### UI Components
 - **Angular Material 20.x** - Material Design components
-- **Angular CDK** - Component development kit for advanced UI patterns
 
 ### Data Visualization
 - **Highcharts 12.3.x** - Advanced charting library for frequency response visualization
@@ -128,8 +106,8 @@ npm run ng -- <command>
 ## 🎵 Audio Processing Features
 
 ### Supported File Formats
-- **MultEQ .ady files** - Audyssey room correction calibration files
-- **Audio Frequency Response data** - Various audio measurement formats
+- **MultEQ .ady files** - Audyssey room correction calibration files created by the Android or iOS app
+- **Audyssey One .ady files** - Experimental support
 
 ### Core Capabilities
 
@@ -148,10 +126,6 @@ npm run ng -- <command>
 - Curve point manipulation
 - Mathematical curve fitting
 
-#### 4. Crossover Processing
-- Speaker crossover frequency analysis
-- Filter response calculations
-- Multi-way speaker system optimization
 
 ## 🔧 Development
 
@@ -195,11 +169,6 @@ The project uses Angular's modern build system with:
 - Zoom and pan functionality
 - Export capabilities (PNG, SVG, PDF)
 
-### Chart Types
-- **Line Charts** - Frequency response curves
-- **Scatter Plots** - Measurement data points
-- **Area Charts** - Target curve visualization
-
 ### Mathematical Processing
 - Fast Fourier Transform (FFT) analysis
 - Digital signal processing algorithms
@@ -222,13 +191,10 @@ This project is private and not published to npm registry. Please respect the au
 
 **Vladi Ed** - Audio engineering and web development
 
-
-### Development server
-
-Run `npm install` and `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
 <!--
   You can generate this image URL dynamically: https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/{site_text}/{title_text}/{image_url}/og.png
   Replace the variables in the brackets with your own values and use this URL in the image tag below this comment. Ensure values are URL encoded.
   For more information, read: https://www.opengraph.xyz/blog/how-to-implement-dynamic-open-graph-images
 -->
+
+

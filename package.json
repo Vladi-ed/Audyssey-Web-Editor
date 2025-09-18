@@ -1,6 +1,6 @@
 {
   "name": "audyssey-editor",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "author": "Vladi Ed",
   "scripts": {
     "ng": "ng",
