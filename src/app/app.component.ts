@@ -8,7 +8,7 @@ import 'highcharts/esm/modules/draggable-points';
 // import 'highcharts/modules/boost'
 // import 'highcharts/modules/datagrouping';
 import 'highcharts/esm/modules/exporting';
-import { HighchartsChartModule } from 'highcharts-angular';
+import { HighchartsChartComponent } from 'highcharts-angular';
 import { initOptions, seriesOptions } from "./helper-functions/highcharts-options";
 import { tooltipOptions } from "./helper-functions/material-options";
 import { decodeCrossover } from "./helper-functions/decode-crossover";
@@ -38,7 +38,7 @@ Highcharts.setOptions(initOptions);
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartModule, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
+    imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
   readonly highcharts = Highcharts as any;

@@ -221,10 +221,9 @@
 
         <mat-card-content>
             <highcharts-chart
-                  [Highcharts]="highcharts"
                   [options]="chartOptions"
                   [(update)]="chartUpdateFlag"
-                  [callbackFunction]="chartCallback"
+                  (chartInstance)="chartCallback($event)"
             />
         </mat-card-content>
     </mat-card>
