@@ -22,6 +22,7 @@ export function decodeChannelName(commandId?: string) {
     case 'BDL' : return 'Back Dolby Left';
     case 'CH' : return 'Center Height';
     case 'FDL' : return 'Front Dolby Left';
+    case 'FDR' : return 'Front Dolby Right';
     case 'FWL' : return 'Front Wide Left';
     case 'SBL' : return 'Surround Back L';
     case 'SBR' : return 'Surround Back R';
