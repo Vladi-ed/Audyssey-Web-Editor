@@ -76,21 +76,20 @@ export class AppComponent {
     // console.log('Highcharts callback one time on graph init');
 
     // update the target curve with draggable points
-    let replacePoint: string;
+    let draggedPointX: number;
     chart.series[2].update({
       type: 'spline',
       point: {
         events: {
           dragStart: function () {
-            replacePoint = '{' + this.x;
+            draggedPointX = this.x as number;
           },
           drop: (a) => {
             // Calculate the relative offset for the new position
             // We dragged the point to an Absolute Y. We need to find what the Base Curve Y is at this X.
-            // @ts-ignore
-            const x = a.newPoint.x ?? (a.target as any).x; // handle both drag/drop event structures just in case
-            // @ts-ignore
-            const absY = a.newPoint.y ?? (a.target as any).y;
+            const event = a as any;
+            const x = event.newPoint?.x ?? event.target.x;
+            const absY = event.newPoint?.y ?? event.target.y;
 
             // Get base value
             const baseVal = getBaseCurveValue(
@@ -104,7 +103,12 @@ export class AppComponent {
 
             const newCurvePoints: string[] = [];
             this.selectedChannel?.customTargetCurvePoints.forEach((point, i) => {
-              if (point.startsWith(replacePoint)) {
+              const coordinates = point.replace(/[{}]/g, '').split(',');
+              const pointFreq = parseFloat(coordinates[0]);
+
+              // Compare frequency with a small epsilon to handle floating point precision differences
+              // e.g. "53.875591278076172" vs 53.87559127807617
+              if (Math.abs(pointFreq - draggedPointX) < 0.01) {
                 // We construct the string as {Freq, Offset}
                 // Audyssey files expect the user points to be stored as offsets.
                 newCurvePoints[i] = `{${x}, ${newOffset.toFixed(2)}}`;

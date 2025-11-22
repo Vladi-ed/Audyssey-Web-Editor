@@ -89,7 +89,13 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
 
     // Check if this specific X is an explicit user control point (for draggability)
     // We check against the ORIGINAL userPoints array
-    const isUserPoint = userPoints.some(p => Math.abs(p.x - x) < 0.01);
+    const foundUserPoint = userPoints.find(p => Math.abs(p.x - x) < 0.01);
+
+    // It is a user point if found, UNLESS it is 20Hz or 20kHz AND has 0 offset
+    const isUserPoint = !!foundUserPoint && !(
+      (Math.abs(x - 20) < 0.01 || Math.abs(x - 20000) < 0.01) &&
+      foundUserPoint.y === 0
+    );
 
     finalCurvePoints.push({
       x: x,
@@ -133,7 +139,8 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
 
       // Calculate offset at limit
       const i = interpolationPoints.findIndex(p => p.x >= limitX);
-      let userOffsetAtLimit = 0;
+      let userOffsetAtLimit: number;
+
       if (i !== -1 && i !== 0) {
         const p0 = interpolationPoints[i - 1];
         const p1 = interpolationPoints[i];
