@@ -13,7 +13,7 @@ import { initOptions, seriesOptions } from "./helper-functions/highcharts-option
 import { tooltipOptions } from "./helper-functions/material-options";
 import { decodeCrossover } from "./helper-functions/decode-crossover";
 import { exportFile } from "./helper-functions/export-file";
-import { calculateTargetCurve } from "./helper-functions/calculate-target-curve";
+import { calculateTargetCurve, getBaseCurveValue } from "./helper-functions/calculate-target-curve";
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
 import { MatRipple, MatOption } from '@angular/material/core';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatExpansionPanelContent } from '@angular/material/expansion';
@@ -85,24 +85,45 @@ export class AppComponent {
             replacePoint = '{' + this.x;
           },
           drop: (a) => {
-            // cannot just convert target curve to points because it contains midrange compensation and rolloff
-            // const newPointsArr = chart.series[2].points.map(point => '{' + point.x + ', ' + point.y + '}');
-            // this.selectedChannel!.customTargetCurvePoints = newPointsArr;
-            // console.log('a.newPoint', a.newPoint, newPointsArr);
+            // Calculate the relative offset for the new position
+            // We dragged the point to an Absolute Y. We need to find what the Base Curve Y is at this X.
+            // @ts-ignore
+            const x = a.newPoint.x ?? (a.target as any).x; // handle both drag/drop event structures just in case
+            // @ts-ignore
+            const absY = a.newPoint.y ?? (a.target as any).y;
+
+            // Get base value
+            const baseVal = getBaseCurveValue(
+              x,
+              this.audysseyData.enTargetCurveType,
+              this.selectedChannel?.midrangeCompensation
+            );
+
+            // Offset = Absolute - Base
+            const newOffset = absY - baseVal;
 
             const newCurvePoints: string[] = [];
             this.selectedChannel?.customTargetCurvePoints.forEach((point, i) => {
               if (point.startsWith(replacePoint)) {
-                newCurvePoints[i] = point.replace(/, ?[-+]?\d*\.?\d+/g, ', '
-                  // @ts-ignore
-                  + a.newPoint.y.toFixed(1));
+                // We construct the string as {Freq, Offset}
+                // Audyssey files expect the user points to be stored as offsets.
+                newCurvePoints[i] = `{${x}, ${newOffset.toFixed(2)}}`;
               }
               else newCurvePoints[i] = point;
             });
 
             if (this.selectedChannel) {
               this.selectedChannel.customTargetCurvePoints = newCurvePoints;
+
+              // Force chart update to redraw the curve with new interpolation
+              // We need to defer this slightly or call updateTargetCurve directly because
+              // Highcharts' default drag behavior only moves the single point,
+              // but our "Adjustment Layer" logic means the whole line shape between points might change.
+              setTimeout(() => this.updateTargetCurve(), 0);
             }
+
+            // returning false prevents Highcharts from applying the default simple drag (which might be wrong while we recalculate)
+            // actually, letting it drop visually is fine, the updateTargetCurve() will snap it to the correct interpolated shape immediately.
           }
         }
       },
