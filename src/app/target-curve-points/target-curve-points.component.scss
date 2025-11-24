@@ -19,6 +19,12 @@ div {
   padding-top: 20px;
 }
 
+.buttons-save-container {
+  display: flex;
+  justify-items: stretch;
+  gap: 12px;
+}
+
 .point-row {
   animation: show-row 600ms 100ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
   // Prestate
