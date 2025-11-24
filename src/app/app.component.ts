@@ -37,6 +37,10 @@ Highcharts.setOptions(initOptions);
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
+    host: {
+      '(dragover)': '$event.preventDefault()',
+      '(drop)': 'onDragDrop($event)',
+    },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
     imports: [MatCard, MatCardContent, MatRipple, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, MatExpansionPanelDescription, MatExpansionPanelContent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
@@ -364,5 +368,11 @@ export class AppComponent {
     else this.selectedChannel.customCrossover = undefined;
 
     this.updateChart();
+  }
+
+  protected onDragDrop(event: DragEvent) {
+    console.log('onDragDrop()', event?.target);
+    event.preventDefault();
+    event.stopPropagation();
   }
 }
