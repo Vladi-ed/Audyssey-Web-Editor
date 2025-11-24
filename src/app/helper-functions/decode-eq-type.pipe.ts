@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'decodeEqType', standalone: true })
 export class DecodeEqTypePipe implements PipeTransform {
-
   transform(value: number | undefined): string {
     if (value == 0) return 'MultiEQ';
     if (value == 1) return 'MultiEQ XT';
