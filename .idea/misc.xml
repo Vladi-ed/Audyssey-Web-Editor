@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+    <component name="JsBowerSettings">
+        <bower-package value="" />
+        <bower.json value="" />
+    </component>
+    <component name="ProjectRootManager">
+        <output url="file://$PROJECT_DIR$/out" />
+    </component>
+    <component name="TypeScriptCompiler">
+        <option name="recompileOnChanges" value="true" />
+    </component>
+</project>
