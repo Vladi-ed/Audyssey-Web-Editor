@@ -143,8 +143,8 @@ export class AppComponent {
         });
 
         if (chart.options.exporting?.menuItemDefinitions) {
-            const scaleBtn = chart.options.exporting.menuItemDefinitions['xScaleBtn'];
-            const graphSmoothingBtn = chart.options.exporting.menuItemDefinitions['graphSmoothingBtn'];
+            const scaleBtn = (chart.options.exporting.menuItemDefinitions as any).xScaleBtn;
+            const graphSmoothingBtn = (chart.options.exporting.menuItemDefinitions as any).graphSmoothingBtn;
 
             scaleBtn.onclick = () => {
                 this.chartLogarithmicScale = !this.chartLogarithmicScale;
