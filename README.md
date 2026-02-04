@@ -22,14 +22,14 @@ Available online at: **https://audyssey.pages.dev**
 ## 🛠️ Technology Stack
 
 ### Core Framework
-- **Angular 20.x** - Latest Angular framework with modern build system
-- **TypeScript 5.8.x** - Type-safe development
+- **Angular 21** - Latest Angular framework with modern build system
+- **TypeScript 5** - Type-safe development
 
 ### UI Components
-- **Angular Material 20.x** - Material Design components
+- **Angular Material** - Material Design components
 
 ### Data Visualization
-- **Highcharts 12.3.x** - Advanced charting library for frequency response visualization
+- **Highcharts 12** - Advanced charting library for frequency response visualization
 - **Highcharts-Angular** - Angular integration for seamless chart implementation
 
 ### Audio Processing
@@ -60,8 +60,8 @@ src/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** (v20.19.0+ or v22.12.0+ or v24.0.0+)
-- **npm** (v6.11.0+ or v7.5.6+ or v8.0.0+)
+- **Node.js** (v24+)
+- **npm** (11+)
 
 ### Installation
 

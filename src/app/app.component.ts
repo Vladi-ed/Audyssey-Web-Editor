@@ -5,7 +5,6 @@ import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/dec
 
 import Highcharts from 'highcharts/esm/highcharts';
 import 'highcharts/esm/modules/draggable-points';
-// import 'highcharts/modules/boost'
 // import 'highcharts/modules/datagrouping';
 import 'highcharts/esm/modules/exporting';
 import { HighchartsChartComponent } from 'highcharts-angular';
@@ -161,29 +160,38 @@ export class AppComponent {
     }
 
     async onUpload(files: FileList | null) {
-        const fileContent = await files?.item(0)?.text();
-        if (fileContent) {
-            this.chartObj?.showLoading();
-            try {
-                this.audysseyData = JSON.parse(fileContent);
-            } catch (e) {
-                this.chartObj?.hideLoading();
-                this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss');
-                return;
-            }
-
-            const validationError = validateAdy(this.audysseyData);
-            if (validationError) {
-                this.chartObj?.hideLoading();
-                this.snackBar.open(validationError, 'Dismiss');
-                return;
-            }
-
-            this.processDataWithWorker(this.audysseyData);
-        } else {
+        const file = files?.item(0);
+        if (!file) {
             this.chartObj?.hideLoading();
             this.snackBar.open('Cannot read the file.', 'Dismiss');
+            return;
         }
+
+        this.chartObj?.showLoading();
+
+        try {
+            const fileContent = await file.text();
+            this.audysseyData = JSON.parse(fileContent);
+        } catch (e) {
+            this.chartObj?.hideLoading();
+            this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss');
+            return;
+        }
+
+        const validationError = validateAdy(this.audysseyData);
+        if (validationError) {
+            this.chartObj?.hideLoading();
+            this.snackBar.open(validationError, 'Dismiss');
+            return;
+        }
+
+        this.processDataWithWorker(this.audysseyData);
+
+        fetch('/stats.api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetModelName: this.audysseyData.targetModelName })
+        }).catch(console.error);
     }
 
     processDataWithWorker(json: AudysseyInterface) {
