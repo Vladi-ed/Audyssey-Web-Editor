@@ -1,6 +1,6 @@
 {
   "name": "audyssey-editor",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "author": "Vladi Ed",
   "scripts": {
     "ng": "ng",
@@ -19,14 +19,14 @@
     "@angular/platform-browser-dynamic": "^21.1.2",
     "fft.js": "^4.0.4",
     "highcharts": "~12.5.0",
-    "highcharts-angular": "^5.4.0",
-    "zone.js": "~0.15.1"
+    "highcharts-angular": "~5.4.0",
+    "zone.js": "~0.16.0"
   },
   "devDependencies": {
     "@angular/build": "^21.1.2",
-    "@angular/cli": "~21.1.2",
+    "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.1.2",
-    "@angular/animations": "21.1.2",
+    "@angular/animations": "^21.1.2",
     "typescript": "~5.9.3"
   }
 }

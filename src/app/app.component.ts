@@ -46,15 +46,14 @@ Highcharts.setOptions(initOptions);
 export class AppComponent {
     readonly highcharts = Highcharts as any;
     readonly appVersion = version;
+    private chartObj?: Highcharts.Chart;
+    private snackBar = inject(MatSnackBar);
     chartOptions: Highcharts.Options = { series: seriesOptions };
-    chartUpdateFlag = false;
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     calculatedChannelsData?: Map<number, number[][]>
     selectedChannel?: DetectedChannel;
     chartLogarithmicScale = true;
     graphSmoothEnabled = false;
-    private chartObj?: Highcharts.Chart;
-    private snackBar = inject(MatSnackBar);
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {
@@ -116,7 +115,7 @@ export class AppComponent {
                             const pointFreq = parseFloat(coordinates[0]);
 
                             // Compare frequency with a small epsilon to handle floating point precision differences
-                            // e.g. "53.875591278076172" vs 53.87559127807617
+                            // e.g. "53.875591278076172" vs. 53.87559127807617
                             if (Math.abs(pointFreq - draggedPointX) < 0.01) {
                                 // We construct the string as {Freq, Offset}
                                 // Audyssey files expect the user points to be stored as offsets.
@@ -307,7 +306,7 @@ export class AppComponent {
             type: 'spline',
         }
 
-        this.chartUpdateFlag = true;
+        this.chartObj?.update(this.chartOptions, true);
     }
 
     updateTargetCurve() {
@@ -316,7 +315,8 @@ export class AppComponent {
         if (!this.selectedChannel) {
             // no selected channel, clear target curve
             this.chartOptions.series![targetCurve] = { data: [], type: 'spline' };
-            this.chartUpdateFlag = true;
+
+            this.chartObj?.update(this.chartOptions, true);
             return;
         }
 
@@ -340,7 +340,7 @@ export class AppComponent {
             type: 'spline',
         };
 
-        this.chartUpdateFlag = true;
+        this.chartObj?.update(this.chartOptions, true);
     }
 
     exportFile() {
