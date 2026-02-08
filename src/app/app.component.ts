@@ -189,7 +189,7 @@ export class AppComponent {
         fetch('/stats.api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetModelName: this.audysseyData.targetModelName })
+            body: JSON.stringify({ targetModelName: this.audysseyData.targetModelName, channels: this.audysseyData.detectedChannels.map(channel => channel.commandId)})
         }).catch(console.error);
     }
 
@@ -291,10 +291,7 @@ export class AppComponent {
     addSubwooferToTheGraph(checked: boolean) {
         const subCutOff = parseInt('200 Hz') / 3;
         const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
-        const subwoofer = 1;
-
-        // if (value) this.chartObj?.addSeries({});
-        // else this.chartObj?.series.at(-1).destroy();
+        const subwoofer = 1; // series number
 
         if (checked) this.chartOptions.series![subwoofer] = {
             data: subDataPoints?.slice(0, subCutOff),

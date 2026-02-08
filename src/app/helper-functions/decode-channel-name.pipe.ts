@@ -29,6 +29,7 @@ const CHANNEL_NAMES: Record<string, string> = {
   'TS': 'Top Surround',
   'SW1': 'Subwoofer',
   'SW2': 'Subwoofer 2',
+  'SW3': 'Subwoofer 3',
   'SWMIX': 'Subwoofer Mix',
 };
 
