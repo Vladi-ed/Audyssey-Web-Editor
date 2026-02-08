@@ -189,7 +189,7 @@ export class AppComponent {
         fetch('/stats.api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetModelName: this.audysseyData.targetModelName, channels: this.audysseyData.detectedChannels.map(channel => channel.commandId)})
+            body: JSON.stringify({ model: this.audysseyData.targetModelName, channels: this.audysseyData.detectedChannels.map(channel => channel.commandId)})
         }).catch(console.error);
     }
 
