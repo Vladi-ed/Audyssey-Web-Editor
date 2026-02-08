@@ -17,7 +17,7 @@ export const onRequestPost = async (context) => {
 
         // 3. Generate a unique key for the new record
         // Using timestamp + random string to ensure uniqueness
-        const key = `stat_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+        const key = `stat_${Date.now()}_${request.cf.country}`;
 
         // 4. Save to KV
         // 'KV' is the binding name from your environment
