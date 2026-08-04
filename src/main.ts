@@ -1,12 +1,11 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import { provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { provideBrowserGlobalErrorListeners } from '@angular/core';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 import { provideHighcharts } from 'highcharts-angular';
 
 bootstrapApplication(AppComponent, {
     providers: [
-        provideZoneChangeDetection({ eventCoalescing: true }),
         provideBrowserGlobalErrorListeners(),
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { verticalPosition: 'top' } },
         provideHighcharts(),
