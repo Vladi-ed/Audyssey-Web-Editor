@@ -10,22 +10,22 @@
   "private": true,
   "dependencies": {
     "@angular/cdk": "^21.1.2",
-    "@angular/common": "^21.1.2",
-    "@angular/compiler": "^21.1.2",
-    "@angular/core": "^21.1.2",
-    "@angular/forms": "^21.1.2",
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
     "@angular/material": "^21.1.2",
-    "@angular/platform-browser": "^21.1.2",
-    "@angular/platform-browser-dynamic": "^21.1.2",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/platform-browser-dynamic": "^22.1.0",
     "fft.js": "^4.0.4",
     "highcharts": "~12.5.0",
     "highcharts-angular": "~5.4.0",
     "zone.js": "~0.16.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.1.2",
-    "@angular/cli": "^21.1.2",
-    "@angular/compiler-cli": "^21.1.2",
-    "typescript": "~5.9.3"
+    "@angular/build": "^22.1.2",
+    "@angular/cli": "^22.1.2",
+    "@angular/compiler-cli": "^22.1.0",
+    "typescript": "~6.0.3"
   }
 }

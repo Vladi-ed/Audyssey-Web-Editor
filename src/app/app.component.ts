@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
@@ -41,10 +41,10 @@ Highcharts.setOptions(initOptions);
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
-    readonly highcharts = Highcharts as any;
     readonly appVersion = version;
     private chartObj?: Highcharts.Chart;
     private snackBar = inject(MatSnackBar);
@@ -112,7 +112,7 @@ export class AppComponent {
                         const newCurvePoints: string[] = [];
                         this.selectedChannel?.customTargetCurvePoints.forEach((point, i) => {
                             const coordinates = point.replace(/[{}]/g, '').split(',');
-                            const pointFreq = parseFloat(coordinates[0]);
+                            const pointFreq = Number.parseFloat(coordinates[0]);
 
                             // Compare frequency with a small epsilon to handle floating point precision differences
                             // e.g. "53.875591278076172" vs. 53.87559127807617
@@ -289,7 +289,7 @@ export class AppComponent {
     }
 
     addSubwooferToTheGraph(checked: boolean) {
-        const subCutOff = parseInt('200 Hz') / 3;
+        const subCutOff = Number.parseInt('200 Hz') / 3;
         const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
         const subwoofer = 1; // series number
 
@@ -322,7 +322,7 @@ export class AppComponent {
             this.chartOptions.series![targetCurve] = {
                 data: this.selectedChannel.customTargetCurvePoints.map(point => {
                     const coordinates = point.replace(/[{}]/g, '').split(',');
-                    return [parseFloat(coordinates[0]), parseFloat(coordinates[1])]
+                    return [Number.parseFloat(coordinates[0]), Number.parseFloat(coordinates[1])]
                 }),
                 type: 'line'
             }
