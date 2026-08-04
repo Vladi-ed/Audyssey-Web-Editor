@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
@@ -48,6 +48,8 @@ export class AppComponent {
     readonly appVersion = version;
     private chartObj?: Highcharts.Chart;
     private snackBar = inject(MatSnackBar);
+    private cdr = inject(ChangeDetectorRef);
+
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     calculatedChannelsData?: Map<number, number[][]>
@@ -125,12 +127,13 @@ export class AppComponent {
 
                         if (this.selectedChannel) {
                             this.selectedChannel.customTargetCurvePoints = newCurvePoints;
+                            this.cdr.markForCheck();
 
                             // Force chart update to redraw the curve with new interpolation
                             // We need to defer this slightly or call updateTargetCurve directly because
                             // Highcharts' default drag behavior only moves the single point,
                             // but our "Adjustment Layer" logic means the whole line shape between points might change.
-                            setTimeout(() => this.updateTargetCurve(), 0);
+                            setTimeout(() => this.updateTargetCurve(), 1);
                         }
 
                         // returning false prevents Highcharts from applying the default simple drag (which might be wrong while we recalculate)
@@ -171,9 +174,11 @@ export class AppComponent {
         try {
             const fileContent = await file.text();
             this.audysseyData = JSON.parse(fileContent);
+            this.cdr.markForCheck();
         } catch (e) {
             this.chartObj?.hideLoading();
             this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss');
+            console.warn(e);
             return;
         }
 
@@ -211,6 +216,7 @@ export class AppComponent {
                 this.selectedChannel = json.detectedChannels[0];
                 this.updateChart();
                 this.chartObj?.hideLoading();
+                this.cdr.markForCheck();
             };
 
             worker.onerror = (e) => {
@@ -221,6 +227,8 @@ export class AppComponent {
         } else {
             this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Ok');
         }
+
+        // TODO: Add a loading indicator to the UI
     }
 
     updateChart() {
