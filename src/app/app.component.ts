@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
@@ -41,7 +41,7 @@ Highcharts.setOptions(initOptions);
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    changeDetection: ChangeDetectionStrategy.Eager,
+    // changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
@@ -54,8 +54,8 @@ export class AppComponent {
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     calculatedChannelsData?: Map<number, number[][]>
     selectedChannel?: DetectedChannel;
-    chartLogarithmicScale = true;
-    graphSmoothEnabled = false;
+    private chartLogarithmicScale = true;
+    private graphSmoothEnabled = false;
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {

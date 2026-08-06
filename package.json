@@ -16,10 +16,10 @@
     "@angular/forms": "^22.1.0",
     "@angular/material": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
-    "tslib": "^2.3.0",
     "fft.js": "^4.0.4",
-    "highcharts": "~12.5.0",
+    "highcharts": "~13.0.0",
     "highcharts-angular": "~5.4.0",
+    "tslib": "^2.3.0",
     "zone.js": "~0.16.0"
   },
   "devDependencies": {

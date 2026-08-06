@@ -1,6 +1,11 @@
 import { Point, SeriesOptionsType, Options } from "highcharts";
 
 export const initOptions: Options = {
+  // Highcharts 13 defaults to adapting its palette to the system color scheme.
+  // The editor has a fixed light Material theme, so keep the chart aligned with it.
+  palette: {
+    colorScheme: 'light',
+  },
   responsive: {
     rules: [{
       chartOptions: {
@@ -15,6 +20,7 @@ export const initOptions: Options = {
     }]
   },
   chart: {
+    animation: true,
     zooming: {
       type: 'x',
       // key: 'ctrl',
@@ -25,7 +31,6 @@ export const initOptions: Options = {
       enabled: true,
       // type: 'x'
     },
-    type: 'spline',
     // events: {
     //   // add points on CLick
     //   click: function (e) {
@@ -65,7 +70,7 @@ export const initOptions: Options = {
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'play', 'xScaleBtn', 'graphSmoothingBtn']
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'xScaleBtn', 'graphSmoothingBtn']
       },
     },
     chartOptions: {
@@ -114,7 +119,6 @@ export const initOptions: Options = {
     },
     // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
     // valueSuffix: ' dB',
-    valueDecimals: 1,
     useHTML: true,
   },
   xAxis: {
