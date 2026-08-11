@@ -21,7 +21,16 @@ $custom-theme: mat.m2-define-light-theme((
 ));
 
 // Include theme styles for all components
-@include mat.all-component-themes($custom-theme);
+@include mat.core-theme($custom-theme);
+@include mat.card-theme($custom-theme);
+@include mat.checkbox-theme($custom-theme);
+@include mat.expansion-theme($custom-theme);
+@include mat.form-field-theme($custom-theme);
+@include mat.input-theme($custom-theme);
+@include mat.radio-theme($custom-theme);
+@include mat.select-theme($custom-theme);
+@include mat.snack-bar-theme($custom-theme);
+@include mat.tooltip-theme($custom-theme);
 
 body {
   margin: 0;

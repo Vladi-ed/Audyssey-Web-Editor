@@ -3,12 +3,9 @@ import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
 
-import Highcharts from 'highcharts/esm/highcharts';
-import 'highcharts/esm/modules/draggable-points';
-// import 'highcharts/modules/datagrouping';
-import 'highcharts/esm/modules/exporting';
+import type Highcharts from 'highcharts/esm/highcharts';
 import { HighchartsChartComponent } from 'highcharts-angular';
-import { initOptions, seriesOptions } from './helper-functions/highcharts-options';
+import { seriesOptions } from './helper-functions/highcharts-options';
 import { tooltipOptions } from './helper-functions/material-options';
 import { decodeCrossover } from './helper-functions/decode-crossover';
 import { exportFile } from './helper-functions/export-file';
@@ -29,8 +26,6 @@ import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/toolt
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
 import { validateAdy } from './helper-functions/validate-ady';
-
-Highcharts.setOptions(initOptions);
 
 @Component({
     selector: 'app-root',

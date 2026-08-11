@@ -78,7 +78,7 @@
             <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltip="Maintains bass and treble when playback volume is reduced to compensate human hearing">
                 Dynamic EQ
             </mat-checkbox>
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltip="Dynamic Volume automatically adjusts the volume level of audio content to minimize large differences between quiet and loud sounds">
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltip="Automatically adjusts the volume level of content to minimize differences between quiet and loud sounds">
                 Dynamic Volume
             </mat-checkbox>
             @if (audysseyData.lfcSupport) {
@@ -224,10 +224,12 @@
         </mat-card-header>
 
         <mat-card-content>
+          @defer (on idle) {
             <highcharts-chart
                   [options]="chartOptions"
                   (chartInstance)="chartCallback($event)"
             />
+          }
         </mat-card-content>
     </mat-card>
 </main>
