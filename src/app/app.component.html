@@ -75,16 +75,17 @@
 <!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
 <!--            </mat-form-field>-->
 
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltip="Dynamic EQ boosting bass and treble at lower volume levels to compensate human hearing">
-                Dynamic EQ</mat-checkbox>
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltip="Maintains bass and treble when playback volume is reduced to compensate human hearing">
+                Dynamic EQ
+            </mat-checkbox>
             <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltip="Dynamic Volume automatically adjusts the volume level of audio content to minimize large differences between quiet and loud sounds">
-                Dynamic Volume</mat-checkbox>
+                Dynamic Volume
+            </mat-checkbox>
             @if (audysseyData.lfcSupport) {
-                <mat-checkbox [(ngModel)]="audysseyData.lfc" matTooltip="Reduce the bass below 100 Hz for neighbors comfort">
+                <mat-checkbox [(ngModel)]="audysseyData.lfc" matTooltip="Reduces the bass below 100 Hz that travels through walls while preserving bass balance in the listening area. Available only on supported receivers.">
                     Audyssey LFC
                 </mat-checkbox>
             }
-
         </mat-expansion-panel>
 
         <mat-expansion-panel>
@@ -137,15 +138,18 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Custom Level (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12" matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty.">
+                    <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12"
+                           matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty.">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Trim Adjustment (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+" matTooltip="Level adjustment relative to the default value">
+                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+"
+                           matTooltip="Level adjustment relative to the default value">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
-                  <mat-label>High Frequency Rolloff (Hz)</mat-label>
-                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000" matTooltip="HF Rolloff start frequency">
+                  <mat-label>Correction limit (Hz)</mat-label>
+                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000"
+                         matTooltip="Sets the highest frequency Audyssey corrects for the selected channel. Frequencies above this limit are left uncorrected.">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -174,8 +178,9 @@
                     </mat-select>
                 </mat-form-field>
 
-                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Add a dip in the frequency response to address potential harshness that can arise from some speakers crossover design">
-                    Midrange Compensation</mat-checkbox>
+                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Applies midrange dip to the selected channel, which can reduce harshness near a speaker's crossover region.">
+                    Midrange Compensation
+                </mat-checkbox>
                 <!-- <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
                 <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
             }
@@ -189,17 +194,16 @@
             </mat-expansion-panel-header>
 
             <ng-template matExpansionPanelContent>
-              <label matTooltip="20Hz and 20kHz are added automatically for compatibility">
-                  Frequency (Hz), Gain (dB)
-              </label>
+                <div matTooltip="20Hz and 20kHz are added automatically for compatibility">
+                    Frequency (Hz), Gain (dB)
+                </div>
 
-            @defer (when selectedChannel) {
-                <app-target-curve-points
-                    [(curvePoints)]="selectedChannel!.customTargetCurvePoints"
-                    (curvePointsChange)="updateTargetCurve()"
-                />
-            }
-
+                @defer (when selectedChannel) {
+                    <app-target-curve-points
+                        (curvePointsChange)="updateTargetCurve()"
+                        [(curvePoints)]="selectedChannel!.customTargetCurvePoints"
+                    />
+                }
             </ng-template>
         </mat-expansion-panel>
     </mat-accordion>
