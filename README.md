@@ -1,11 +1,11 @@
-# Audyssey Web Editor
+# ADY Web Editor
 
-Edit your MultEQ *.ady files, analyze speakers frequency response, adjust target curve and many more.
+ADY Web Editor is an independent, open-source web application for inspecting, editing, and exporting `.ady` room-calibration files compatible with Audyssey MultEQ.
 
 ## 🎯 Overview
 
 
-The Audyssey Web Editor is a specialized audio engineering tool built with Angular and Highcharts that enables users to:
+ADY Web Editor is a specialized audio engineering tool built with Angular and Highcharts that enables users to:
 
 - **Edit MultEQ \*.ady files** - Modify Audyssey room correction calibration files
 - **Analyze speaker frequency response** - Visualize and understand audio equipment performance
@@ -22,15 +22,14 @@ Available online at: **https://audyssey.pages.dev**
 ## 🛠️ Technology Stack
 
 ### Core Framework
-- **Angular 21** - Latest Angular framework with modern build system
-- **TypeScript 5** - Type-safe development
+- **Angular 22** - Latest Angular framework with modern build system
+- **TypeScript 6** - Type-safe development
 
 ### UI Components
 - **Angular Material** - Material Design components
 
 ### Data Visualization
-- **Highcharts 12** - Advanced charting library for frequency response visualization
-- **Highcharts-Angular** - Angular integration for seamless chart implementation
+- **Highcharts** - Advanced charting library for frequency response visualization
 
 ### Audio Processing
 - **FFT.js** - Fast Fourier Transform library for audio signal processing
@@ -68,7 +67,6 @@ src/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd Audyssey-Editor
    ```
 
 2. **Install dependencies**
@@ -185,16 +183,10 @@ The project uses Angular's modern build system with:
 
 ## 📄 License
 
-This project is private and not published to npm registry. Please respect the author's intellectual property rights.
+ADY Web Editor is an independent open-source project and is not affiliated with or endorsed by Audyssey Laboratories.
+Audyssey and MultEQ are trademarks of Audyssey Laboratories, Inc.
 
 ## 👨‍💻 Author
 
 **Vladi Ed** - Audio engineering and web development
-
-<!--
-  You can generate this image URL dynamically: https://ogcdn.net/6064b869-74ed-4eb9-b76c-0b701ffe7e6b/v4/{site_text}/{title_text}/{image_url}/og.png
-  Replace the variables in the brackets with your own values and use this URL in the image tag below this comment. Ensure values are URL encoded.
-  For more information, read: https://www.opengraph.xyz/blog/how-to-implement-dynamic-open-graph-images
--->
-
 

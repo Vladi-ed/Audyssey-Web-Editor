@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Audyssey-Editor": {
+    "ady-editor": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -52,7 +52,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "webWorkerTsConfig": "tsconfig.worker.json",
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -83,10 +83,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Audyssey-Editor:build:production"
+              "buildTarget": "ady-editor:build:production"
             },
             "development": {
-              "buildTarget": "Audyssey-Editor:build:development"
+              "buildTarget": "ady-editor:build:development"
             }
           },
           "defaultConfiguration": "development"
