@@ -1,17 +1,17 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
 
 import type Highcharts from 'highcharts/esm/highcharts';
 import { HighchartsChartComponent } from 'highcharts-angular';
-import { seriesOptions } from './helper-functions/highcharts-options';
+import { darkChartTheme, lightChartTheme, seriesOptions } from './helper-functions/highcharts-options';
 import { tooltipOptions } from './helper-functions/material-options';
 import { decodeCrossover } from './helper-functions/decode-crossover';
 import { exportFile } from './helper-functions/export-file';
 import { calculateTargetCurve, getBaseCurveValue } from './helper-functions/calculate-target-curve';
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
-import { MatRipple, MatOption } from '@angular/material/core';
+import { MatOption, MatRipple } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -20,7 +20,7 @@ import { MatSelect } from '@angular/material/select';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ChannelSelectorComponent } from './channel-selector/channel-selector.component';
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, DOCUMENT } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -44,6 +44,8 @@ export class AppComponent {
     private chartObj?: Highcharts.Chart;
     private snackBar = inject(MatSnackBar);
     private cdr = inject(ChangeDetectorRef);
+    private document = inject(DOCUMENT);
+    darkThemeEnabled = false;
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
@@ -51,6 +53,10 @@ export class AppComponent {
     selectedChannel?: DetectedChannel;
     private chartLogarithmicScale = true;
     private graphSmoothEnabled = false;
+
+    constructor() {
+        this.syncColorScheme();
+    }
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {
@@ -154,6 +160,67 @@ export class AppComponent {
             }
         }
         this.chartObj = chart;
+        this.applyChartTheme();
+    }
+
+    toggleColorScheme() {
+        this.darkThemeEnabled = !this.darkThemeEnabled;
+        this.syncColorScheme();
+    }
+
+    private syncColorScheme() {
+        this.document.documentElement.style.colorScheme = this.darkThemeEnabled ? 'dark' : 'light';
+        this.document.body.classList.toggle('dark-theme', this.darkThemeEnabled);
+        this.applyChartTheme();
+        this.cdr.markForCheck();
+    }
+
+    private applyChartTheme() {
+        if (!this.chartObj) return;
+
+        this.chartObj.update(this.darkThemeEnabled ? darkChartTheme : lightChartTheme, false);
+
+        const [measurement, subwoofer, targetCurve] = this.chartObj.series;
+        measurement?.update((this.darkThemeEnabled ? {
+            color: '#45d7ff',
+            lineWidth: 2,
+            zones: [],
+        } : {
+            color: '#719f20',
+            lineWidth: 1,
+            zones: [
+                { value: -10, color: '#f79d5c' },
+                { value: 5, color: '#719f20' },
+                { value: 10, color: '#d98f52' },
+                { value: 20, color: '#ff0000' },
+                { color: '#c93737' },
+            ],
+        }) as Highcharts.SeriesOptionsType, false);
+        subwoofer?.update({
+            type: 'spline',
+            color: this.darkThemeEnabled ? '#ffbd54' : '#000000',
+            lineWidth: this.darkThemeEnabled ? 1.5 : 0.8,
+        }, false);
+        targetCurve?.update({
+            type: 'spline',
+            color: this.darkThemeEnabled ? '#9a5cff' : '#008000',
+            lineWidth: this.darkThemeEnabled ? 2.4 : 2,
+            marker: this.darkThemeEnabled ? {
+                lineWidth: 1.5,
+                lineColor: '#f3edff',
+                fillColor: '#9a5cff',
+                radius: 4,
+                symbol: 'circle',
+            } : {
+                lineWidth: 0,
+                lineColor: '#008000',
+                fillColor: '#008000',
+                radius: 4,
+                symbol: 'circle',
+            },
+        }, false);
+
+        this.chartObj.redraw();
     }
 
     async onUpload(files: FileList | null) {

@@ -1,95 +1,346 @@
-/* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
 
 // Include the common styles for Angular Material
 @include mat.core();
 
-// Define custom palettes
-$custom-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
-$custom-accent: mat.m2-define-palette(mat.$m2-green-palette);
-$custom-warn: mat.m2-define-palette(mat.$m2-red-palette);
+:root {
+    color-scheme: light;
+}
 
-// Create the theme object
-$custom-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $custom-primary,
-    accent: $custom-accent,
-    warn: $custom-warn,
-  ),
-  typography: mat.m2-define-typography-config(),
-  density: 0
+// Light theme
+$light-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$light-accent: mat.m2-define-palette(mat.$m2-green-palette);
+$light-warn: mat.m2-define-palette(mat.$m2-red-palette);
+$light-theme: mat.m2-define-light-theme((
+    color: (
+        primary: $light-primary,
+        accent: $light-accent,
+        warn: $light-warn,
+    ),
+    typography: mat.m2-define-typography-config(),
+    density: 0
 ));
 
-// Include theme styles for all components
-@include mat.core-theme($custom-theme);
-@include mat.card-theme($custom-theme);
-@include mat.checkbox-theme($custom-theme);
-@include mat.expansion-theme($custom-theme);
-@include mat.form-field-theme($custom-theme);
-@include mat.input-theme($custom-theme);
-@include mat.radio-theme($custom-theme);
-@include mat.select-theme($custom-theme);
-@include mat.snack-bar-theme($custom-theme);
-@include mat.tooltip-theme($custom-theme);
+// Include theme styles for all used components
+@include mat.core-theme($light-theme);
+@include mat.card-theme($light-theme);
+@include mat.checkbox-theme($light-theme);
+@include mat.expansion-theme($light-theme);
+@include mat.form-field-theme($light-theme);
+@include mat.input-theme($light-theme);
+@include mat.radio-theme($light-theme);
+@include mat.select-theme($light-theme);
+@include mat.snack-bar-theme($light-theme);
+@include mat.tooltip-theme($light-theme);
+
+// Optional dark theme.
+$ady-primary: mat.m2-define-palette(mat.$m2-cyan-palette, A200, A100, A400);
+$ady-accent: mat.m2-define-palette(mat.$m2-deep-purple-palette, A200, A100, A400);
+$ady-warn: mat.m2-define-palette(mat.$m2-amber-palette, A200, A100, A400);
+$dark-theme: mat.m2-define-dark-theme((
+    color: (
+        primary: $ady-primary,
+        accent: $ady-accent,
+        warn: $ady-warn,
+    ),
+    typography: mat.m2-define-typography-config(
+        $font-family: 'Inter, Roboto, "Helvetica Neue", sans-serif'
+    ),
+    density: 0
+));
 
 body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: gray;
-  --mat-snack-bar-button-color: white;
-  --mat-checkbox-selected-checkmark-color: white;
+    margin: 0 10px 10px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    color: light-dark(#000000, #eef5ff);
+    background-color: light-dark(gray, #020916);
+    --mat-snack-bar-button-color: white;
+    --mat-checkbox-selected-checkmark-color: white;
 }
 
 @font-face {
-  font-family: "Helvetica Neue";
-  size-adjust: 99.4%; // x
-  ascent-override: 94%; // y
-  src: local("Arial");
+    font-family: "Helvetica Neue";
+    size-adjust: 99.4%; // x
+    ascent-override: 94%; // y
+    src: local("Arial");
 }
 
 .flat-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #b0b0b0;
-  padding: 0 16px 1px;
-  height: 46px;
-  border-radius: 4px;
-  color: var(--mat-expansion-header-text-color);
-  background-color: white;
-  cursor: pointer;
-  user-select: none;
-
-  @media (max-width: 500px) {
-    font-size: 14px;
-  }
+    display: flex;
+    height: 46px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px 1px;
+    color: var(--mat-expansion-header-text-color);
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid #b0b0b0;
+    border-radius: 4px;
+    background-color: white;
 }
+
 .flat-btn:hover {
-  color: black;
-  border-color: #545454;
-}
-.flat-btn:disabled {
-  border-color: #f5f5f5;
-  cursor: auto;
-}
-h1 {
-  font-weight: 700;
+    color: black;
+    border-color: #545454;
 }
 
-// highcharts
+.flat-btn:disabled {
+    cursor: auto;
+    border-color: #f5f5f5;
+}
+
+h1 {
+    font-weight: 700;
+}
+
 .tooltip-header {
-  font-weight: 700;
-  margin-bottom: 6px;
-  padding: 4px 8px;
-  text-align: center;
-  border: 1px solid gray;
-  border-radius: 2px;
+    margin-bottom: 6px;
+    padding: 4px 8px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 2px;
 }
 
 .draggable-cursor {
-  cursor: ns-resize;
+    cursor: ns-resize;
 }
 
 .mdc-button.mat-mdc-snack-bar-action {
-  border: 1px solid gray;
+    border: 1px solid gray;
+}
+
+body.dark-theme {
+    @include mat.core-color($dark-theme);
+    @include mat.card-color($dark-theme);
+    @include mat.checkbox-color($dark-theme);
+    @include mat.expansion-color($dark-theme);
+    @include mat.form-field-color($dark-theme);
+    @include mat.input-color($dark-theme);
+    @include mat.radio-color($dark-theme);
+    @include mat.select-color($dark-theme);
+    @include mat.snack-bar-color($dark-theme);
+    @include mat.tooltip-color($dark-theme);
+
+    color: var(--ady-text);
+    font-family: Inter, Roboto, "Helvetica Neue", sans-serif;
+    background: radial-gradient(circle at 68% 22%, rgba(16, 70, 142, 0.22), transparent 34%),
+    radial-gradient(circle at 15% 3%, rgba(42, 74, 126, 0.14), transparent 26%),
+    linear-gradient(145deg, var(--ady-bg-deep) 0%, #061226 55%, #020a19 100%);
+    background-attachment: fixed;
+    --ady-bg: #020916;
+    --ady-bg-deep: #010611;
+    --ady-border: rgba(112, 143, 184, 0.33);
+    --ady-border-strong: rgba(96, 156, 218, 0.55);
+    --ady-text: #eef5ff;
+    --ady-text-muted: #9baac1;
+    --ady-cyan: #45d7ff;
+    --ady-violet: #9a5cff;
+    --ady-amber: #ffbd54;
+    --ady-glow: 0 0 24px rgba(41, 150, 255, 0.13);
+    --mat-snack-bar-button-color: var(--ady-cyan);
+    --mat-checkbox-selected-checkmark-color: #02111f;
+
+    &::before {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        content: '';
+        pointer-events: none;
+        opacity: 0.32;
+        background-image: linear-gradient(rgba(65, 127, 202, 0.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 127, 202, 0.028) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(to bottom, transparent, black 26%, black 80%, transparent);
+    }
+
+    ::selection {
+        color: #001522;
+        background: var(--ady-cyan);
+    }
+
+    .mat-mdc-card,
+    .mat-expansion-panel {
+        color: var(--ady-text);
+        border: 1px solid var(--ady-border);
+        background: linear-gradient(145deg, rgba(12, 27, 50, 0.95), rgba(5, 15, 31, 0.95)) !important;
+        box-shadow: var(--ady-glow) !important;
+        backdrop-filter: blur(14px);
+    }
+
+    .mat-mdc-card {
+        border-radius: 16px;
+    }
+
+    // Every accordion panel owns its outline. This avoids broken corners when a
+    // neighboring panel expands and Material adds its spacing class.
+    .info-panels .mat-expansion-panel {
+        overflow: hidden;
+        margin: 0 0 8px !important;
+        border: 1px solid var(--ady-border) !important;
+        border-radius: 14px !important;
+        box-shadow: none !important;
+    }
+
+    .info-panels .mat-expansion-panel-spacing {
+        margin: 0 0 8px !important;
+        border-color: var(--ady-border-strong) !important;
+    }
+
+    .mat-expansion-panel-header {
+        min-height: 58px;
+        letter-spacing: 0.01em;
+        border-radius: 13px !important;
+        border-bottom: 1px solid transparent;
+        transition: background-color 180ms ease, border-color 180ms ease;
+    }
+
+    .mat-expansion-panel-header:hover,
+    .mat-expansion-panel-header.mat-expanded {
+        background: rgba(32, 84, 144, 0.13) !important;
+    }
+
+    .mat-expansion-panel-header.mat-expanded {
+        border-radius: 13px 13px 0 0 !important;
+        border-bottom-color: rgba(97, 137, 184, 0.18);
+        margin-bottom: 16px;
+        padding-top: 2px;
+        min-height: 54px;
+        height: 50px
+    }
+
+    .mat-expansion-panel-header-title,
+    .mat-expansion-panel-header-description {
+        color: var(--ady-text) !important;
+        font-weight: 500;
+    }
+
+    .mat-expansion-indicator::after {
+        color: var(--ady-cyan) !important;
+    }
+
+    .mat-mdc-form-field {
+        width: 100%;
+        --mat-form-field-outlined-outline-color: rgba(109, 139, 177, 0.48);
+        --mat-form-field-outlined-hover-outline-color: rgba(69, 215, 255, 0.7);
+        --mat-form-field-outlined-focus-outline-color: var(--ady-cyan);
+        --mat-form-field-outlined-label-text-color: var(--ady-text-muted);
+        --mat-form-field-outlined-focus-label-text-color: var(--ady-cyan);
+        --mat-form-field-container-text-color: var(--ady-text);
+        --mat-select-enabled-trigger-text-color: var(--ady-text);
+    }
+
+    .mat-mdc-text-field-wrapper {
+        border-radius: 8px !important;
+        background: rgba(3, 12, 27, 0.46);
+    }
+
+    .mat-mdc-checkbox {
+        --mat-checkbox-label-text-color: var(--ady-text);
+        --mat-checkbox-selected-state-layer-color: var(--ady-cyan);
+        --mat-checkbox-selected-icon-color: var(--ady-cyan);
+        --mat-checkbox-selected-focus-icon-color: var(--ady-cyan);
+        --mat-checkbox-selected-hover-icon-color: #74e3ff;
+        --mat-checkbox-selected-pressed-icon-color: #74e3ff;
+        --mdc-checkbox-selected-checkmark-color: #03111e;
+        --mdc-checkbox-selected-icon-color: var(--ady-cyan);
+        --mdc-checkbox-selected-focus-icon-color: var(--ady-cyan);
+        --mdc-checkbox-selected-hover-icon-color: #74e3ff;
+        --mdc-checkbox-selected-pressed-icon-color: #74e3ff;
+    }
+
+    .mat-mdc-radio-button {
+        --mat-radio-label-text-color: var(--ady-text);
+    }
+
+    .mat-mdc-radio-button.mat-mdc-radio-checked {
+        color: var(--ady-cyan);
+    }
+
+    .mat-mdc-select-panel,
+    .mat-mdc-menu-panel {
+        color: var(--ady-text);
+        border: 1px solid var(--ady-border);
+        background: #0a1930 !important;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    .mat-mdc-option:hover:not(.mdc-list-item--disabled),
+    .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+        background: rgba(46, 137, 255, 0.16) !important;
+    }
+
+    .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+        border: 1px solid var(--ady-border-strong);
+        background: #0b1b34 !important;
+    }
+
+    .mat-mdc-tooltip .mdc-tooltip__surface {
+        color: var(--ady-text);
+        border: 1px solid var(--ady-border);
+        background: #10233f;
+    }
+
+    .flat-btn {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 17px;
+        color: #dceaff;
+        font: inherit;
+        white-space: nowrap;
+        border: 1px solid rgba(88, 133, 183, 0.5);
+        border-radius: 9px;
+        background: linear-gradient(135deg, rgba(21, 49, 84, 0.74), rgba(6, 20, 42, 0.72));
+        transition: color 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .flat-btn:hover {
+        color: #fff;
+        border-color: var(--ady-cyan);
+        background: linear-gradient(135deg, rgba(22, 88, 144, 0.68), rgba(11, 38, 76, 0.82));
+        box-shadow: 0 0 22px rgba(69, 215, 255, 0.13);
+        transform: translateY(-1px);
+    }
+
+    .flat-btn:focus-visible {
+        outline: 2px solid var(--ady-cyan);
+        outline-offset: 3px;
+    }
+
+    .flat-btn:disabled {
+        opacity: 0.38;
+        transform: none;
+    }
+
+    .flat-btn svg {
+        fill: currentColor;
+    }
+
+    .tooltip-header {
+        border-color: var(--ady-border);
+        border-radius: 5px;
+    }
+
+    .mdc-button.mat-mdc-snack-bar-action {
+        border-color: var(--ady-border);
+    }
+
+    .highcharts-container,
+    .highcharts-root {
+        font-family: Inter, Roboto, sans-serif !important;
+    }
+}
+
+@media (max-width: 500px) {
+    .flat-btn {
+        font-size: 14px;
+    }
+
+    body.dark-theme .flat-btn {
+        min-height: 42px;
+        padding-inline: 13px;
+    }
 }

@@ -1,86 +1,114 @@
 div {
-  display: flex;
+    display: flex;
 }
 
 .virtual-scroll-container {
-  height: 45vh;
+    height: 45vh;
 
-  input {
-    width: 100%
-  }
-  button {
-    height: 25px;
-  }
+    input {
+        width: 100%
+    }
+
+    button {
+        height: 25px;
+    }
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
 }
 
 .buttons-save-container {
-  display: flex;
-  justify-items: stretch;
-  gap: 12px;
+    display: flex;
+    justify-items: stretch;
+    gap: 12px;
 }
 
 .point-row {
-  animation: show-row 600ms 100ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
-  // Prestate
-  opacity: 60%;
+    animation: show-row 600ms 100ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
+    // Prestate
+    opacity: 60%;
 }
 
 .point-row > mat-form-field:first-child {
-  margin-right: 12px;
+    margin-right: 12px;
 }
 
 .row-remove {
-  animation: hide-row 300ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
+    animation: hide-row 300ms cubic-bezier(0.38, 0.97, 0.56, 0.76) forwards;
 }
 
 .remove-btn {
-  display: flex;
-  height: 55px;
-  border-radius: 4px;
-  padding-right: 0;
-  padding-left: 1px;
-  margin-left: 7px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  flex-shrink: 0;
-  width: 20px;
+    display: flex;
+    height: 55px;
+    border-radius: 4px;
+    padding-right: 0;
+    padding-left: 1px;
+    margin-left: 7px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    flex-shrink: 0;
+    width: 20px;
+
+    svg {
+        fill: currentColor;
+    }
+}
+
+:host-context(.dark-theme) .remove-btn {
+    color: #91a4bd;
+    transition: color 160ms ease, background-color 160ms ease;
+
+    &:hover {
+        color: #ff7184;
+    }
+
+    &:focus-visible {
+        color: #ff7184;
+        outline: 1px solid #ff7184;
+        outline-offset: 2px;
+    }
 }
 
 .save-btn {
-  border: 1.5px solid #545454;
-  &:disabled {
-    opacity: 0.4;
-    border-width: 1px;
-  }
+    border: 1.5px solid #545454;
+
+    &:disabled {
+        opacity: 0.4;
+        border-width: 1px;
+    }
 }
+
 .add-btn {
-  flex-grow: 1;
+    flex-grow: 1;
 }
+
 .copy-paste-btn {
-  border: none;
+    border: none !important;
+    background: transparent !important;
+}
+.copy-paste-btn:hover {
+    box-shadow: none !important;
 }
 
 @keyframes show-row {
-  100% {
-    opacity: 1;
-    transform: none;
-  }
+    100% {
+        opacity: 1;
+        transform: none;
+    }
 }
+
 @keyframes hide-row {
-  0% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px);
-    height: 0;
-  }
+    0% {
+        opacity: 1;
+        transform: none;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+        height: 0;
+    }
 }
