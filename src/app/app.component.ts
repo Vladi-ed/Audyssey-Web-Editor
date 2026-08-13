@@ -36,7 +36,6 @@ import { validateAdy } from './helper-functions/validate-ady';
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    // changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent {
@@ -53,10 +52,6 @@ export class AppComponent {
     selectedChannel?: DetectedChannel;
     private chartLogarithmicScale = true;
     private graphSmoothEnabled = false;
-
-    constructor() {
-        this.syncColorScheme();
-    }
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {

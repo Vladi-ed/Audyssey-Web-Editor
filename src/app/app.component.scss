@@ -153,8 +153,7 @@ mat-card mat-card-header {
     align-items: center;
     justify-content: center;
     margin-bottom: 0;
-
-    height: 10px;
+    height: 2px;
 }
 
 .chart-channel-select {
@@ -339,20 +338,10 @@ mat-card mat-card-header {
     --mat-select-trigger-text-weight: 600;
 }
 
-//:host-context(.dark-theme) .chart-card .mat-mdc-card-header {
-//    z-index: 2;
-//    margin-bottom: 0;
-//}
-
-//:host-context(.dark-theme) .chart-card .mat-mdc-card-content {
-//    padding: 0 12px 12px;
-//}
 
 :host-context(.dark-theme) .chart-channel-select {
-    //height: 48px;
-    //margin-top: 5px;
-    background: rgba(12, 27, 50, 0.95);
-
+    background: rgb(10 24 45);
+    width: auto;
 }
 
 :host-context(.dark-theme) .chart-channel-select ::ng-deep .mat-mdc-select-value-text {
@@ -370,7 +359,7 @@ mat-card mat-card-header {
     padding-block: 11px;
 }
 
-:host-context(.dark-theme) .chart-channel-select ::ng-deep .mdc-notched-outline {
+.chart-channel-select ::ng-deep .mdc-notched-outline {
     display: none;
 }
 
