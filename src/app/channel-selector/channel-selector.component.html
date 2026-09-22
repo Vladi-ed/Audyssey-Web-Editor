@@ -1,4 +1,8 @@
-<mat-radio-group [value]="selectedChannel()" class="channel-radio-group" (change)="updateSelectedChannel($event)">
+<mat-radio-group
+    class="channel-radio-group"
+    [value]="selectedChannel()"
+    (change)="selectedChannel.set($event.value)"
+>
     @for (channel of detectedChannels(); track (channel.enChannelType || $index)) {
         <mat-radio-button class="channel-radio-button" [value]="channel">
             {{ channel.commandId | decodeChannelName }}

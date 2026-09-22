@@ -1,14 +1,12 @@
-import { Component, input, model } from "@angular/core";
-import { MatRadioButton, MatRadioChange, MatRadioGroup } from "@angular/material/radio";
-import { FormsModule } from "@angular/forms";
-import { DecodeChannelNamePipe } from "../helper-functions/decode-channel-name.pipe";
-import { DetectedChannel } from "../interfaces/detected-channel";
+import { Component, input, model } from '@angular/core';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
+import { DecodeChannelNamePipe } from '../helper-functions/decode-channel-name.pipe';
+import { DetectedChannel } from '../interfaces/detected-channel';
 
 @Component({
     selector: 'app-channel-selector',
     imports: [
         MatRadioGroup,
-        FormsModule,
         MatRadioButton,
         DecodeChannelNamePipe,
     ],
@@ -18,8 +16,4 @@ import { DetectedChannel } from "../interfaces/detected-channel";
 export class ChannelSelectorComponent {
   detectedChannels = input.required<DetectedChannel[]>();
   selectedChannel = model<DetectedChannel>();
-
-  updateSelectedChannel(selectorChange: MatRadioChange) {
-    this.selectedChannel.set(selectorChange.value);
-  }
 }
