@@ -15,34 +15,28 @@ export const onRequestPost = async (context) => {
             return new Response("Error: JSON body is empty or invalid", { status: 400 });
         }
 
-        // 3. Generate a unique key for the new record
-        const country = request.cf?.country || "unknown";
-        const key = `stat_${Date.now()}_${country}_${crypto.randomUUID()}`;
-
-        // 4. Save to KV
-        // await env.KV.put(key, JSON.stringify(data));
-
-        // 5. Send a notification to Telegram when configured
+        // 3. Send a notification to Telegram when configured
         if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
-            console.log('env.TELEGRAM_CHAT_ID', env.TELEGRAM_CHAT_ID)
-            await sendToTelegram(data, env);
-        }
-        else {
-            console.log('env.TELEGRAM_CHAT_ID is not configured', !!env.TELEGRAM_BOT_TOKEN, !!env.TELEGRAM_CHAT_ID)
+            const clientInfo = {
+                ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "unknown",
+                country: request.cf?.country || "unknown",
+                city: request.cf?.city || "unknown"
+            };
+            await sendToTelegram(data, clientInfo, env);
         }
 
-        // 6. Return success response
-        return new Response(JSON.stringify({ success: true, id: key, message: "Record saved" }), {
+        // 4. Return success response
+        return new Response(JSON.stringify({ success: true, message: "Record received" }), {
             headers: { "Content-Type": "application/json" },
-            status: 201
+            status: 200
         });
     } catch (err) {
         return new Response(`Server Error: ${err.message}`, { status: 500 });
     }
 };
 
-async function sendToTelegram(data, env) {
-    const message = formatTelegramMessage(data);
+async function sendToTelegram(data, clientInfo, env) {
+    const message = formatTelegramMessage(data, clientInfo);
     const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,18 +52,27 @@ async function sendToTelegram(data, env) {
     }
 }
 
-function formatTelegramMessage(data) {
+function formatTelegramMessage(data, clientInfo) {
     const lines = [
         "<b>📊 New Stats Record</b>",
-        `<i>${new Date().toISOString()}</i>`,
+        "",
+        `<b>📍 Location:</b> ${escapeHtml(clientInfo.city)}, ${escapeHtml(clientInfo.country)}`,
+        `<b>🌐 IP:</b> <code>${escapeHtml(clientInfo.ip)}</code>`,
         ""
     ];
 
     for (const [key, value] of Object.entries(data)) {
         const displayKey = escapeHtml(key.replace(/([A-Z])/g, " $1").trim());
-        const displayValue = typeof value === "object" && value !== null
-            ? JSON.stringify(value)
-            : String(value);
+
+        let displayValue;
+        if (Array.isArray(value)) {
+            displayValue = value.join(", ");
+        } else if (typeof value === "object" && value !== null) {
+            displayValue = JSON.stringify(value);
+        } else {
+            displayValue = String(value);
+        }
+
         lines.push(`<b>${displayKey}:</b> ${escapeHtml(displayValue)}`);
     }
 
