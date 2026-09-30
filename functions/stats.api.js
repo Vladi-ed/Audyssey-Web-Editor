@@ -20,11 +20,15 @@ export const onRequestPost = async (context) => {
         const key = `stat_${Date.now()}_${country}_${crypto.randomUUID()}`;
 
         // 4. Save to KV
-        await env.KV.put(key, JSON.stringify(data));
+        // await env.KV.put(key, JSON.stringify(data));
 
         // 5. Send a notification to Telegram when configured
         if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
+            console.log('env.TELEGRAM_CHAT_ID', env.TELEGRAM_CHAT_ID)
             await sendToTelegram(data, env);
+        }
+        else {
+            console.log('env.TELEGRAM_CHAT_ID is not configured', !!env.TELEGRAM_BOT_TOKEN, !!env.TELEGRAM_CHAT_ID)
         }
 
         // 6. Return success response
