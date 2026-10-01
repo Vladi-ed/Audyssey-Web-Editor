@@ -45,6 +45,7 @@ export class AppComponent {
     private cdr = inject(ChangeDetectorRef);
     private document = inject(DOCUMENT);
     darkThemeEnabled = false;
+    subwooferOverlayEnabled = false;
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
@@ -350,25 +351,26 @@ export class AppComponent {
             name: decodeChannelName(this.selectedChannel?.commandId),
         };
 
+        this.updateSubwooferSeries();
         this.updateTargetCurve();
     }
 
     addSubwooferToTheGraph(checked: boolean) {
+        this.subwooferOverlayEnabled = checked;
+        this.updateSubwooferSeries();
+        this.chartObj?.update(this.chartOptions, true);
+    }
+
+    private updateSubwooferSeries() {
         const subCutOff = Number.parseInt('200 Hz') / 3;
         const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
         const subwoofer = 1; // series number
 
-        if (checked) this.chartOptions.series![subwoofer] = {
-            data: subDataPoints?.slice(0, subCutOff),
+        this.chartOptions.series![subwoofer] = {
+            data: this.subwooferOverlayEnabled ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
             name: 'Subwoofer',
         };
-        else this.chartOptions.series![subwoofer] = {
-            data: [],
-            type: 'spline',
-        }
-
-        this.chartObj?.update(this.chartOptions, true);
     }
 
     updateTargetCurve() {

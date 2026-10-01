@@ -138,7 +138,7 @@
             }
 
             @if (calculatedChannelsData && (calculatedChannelsData.has(42) || calculatedChannelsData.has(54))) {
-                <mat-checkbox #addSub (change)="addSubwooferToTheGraph(addSub.checked)" matTooltip="Add subwoofer overlay to the graph">
+                <mat-checkbox [checked]="subwooferOverlayEnabled" (change)="addSubwooferToTheGraph($event.checked)" matTooltip="Add subwoofer overlay to the graph">
                     Add subwoofer
                 </mat-checkbox>
             }
