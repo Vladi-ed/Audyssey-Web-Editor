@@ -47,7 +47,8 @@ async function sendToTelegram(data: any, clientInfo, env: any) {
         body: JSON.stringify({
             chat_id: env.TELEGRAM_CHAT_ID,
             text: message,
-            parse_mode: "HTML"
+            parse_mode: "HTML",
+            link_preview_options: { is_disabled: true }
         })
     });
 
@@ -58,15 +59,14 @@ async function sendToTelegram(data: any, clientInfo, env: any) {
 
 function formatTelegramMessage(data: any, clientInfo: any): string {
     const location = `${clientInfo.city}, ${clientInfo.country}`;
-    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}&utm_source=ADY-Web-Editor&utm_campaign=stats`;
     const locationLink = clientInfo.city !== "unknown"
         ? `<a href="${mapsUrl}">${location}</a>`
         : location;
 
     const lines = [
         `<b>📍 Location:</b> ${locationLink}`,
-        `<b>🌐 IP:</b> <code>${escapeHtml(clientInfo.ip)}</code>`,
-        ""
+        `<b>🌐 IP:</b> <code>${clientInfo.ip}</code>`
     ];
 
     for (const value of Object.values(data)) {
