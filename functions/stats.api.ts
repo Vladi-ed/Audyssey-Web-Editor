@@ -1,9 +1,9 @@
 import { decodeChannelName } from '../src/app/helper-functions/decode-channel-name.pipe';
 
-export const onRequestPost = async (context: any) => {
-    try {
-        const { request, env } = context;
+interface Env { TELEGRAM_BOT_TOKEN: string, TELEGRAM_CHAT_ID: string }
 
+export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
+    try {
         // 1. Check content type
         const contentType = request.headers.get("content-type");
         if (!contentType?.includes("application/json")) {
@@ -21,7 +21,9 @@ export const onRequestPost = async (context: any) => {
         if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
             const clientInfo = {
                 ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "unknown",
-                country: request.cf?.country || "unknown",
+                country: request.cf?.country
+                    ? new Intl.DisplayNames(["en"], { type: "region" }).of(request.cf.country) ?? request.cf.country
+                    : "unknown",
                 city: request.cf?.city || "unknown"
             };
             await sendToTelegram(data, clientInfo, env);
@@ -37,7 +39,7 @@ export const onRequestPost = async (context: any) => {
     }
 };
 
-async function sendToTelegram(data: any, clientInfo: any, env: any) {
+async function sendToTelegram(data: any, clientInfo, env: any) {
     const message = formatTelegramMessage(data, clientInfo);
     const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
@@ -57,10 +59,9 @@ async function sendToTelegram(data: any, clientInfo: any, env: any) {
 function formatTelegramMessage(data: any, clientInfo: any): string {
     const location = `${clientInfo.city}, ${clientInfo.country}`;
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
-    const locationText = escapeHtml(location);
     const locationLink = clientInfo.city !== "unknown"
-        ? `<a href="${escapeHtml(mapsUrl)}">${locationText}</a>`
-        : locationText;
+        ? `<a href="${mapsUrl}">${location}</a>`
+        : location;
 
     const lines = [
         `<b>📍 Location:</b> ${locationLink}`,
@@ -68,21 +69,19 @@ function formatTelegramMessage(data: any, clientInfo: any): string {
         ""
     ];
 
-    for (const [key, value] of Object.entries(data)) {
-        const displayKey = escapeHtml(key.replace(/([A-Z])/g, " $1").trim());
-
+    for (const value of Object.values(data)) {
         let displayValue: string;
         if (Array.isArray(value)) {
             displayValue = value
                 .map((item: string) => escapeHtml(decodeChannelName(item)))
                 .join("\n");
         } else if (typeof value === "object" && value !== null) {
-            displayValue = JSON.stringify(value);
+            displayValue = escapeHtml(JSON.stringify(value));
         } else {
-            displayValue = String(value);
+            displayValue = escapeHtml(String(value));
         }
 
-        lines.push(`<b>${displayKey}:</b>\n${displayValue}`);
+        lines.push(`\n${displayValue}`);
     }
 
     return lines.join("\n").slice(0, 4096);
