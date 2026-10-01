@@ -55,10 +55,15 @@ async function sendToTelegram(data: any, clientInfo: any, env: any) {
 }
 
 function formatTelegramMessage(data: any, clientInfo: any): string {
+    const location = `${clientInfo.city}, ${clientInfo.country}`;
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+    const locationText = escapeHtml(location);
+    const locationLink = clientInfo.city !== "unknown"
+        ? `<a href="${escapeHtml(mapsUrl)}">${locationText}</a>`
+        : locationText;
+
     const lines = [
-        "<b>📊 New Stats Record</b>",
-        "",
-        `<b>📍 Location:</b> ${escapeHtml(clientInfo.city)}, ${escapeHtml(clientInfo.country)}`,
+        `<b>📍 Location:</b> ${locationLink}`,
         `<b>🌐 IP:</b> <code>${escapeHtml(clientInfo.ip)}</code>`,
         ""
     ];
