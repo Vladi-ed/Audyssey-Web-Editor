@@ -146,6 +146,7 @@ export class AppComponent {
 
             scaleBtn.onclick = () => {
                 this.chartLogarithmicScale = !this.chartLogarithmicScale;
+                this.updateChart();
                 chart.update({ xAxis: { type: this.chartLogarithmicScale ? 'logarithmic' : 'linear' } });
                 this.updateChartMenuItems(); // updateChart() doesn't update menus
             }
@@ -261,7 +262,6 @@ export class AppComponent {
 
         if (typeof Worker !== 'undefined') { // if supported
             const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
-            worker.postMessage(json.detectedChannels);
             console.log('detectedChannels', json.detectedChannels.map(channel => ({
                 id: channel.enChannelType,
                 name: channel.commandId
@@ -269,6 +269,8 @@ export class AppComponent {
 
             worker.onmessage = ({ data }) => {
                 // console.log('Got a message from Web-Worker');
+                worker.terminate();
+                if (this.audysseyData !== json) return;
                 this.calculatedChannelsData = data;
 
                 this.selectedChannel = json.detectedChannels[0];
@@ -279,9 +281,12 @@ export class AppComponent {
 
             worker.onerror = (e) => {
                 console.error('Worker error', e);
+                worker.terminate();
+                if (this.audysseyData !== json) return;
                 this.chartObj?.hideLoading();
                 this.snackBar.open('Background processing error.', 'Dismiss', { duration: 5000 });
             };
+            worker.postMessage(json.detectedChannels);
         } else {
             this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Ok');
         }
@@ -302,7 +307,7 @@ export class AppComponent {
         }
 
         const XMin = 10, XMax = 24000;
-        const xAxisBands = [] as any[];
+        const xAxisBands: Highcharts.XAxisPlotBandsOptions[] = [];
 
         this.chartOptions.title = { text: decodeChannelName(this.selectedChannel?.commandId) };
         this.chartOptions.subtitle = { style: { color: 'white' } };

@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
-import {calculatePoints} from "./calculate-points";
-import {DetectedChannel} from "../interfaces/detected-channel";
+import { calculatePoints } from './calculate-points';
+import { DetectedChannel } from '../interfaces/detected-channel';
 
-addEventListener('message', ({ data }) => {
+addEventListener('message', ({ data }: MessageEvent<DetectedChannel[]>) => {
   console.time("Calculate AllChannels in background");
 
   // const response = new Map((data as DetectedChannel[]).map(channel => [channel.commandId, calculatePoints(channel.responseData[0])]));
@@ -12,7 +12,7 @@ addEventListener('message', ({ data }) => {
   data.forEach((channel: DetectedChannel) => {
     // console.log('channel', channel.commandId);
     const firstMeasurement = 0;
-    map.set(channel.enChannelType, calculatePoints(channel.responseData[firstMeasurement]));
+    map.set(channel.enChannelType, calculatePoints(channel.responseData?.[firstMeasurement]));
   });
 
   console.timeEnd("Calculate AllChannels in background");
