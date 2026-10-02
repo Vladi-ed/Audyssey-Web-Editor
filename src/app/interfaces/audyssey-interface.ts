@@ -1,4 +1,4 @@
-import {DetectedChannel} from "./detected-channel";
+import { DetectedChannel } from './detected-channel';
 
 export interface AudysseyInterface {
     adcLineup?: number
@@ -14,7 +14,7 @@ export interface AudysseyInterface {
     lfc?: boolean
     lfcSupport?: boolean
     subwooferLayout?: string; // "N/A"
-    subwooferMode?: "Standard" | "Custom"
+    subwooferMode?: "Standard" | "Custom" | "Directional" | "N/A"
     subwooferNum?: string; // "3"
     systemDelay?: number
     targetModelName?: string
