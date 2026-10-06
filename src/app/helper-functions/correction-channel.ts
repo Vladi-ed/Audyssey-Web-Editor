@@ -1,5 +1,10 @@
 import type { DetectedChannel } from '../interfaces/detected-channel';
 
+export function isSubwoofer(channel: DetectedChannel): boolean {
+    // All recovered ADY subwoofer indices: LFE, directional, mixed, and four-sub LFE.
+    return channel.enChannelType >= 42 && channel.enChannelType <= 65;
+}
+
 // ADY channel indices, not enum ordinals or receiver output names.
 export function isSharedSubwoofer(channel: DetectedChannel, mode?: string): boolean {
     return mode?.toLowerCase() !== 'directional' && channel.enChannelType >= 54 && channel.enChannelType <= 57;
