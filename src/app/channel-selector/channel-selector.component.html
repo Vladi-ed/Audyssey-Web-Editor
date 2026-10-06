@@ -5,7 +5,7 @@
 >
     @for (channel of detectedChannels(); track (channel.enChannelType || $index)) {
         <mat-radio-button class="channel-radio-button" [value]="channel">
-            {{ channel.commandId | decodeChannelName }}
+            {{ channelName()(channel) }}
         </mat-radio-button>
     }
 </mat-radio-group>

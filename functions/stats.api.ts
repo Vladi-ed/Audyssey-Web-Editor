@@ -1,4 +1,4 @@
-import { decodeChannelName } from '../src/app/helper-functions/decode-channel-name.pipe';
+import { decodeChannelName } from '../src/app/helper-functions/decode-channel-name';
 
 interface Env { TELEGRAM_BOT_TOKEN: string, TELEGRAM_CHAT_ID: string, STATS: AnalyticsEngineDataset; }
 

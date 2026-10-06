@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
-import { decodeChannelName, DecodeChannelNamePipe } from './helper-functions/decode-channel-name.pipe';
+import { decodeChannelName } from './helper-functions/decode-channel-name';
 
 import type Highcharts from 'highcharts/esm/highcharts';
 import { HighchartsChartComponent } from 'highcharts-angular';
@@ -25,7 +25,13 @@ import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
-import { validateAdy } from './helper-functions/validate-ady';
+import { AdyFileLoader } from './helper-functions/ady-file-loader';
+import {
+    getCorrectionChannels,
+    getSharedSubwooferOutputs,
+    resolveCorrectionChannel
+} from './helper-functions/correction-channel';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 @Component({
     selector: 'app-root',
@@ -36,9 +42,9 @@ import { validateAdy } from './helper-functions/validate-ady';
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeChannelNamePipe, DecodeEqTypePipe, MatTooltip]
+    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeEqTypePipe, MatTooltip, MatRadioButton, MatRadioGroup]
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
     readonly appVersion = version;
     private chartObj?: Highcharts.Chart;
     private snackBar = inject(MatSnackBar);
@@ -49,10 +55,99 @@ export class AppComponent {
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
+    loadedFileName?: string;
     calculatedChannelsData?: Map<number, number[][]>
-    selectedChannel?: DetectedChannel;
+    selectedChannelRaw?: DetectedChannel;
     private chartLogarithmicScale = true;
     private graphSmoothEnabled = false;
+    private selectionToRestore: number[] = [];
+    private fileLoader = new AdyFileLoader({
+        accepted: (data, filename) => {
+            // Keep IDs while clearing old objects, including across overlapping loads.
+            if (this.selectedChannelRaw) {
+                this.selectionToRestore = [this.selectedChannelRaw.enChannelType];
+                const selectedChannel = this.selectedChannel;
+                if (selectedChannel && selectedChannel !== this.selectedChannelRaw) {
+                    this.selectionToRestore.push(selectedChannel.enChannelType);
+                }
+            }
+            this.audysseyData = data;
+            this.loadedFileName = filename;
+            this.selectedChannelRaw = undefined;
+            this.calculatedChannelsData = undefined;
+            this.subwooferOverlayEnabled = false;
+            this.updateChart();
+            this.chartObj?.zoomOut();
+        },
+        processed: measurements => {
+            this.calculatedChannelsData = measurements;
+            this.selectedChannelRaw = this.selectionToRestore
+                .map(id => this.audysseyData.detectedChannels.find(channel => channel.enChannelType === id))
+                .find(channel => channel !== undefined) ?? this.correctionChannels[0];
+            this.updateChart();
+        },
+        loadingChanged: () => this.syncLoading(),
+        error: (message, cause) => {
+            this.snackBar.open(message, 'Dismiss', { duration: 5000 });
+            if (cause) console.warn(cause);
+        },
+    });
+
+    get isLoading(): boolean {
+        return this.fileLoader.isLoading;
+    }
+
+    // The correction owner can differ from the selected physical output.
+    get selectedChannel(): DetectedChannel | undefined {
+        return resolveCorrectionChannel(this.selectedChannelRaw, this.audysseyData.detectedChannels, this.audysseyData.subwooferMode);
+    }
+
+    get correctionChannels(): DetectedChannel[] {
+        return getCorrectionChannels(this.audysseyData.detectedChannels, this.audysseyData.subwooferMode);
+    }
+
+    get sharedSubwooferOutputs(): DetectedChannel[] {
+        return getSharedSubwooferOutputs(this.selectedChannelRaw, this.audysseyData.detectedChannels, this.audysseyData.subwooferMode);
+    }
+
+    get sharedSubwooferOutputNames(): string {
+        return this.sharedSubwooferOutputs.map(channel => `SW${channel.enChannelType - 53}`).join(', ');
+    }
+
+    get selectedOutputName(): string {
+        if (!this.selectedChannelRaw) return '';
+        return this.selectedChannelRaw.commandId;
+    }
+
+    correctionChannelName = (channel: DetectedChannel): string =>
+        getSharedSubwooferOutputs(channel, this.audysseyData.detectedChannels, this.audysseyData.subwooferMode).length > 1
+            ? 'Subwoofers' : decodeChannelName(channel.commandId, channel.enChannelType);
+
+    get correctionCurveTooltip(): string {
+        if (this.sharedSubwooferOutputs.length > 1) {
+            return `${this.selectedOutputName} selected · Shared correction for ${this.sharedSubwooferOutputNames}`;
+        }
+        return this.selectedChannelRaw && !this.selectedChannel
+            ? 'Shared subwoofer curve unavailable: the primary subwoofer entry is missing. Output settings remain editable.' : '';
+    }
+
+    selectCorrectionChannel(channel: DetectedChannel) {
+        if (this.isLoading) return;
+        if (this.selectedChannel !== channel) this.selectedChannelRaw = channel;
+        this.updateChart();
+    }
+
+    selectSubwooferOutput(channel: DetectedChannel) {
+        if (this.isLoading) return;
+        if (!this.sharedSubwooferOutputs.includes(channel)) return;
+        this.selectedChannelRaw = channel;
+        this.updateChart();
+    }
+
+    isSubwoofer(channel: DetectedChannel): boolean {
+        // All recovered ADY subwoofer indices: LFE, directional, mixed, and four-sub LFE.
+        return channel.enChannelType >= 42 && channel.enChannelType <= 65;
+    }
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {
@@ -72,8 +167,6 @@ export class AppComponent {
 
     chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
         // console.log('Highcharts callback one time on graph init');
-
-        // update the target curve with draggable points
         let draggedPointX: number;
         chart.series[2].update({
             type: 'spline',
@@ -82,34 +175,30 @@ export class AppComponent {
                     dragStart: function () {
                         draggedPointX = this.x as number;
                     },
-                    drop: (a) => {
-                        // Calculate the relative offset for the new position
-                        // We dragged the point to an Absolute Y. We need to find what the Base Curve Y is at this X.
-                        const event = a as any;
-                        const x = event.newPoint?.x ?? event.target.x;
-                        const absY = event.newPoint?.y ?? event.target.y;
+                    drop: (event) => {
+                        if (this.isLoading) return false;
+                        const selectedChannel = this.selectedChannel;
+                        if (!selectedChannel) return false;
+                        const newValues = event.newPointId ? event.newPoints[event.newPointId]?.newValues : undefined;
+                        const x = newValues?.['x'] ?? event.target.x;
+                        const absY = newValues?.['y'] ?? event.target.y;
+                        if (typeof x !== 'number' || typeof absY !== 'number') return false;
 
-                        console.log('absY', event.newPoint?.y, event.target.y);
-
-                        // Get base value
+                        // ADY stores offsets relative to the base curve, not absolute graph values.
                         const baseVal = getBaseCurveValue(
                             x,
                             this.audysseyData.enTargetCurveType,
-                            this.selectedChannel?.midrangeCompensation
+                            selectedChannel.midrangeCompensation
                         );
 
-                        // Offset = Absolute - Base
                         let newOffset = absY - baseVal;
 
                         // Clamp the offset to be within -12 and 12
                         if (newOffset > 12) newOffset = 12;
                         if (newOffset < -12) newOffset = -12;
 
-                        console.log('newOffset', newOffset);
-
-
                         const newCurvePoints: string[] = [];
-                        this.selectedChannel?.customTargetCurvePoints.forEach((point, i) => {
+                        selectedChannel.customTargetCurvePoints.forEach((point, i) => {
                             const coordinates = point.replace(/[{}]/g, '').split(',');
                             const pointFreq = Number.parseFloat(coordinates[0]);
 
@@ -122,27 +211,23 @@ export class AppComponent {
                             } else newCurvePoints[i] = point;
                         });
 
-                        if (this.selectedChannel) {
-                            this.selectedChannel.customTargetCurvePoints = newCurvePoints;
-                            this.cdr.markForCheck();
+                        selectedChannel.customTargetCurvePoints = newCurvePoints;
+                        this.cdr.markForCheck();
 
-                            // Force chart update to redraw the curve with new interpolation
-                            // We need to defer this slightly or call updateTargetCurve directly because
-                            // Highcharts' default drag behavior only moves the single point,
-                            // but our "Adjustment Layer" logic means the whole line shape between points might change.
-                            setTimeout(() => this.updateTargetCurve(), 1);
-                        }
+                        // Rebuild interpolation after Highcharts completes its default point drop.
+                        setTimeout(() => this.updateTargetCurve(), 1);
 
-                        // returning false prevents Highcharts from applying the default simple drag (which might be wrong while we recalculate)
-                        // actually, letting it drop visually is fine, the updateTargetCurve() will snap it to the correct interpolated shape immediately.
+                        // Allow the default drop; explicit return satisfies noImplicitReturns.
+                        return undefined;
                     }
                 }
             },
         });
 
         if (chart.options.exporting?.menuItemDefinitions) {
-            const scaleBtn = (chart.options.exporting.menuItemDefinitions as any).xScaleBtn;
-            const graphSmoothingBtn = (chart.options.exporting.menuItemDefinitions as any).graphSmoothingBtn;
+            const menuItems = chart.options.exporting.menuItemDefinitions as Record<string, Highcharts.ExportingMenuObject>;
+            const scaleBtn = menuItems['xScaleBtn'];
+            const graphSmoothingBtn = menuItems['graphSmoothingBtn'];
 
             scaleBtn.onclick = () => {
                 this.chartLogarithmicScale = !this.chartLogarithmicScale;
@@ -158,6 +243,7 @@ export class AppComponent {
         }
         this.chartObj = chart;
         this.applyChartTheme();
+        this.syncLoading();
     }
 
     toggleColorScheme() {
@@ -222,100 +308,57 @@ export class AppComponent {
 
     async onUpload(files: FileList | null) {
         const file = files?.item(0);
-        if (!file) {
-            this.chartObj?.hideLoading();
-            this.snackBar.open('Cannot read the file.', 'Dismiss');
-            return;
-        }
-
-        this.chartObj?.showLoading();
-
-        try {
-            const fileContent = await file.text();
-            this.audysseyData = JSON.parse(fileContent);
-            this.cdr.markForCheck();
-        } catch (e) {
-            this.chartObj?.hideLoading();
-            this.snackBar.open('Invalid file format. Expecting .ady file JSON format.', 'Dismiss');
-            console.warn(e);
-            return;
-        }
-
-        const validationError = validateAdy(this.audysseyData);
-        if (validationError) {
-            this.chartObj?.hideLoading();
-            this.snackBar.open(validationError, 'Dismiss');
-            return;
-        }
-
-        this.processDataWithWorker(this.audysseyData);
+        if (!file) return;
+        const data = await this.fileLoader.loadFile(file);
+        if (!data) return;
 
         fetch('/stats.api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: this.audysseyData.targetModelName, channels: this.audysseyData.detectedChannels.map(channel => channel.commandId)})
+            body: JSON.stringify({ model: data.targetModelName, channels: data.detectedChannels.map(channel => channel.commandId) })
         }).catch(console.error);
     }
 
-    processDataWithWorker(json: AudysseyInterface) {
-        console.log('File content:', json);
+    private syncLoading() {
+        if (this.isLoading) this.chartObj?.showLoading();
+        else this.chartObj?.hideLoading();
+        this.cdr.markForCheck();
+    }
 
-        if (typeof Worker !== 'undefined') { // if supported
-            const worker = new Worker(new URL('./helper-functions/bg-calculator.worker', import.meta.url));
-            console.log('detectedChannels', json.detectedChannels.map(channel => ({
-                id: channel.enChannelType,
-                name: channel.commandId
-            })));
-
-            worker.onmessage = ({ data }) => {
-                // console.log('Got a message from Web-Worker');
-                worker.terminate();
-                if (this.audysseyData !== json) return;
-                this.calculatedChannelsData = data;
-
-                this.selectedChannel = json.detectedChannels[0];
-                this.updateChart();
-                this.chartObj?.hideLoading();
-                this.cdr.markForCheck();
-            };
-
-            worker.onerror = (e) => {
-                console.error('Worker error', e);
-                worker.terminate();
-                if (this.audysseyData !== json) return;
-                this.chartObj?.hideLoading();
-                this.snackBar.open('Background processing error.', 'Dismiss', { duration: 5000 });
-            };
-            worker.postMessage(json.detectedChannels);
-        } else {
-            this.snackBar.open('Your browser is not supported. Please use latest Firefox or Chrome.', 'Ok');
-        }
-
-        // TODO: Add a loading indicator to the UI
+    ngOnDestroy() {
+        this.fileLoader.destroy();
     }
 
     updateChart() {
-        // console.log('updateChart()')
+        const selectedChannel = this.selectedChannel;
 
-        if (!this.selectedChannel) {
-            // Clear key series to avoid stale chart when no selection
-            // this.chartOptions.series = this.chartOptions.series || [];
-            // this.chartOptions.series[0] = { data: [], type: this.graphSmoothEnabled ? 'spline' : 'line', name: '' };
-            // this.chartOptions.series[2] = { data: [], type: 'spline' };
-            // this.chartUpdateFlag = true;
-            return; // Guard when no channel is selected
+        if (!selectedChannel) {
+            this.chartOptions.title = { text: 'Measurements graph' };
+            this.chartOptions.xAxis = {
+                min: 10,
+                max: 24000,
+                type: this.chartLogarithmicScale ? 'logarithmic' : 'linear',
+                plotBands: []
+            };
+            this.chartOptions.series = this.chartOptions.series?.map(
+                series => ({ ...series, data: [] })
+            ) as Highcharts.SeriesOptionsType[];
+
+            this.chartObj?.update(this.chartOptions, true);
+            return;
         }
 
         const XMin = 10, XMax = 24000;
         const xAxisBands: Highcharts.XAxisPlotBandsOptions[] = [];
+        const selectedChannelName = this.correctionChannelName(selectedChannel);
 
-        this.chartOptions.title = { text: decodeChannelName(this.selectedChannel?.commandId) };
+        this.chartOptions.title = { text: selectedChannelName };
         this.chartOptions.subtitle = { style: { color: 'white' } };
 
-        // add frequency Rolloff
-        if (this.selectedChannel?.frequencyRangeRolloff && this.selectedChannel.frequencyRangeRolloff < 20000) {
+        // Add frequency rolloff only if it's less then 20kHz
+        if (selectedChannel.frequencyRangeRolloff && selectedChannel.frequencyRangeRolloff < 20000) {
             xAxisBands.push({
-                from: this.selectedChannel.frequencyRangeRolloff,
+                from: selectedChannel.frequencyRangeRolloff,
                 to: XMax,
                 color: 'rgba(68, 170, 213, 0.1)',
                 label: {
@@ -325,11 +368,14 @@ export class AppComponent {
             });
         }
 
-        // add Crossover if it's a logarithmic scale
-        if (this.selectedChannel?.customCrossover && this.selectedChannel.customCrossover != 'F' && this.chartLogarithmicScale) {
+        // Add speaker crossover when using a logarithmic scale
+        if (!this.isSubwoofer(selectedChannel) &&
+            selectedChannel.customCrossover &&
+            selectedChannel.customCrossover !== 'F' &&
+            this.chartLogarithmicScale) {
             xAxisBands.push({
                 from: XMin,
-                to: decodeCrossover(this.selectedChannel.customCrossover),
+                to: decodeCrossover(selectedChannel.customCrossover),
                 color: 'rgba(160, 160, 160, 0.1)',
                 label: {
                     text: 'Crossover',
@@ -345,34 +391,36 @@ export class AppComponent {
             plotBands: xAxisBands
         };
 
-        // const selectedChannelData = calculatePoints(this.selectedChannel?.responseData[0], this.dataSmoothEnabled);
-        const selectedChannelData = this.calculatedChannelsData?.get(this.selectedChannel.enChannelType) ?? [];
+        const selectedChannelData = this.calculatedChannelsData?.get(selectedChannel.enChannelType) ?? [];
 
-        // adding first graph
         const measurement = 0;
         this.chartOptions.series![measurement] = {
             data: [...selectedChannelData],
             type: this.graphSmoothEnabled ? 'spline' : 'line',
-            name: decodeChannelName(this.selectedChannel?.commandId),
+            name: selectedChannelName
         };
 
-        this.updateSubwooferSeries();
+        this.updateSubwooferSeries(selectedChannel);
         this.updateTargetCurve();
     }
 
     addSubwooferToTheGraph(checked: boolean) {
+        const selectedChannel = this.selectedChannel;
+        if (!selectedChannel) return;
+
         this.subwooferOverlayEnabled = checked;
-        this.updateSubwooferSeries();
+        this.updateSubwooferSeries(selectedChannel);
         this.chartObj?.update(this.chartOptions, true);
     }
 
-    private updateSubwooferSeries() {
+    private updateSubwooferSeries(selectedChannel: DetectedChannel) {
         const subCutOff = Number.parseInt('200 Hz') / 3;
         const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
         const subwoofer = 1; // series number
+        const showOverlay = this.subwooferOverlayEnabled && !this.isSubwoofer(selectedChannel);
 
         this.chartOptions.series![subwoofer] = {
-            data: this.subwooferOverlayEnabled ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
+            data: showOverlay ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
             name: 'Subwoofer',
         };
@@ -380,8 +428,9 @@ export class AppComponent {
 
     updateTargetCurve() {
         const targetCurve = 2;
+        const selectedChannel = this.selectedChannel;
 
-        if (!this.selectedChannel) {
+        if (!selectedChannel) {
             // no selected channel, clear target curve
             this.chartOptions.series![targetCurve] = { data: [], type: 'spline' };
 
@@ -390,9 +439,9 @@ export class AppComponent {
         }
 
         // condition for Audyssey One modified files
-        if (this.selectedChannel.customTargetCurvePoints && this.selectedChannel.customTargetCurvePoints.length > 1000) {
+        if (selectedChannel.customTargetCurvePoints && selectedChannel.customTargetCurvePoints.length > 1000) {
             this.chartOptions.series![targetCurve] = {
-                data: this.selectedChannel.customTargetCurvePoints.map(point => {
+                data: selectedChannel.customTargetCurvePoints.map(point => {
                     const coordinates = point.replace(/[{}]/g, '').split(',');
                     return [Number.parseFloat(coordinates[0]), Number.parseFloat(coordinates[1])]
                 }),
@@ -402,9 +451,9 @@ export class AppComponent {
         else this.chartOptions.series![targetCurve] = {
             data: calculateTargetCurve(
                 this.audysseyData.enTargetCurveType,
-                this.selectedChannel.midrangeCompensation,
-                this.selectedChannel.customTargetCurvePoints,
-                this.selectedChannel.frequencyRangeRolloff
+                selectedChannel.midrangeCompensation,
+                selectedChannel.customTargetCurvePoints,
+                selectedChannel.frequencyRangeRolloff
             ),
             type: 'spline',
         };
@@ -413,47 +462,43 @@ export class AppComponent {
     }
 
     exportFile() {
+        if (this.isLoading || !this.audysseyData.detectedChannels.length) return;
         exportFile(this.audysseyData, this.audysseyData.title, 'ady');
     }
 
-    async loadExample() {
-        this.chartObj?.showLoading();
-        this.audysseyData.targetModelName = 'Loading...';
-        const example = await fetch('assets/example-2-subs.ady').then(file => file.json());
-        this.audysseyData = example;
-        this.processDataWithWorker(example);
+    loadExample() {
+        return this.fileLoader.loadExample();
     }
 
     updateCrossover() {
-        if (!this.selectedChannel) return;
+        if (this.isLoading || !this.selectedChannelRaw) return;
 
-        if (this.selectedChannel.customCrossover) {
-            if (this.selectedChannel.customCrossover === 'F')
-                this.selectedChannel.customSpeakerType = 'L';
+        if (this.selectedChannelRaw.customCrossover) {
+            if (this.selectedChannelRaw.customCrossover === 'F')
+                this.selectedChannelRaw.customSpeakerType = 'L';
             else
-                this.selectedChannel.customSpeakerType = 'S';
+                this.selectedChannelRaw.customSpeakerType = 'S';
         }
-        else this.selectedChannel.customSpeakerType = undefined;
+        else this.selectedChannelRaw.customSpeakerType = undefined;
 
         this.updateChart();
     }
 
     updateSpeakerType() {
-        if (!this.selectedChannel) return;
+        if (this.isLoading || !this.selectedChannelRaw) return;
 
-        if (this.selectedChannel.customSpeakerType) {
-            if (this.selectedChannel.customSpeakerType === 'L')
-                this.selectedChannel.customCrossover = 'F'
+        if (this.selectedChannelRaw.customSpeakerType) {
+            if (this.selectedChannelRaw.customSpeakerType === 'L')
+                this.selectedChannelRaw.customCrossover = 'F'
             else
-                this.selectedChannel.customCrossover = '80';
+                this.selectedChannelRaw.customCrossover = '80';
         }
-        else this.selectedChannel.customCrossover = undefined;
+        else this.selectedChannelRaw.customCrossover = undefined;
 
         this.updateChart();
     }
 
     protected onDragDrop(event: DragEvent) {
-        console.log('onDragDrop()', event?.target);
         event.preventDefault();
         event.stopPropagation();
     }

@@ -5,7 +5,6 @@
                 <h1>ADY Web Editor</h1>
                 <small class="version">v{{ appVersion }}</small>
             </div>
-            <!--          <p class="tagline">Audyssey calibration workspace</p>-->
         </div>
 
         <div class="header-actions">
@@ -19,11 +18,12 @@
             <input #fileInput (change)="onUpload(fileInput.files)" accept=".ady" hidden id="input-file-id" onclick="this.value=null" type="file"/>
 
             @if (!audysseyData.targetModelName) {
-                <span class="or-label">or</span> <span (click)="loadExample()" class="flat-btn" matRipple>Load Example</span>
+                <span class="or-label">or</span>
+                <button (click)="loadExample()" [disabled]="isLoading" class="flat-btn" matRipple type="button">Load Example</button>
             }
 
-            @if (fileInput.files?.length) {
-                <span class="file-name">{{ fileInput.files!.item(0)?.name }}</span>
+            @if (loadedFileName) {
+                <span class="file-name">{{ loadedFileName }}</span>
             }
 
             <a class="icon-link" href="https://t.me/vonder" matTooltip="Contact me in Telegram" target='_blank'>
@@ -66,17 +66,17 @@
                 }
             </button>
 
-            <div (click)="exportFile()" class="flat-btn" matRipple matTooltip="Save to a new .ady file" type="button">
+            <button (click)="exportFile()" [disabled]="isLoading || !audysseyData.detectedChannels.length" class="flat-btn" matRipple matTooltip="Save to a new .ady file" type="button">
                 <svg height="20" style="margin-top: 2px; margin-right: 5px" viewBox="0 96 960 960" width="20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M263.717 864Q234 864 213 842.85T192 792v-72h72v72h432v-72h72v72q0 29.7-21.162 50.85Q725.676 864 695.96 864H263.717ZM480 720 288 528l51-51 105 105V240h72v342l105-105 51 51-192 192Z"/>
                 </svg>
                 Export
-            </div>
+            </button>
         </div>
     </mat-card-content>
 </mat-card>
 
-<main>
+<main [attr.aria-busy]="isLoading" [attr.inert]="isLoading ? '' : null">
     <mat-accordion class="info-panels">
         <mat-expansion-panel expanded>
             <mat-expansion-panel-header>
@@ -85,31 +85,31 @@
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
-            @if (fileInput.files?.length) {
-                <div class="expansion-panel-first-line"  style="margin-bottom: 14px">Device: {{audysseyData.targetModelName}}</div>
+            @if (audysseyData.targetModelName) {
+                <div class="expansion-panel-first-line" style="margin-bottom: 14px">Device: {{ audysseyData.targetModelName }}</div>
             }
 
             <div class="expansion-panel-first-line">
-                System: {{audysseyData.enMultEQType | decodeEqType}}
+                System: {{ audysseyData.enMultEQType | decodeEqType }}
             </div>
 
             <mat-form-field appearance="outline">
                 <mat-label>Profile name</mat-label>
-                <input matInput [(ngModel)]="audysseyData.title" matTooltip="Internal name. Not the same as file name.">
+                <input [(ngModel)]="audysseyData.title" matInput matTooltip="Internal name. Not the same as file name.">
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Target curve type</mat-label>
-                <mat-select [(ngModel)]="audysseyData.enTargetCurveType" (selectionChange)="updateTargetCurve()" matTooltip="High frequency rolloff">
+                <mat-select (selectionChange)="updateTargetCurve()" [(ngModel)]="audysseyData.enTargetCurveType" matTooltip="High frequency rolloff">
                     <mat-option [value]="1">HF Rolloff 1</mat-option>
                     <mat-option [value]="2">HF Rolloff 2</mat-option>
                 </mat-select>
             </mat-form-field>
-<!--            <mat-form-field appearance="outline">-->
-<!--                <mat-label>System Delay</mat-label>-->
-<!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
-<!--            </mat-form-field>-->
+            <!--            <mat-form-field appearance="outline">-->
+            <!--                <mat-label>System Delay</mat-label>-->
+            <!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
+            <!--            </mat-form-field>-->
 
-            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" style="padding-right: 16px" matTooltip="Maintains bass and treble when playback volume is reduced to compensate human hearing">
+            <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" matTooltip="Maintains bass and treble when playback volume is reduced to compensate human hearing" style="padding-right: 16px">
                 Dynamic EQ
             </mat-checkbox>
             <mat-checkbox [(ngModel)]="audysseyData.dynamicVolume" matTooltip="Automatically adjusts the volume level of content to minimize differences between quiet and loud sounds">
@@ -131,14 +131,15 @@
 
             @defer (on idle) {
                 <app-channel-selector
-                    [detectedChannels]="audysseyData.detectedChannels"
-                    [(selectedChannel)]="selectedChannel"
-                    (selectedChannelChange)="updateChart()"
+                    (selectedChannelChange)="selectCorrectionChannel($event!)"
+                    [channelName]="correctionChannelName"
+                    [detectedChannels]="correctionChannels"
+                    [selectedChannel]="selectedChannel ?? selectedChannelRaw"
                 />
             }
 
-            @if (calculatedChannelsData && (calculatedChannelsData.has(42) || calculatedChannelsData.has(54))) {
-                <mat-checkbox [checked]="subwooferOverlayEnabled" (change)="addSubwooferToTheGraph($event.checked)" matTooltip="Add subwoofer overlay to the graph">
+            @if (selectedChannelRaw && !isSubwoofer(selectedChannelRaw)) {
+                <mat-checkbox (change)="addSubwooferToTheGraph($event.checked)" [checked]="subwooferOverlayEnabled" matTooltip="Add subwoofer overlay to the graph">
                     Add subwoofer
                 </mat-checkbox>
             }
@@ -151,77 +152,98 @@
                     Channel info
                 </mat-panel-title>
                 <mat-panel-description>
-                  @if (selectedChannel) {
-                    <span style="margin-left: 10px">({{selectedChannel.commandId}})</span>
-                  }
+                    @if (selectedChannelRaw) {
+                        <span style="margin-left: 10px">({{ selectedOutputName }})</span>
+                    }
                 </mat-panel-description>
             </mat-expansion-panel-header>
 
-            @if (selectedChannel) {
-                <div class="expansion-panel-first-line" style="margin-bottom: 14px">
-                    Name: {{ selectedChannel.commandId | decodeChannelName }}
-                </div>
+            @if (selectedChannelRaw) {
+                @if (selectedChannel; as curve) {
+                    <section aria-label="Correction settings" class="channel-section">
+                        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                            <mat-label>Correction limit (Hz)</mat-label>
+                            <input (input)="updateChart()" [(ngModel)]="curve.frequencyRangeRolloff" matInput matTooltip="Sets the highest frequency Audyssey corrects for this curve. Frequencies above this limit are left uncorrected." max="20000" min="50"
+                                   type="number">
+                        </mat-form-field>
 
-                <div class="expansion-panel-first-line" [matTooltip]="(selectedChannel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'">
-                    Distance: {{ selectedChannel.channelReport.distance | number: '1.2-3' }}m
-                </div>
+                    </section>
+                }
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Custom Distance (m)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.customDistance" type="number" step="0.01" min="0.1" max="20">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Custom Level (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.customLevel" type="number" step="0.5" min="-12" max="12"
-                           matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty.">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Trim Adjustment (dB)</mat-label>
-                    <input matInput [(ngModel)]="selectedChannel.trimAdjustment" (input)="updateChart()" pattern="^-?[0-9]*[.]?[0-9]+"
-                           matTooltip="Level adjustment relative to the default value">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Correction limit (Hz)</mat-label>
-                  <input matInput [(ngModel)]="selectedChannel.frequencyRangeRolloff" (input)="updateChart()" type="number" min="50" max="20000"
-                         matTooltip="Sets the highest frequency Audyssey corrects for the selected channel. Frequencies above this limit are left uncorrected.">
-                </mat-form-field>
+                <section aria-label="Output settings" class="channel-section">
+                    @if (sharedSubwooferOutputs.length > 1) {
+                        <mat-radio-group (change)="selectSubwooferOutput($event.value)" [value]="selectedChannelRaw"
+                                         aria-label="Subwoofer output" class="subwoofer-output-selector">
+                            @for (output of sharedSubwooferOutputs; track output.enChannelType) {
+                                <mat-radio-button [aria-label]="'Subwoofer ' + (output.enChannelType - 53)" [matTooltip]="'Subwoofer ' + (output.enChannelType - 53) + ': settings apply to this output only.'"
+                                                  [value]="output">
+                                    SW{{ output.enChannelType - 53 }}
+                                </mat-radio-button>
+                            }
+                        </mat-radio-group>
+                    }
 
-                <mat-form-field appearance="outline">
-                    <mat-label>Custom Crossover</mat-label>
-                    <mat-select [(ngModel)]="selectedChannel.customCrossover" (selectionChange)="updateCrossover()" matTooltip="Low frequency crossover to a subwoofer. If you want to use the default crossover, set Auto.">
-                        <mat-option [value]="undefined">Auto</mat-option>
-                        <mat-option [value]="'40'">40 Hz</mat-option>
-                        <mat-option [value]="'60'">60 Hz</mat-option>
-                        <mat-option [value]="'80'">80 Hz</mat-option>
-                        <mat-option [value]="'90'">90 Hz</mat-option>
-                        <mat-option [value]="'10'">100 Hz</mat-option>
-                        <mat-option [value]="'11'">110 Hz</mat-option>
-                        <mat-option [value]="'12'">120 Hz</mat-option>
-                        <mat-option [value]="'15'">150 Hz</mat-option>
-                        <mat-option [value]="'20'">200 Hz</mat-option>
-                        <mat-option [value]="'25'">250 Hz</mat-option>
-                        <mat-option [value]="'F'">Full Band</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Custom Speaker Type</mat-label>
-                    <mat-select [(ngModel)]="selectedChannel.customSpeakerType" (selectionChange)="updateSpeakerType()" matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. If you want to use the default type, choose Auto.">
-                        <mat-option [value]="undefined">Auto</mat-option>
-                        <mat-option [value]="'S'">Small</mat-option>
-                        <mat-option [value]="'L'">Large</mat-option>
-                    </mat-select>
-                </mat-form-field>
+                    @if (selectedChannelRaw.channelReport.distance > 0) {
+                        <p [matTooltip]="(selectedChannelRaw.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'" class="channel-meta">
+                            Measured distance: {{ selectedChannelRaw.channelReport.distance | number: '1.2-3' }} m
+                        </p>
+                    }
 
-                <mat-checkbox [(ngModel)]="selectedChannel.midrangeCompensation" (change)="updateTargetCurve()" matTooltip="Applies midrange dip to the selected channel, which can reduce harshness near a speaker's crossover region.">
-                    Midrange Compensation
-                </mat-checkbox>
-                <!-- <mat-checkbox [(ngModel)]="selectedChannel.isSkipMeasurement">Skip Measurement</mat-checkbox>-->
-                <mat-checkbox [(ngModel)]="selectedChannel.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
+                    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                        <mat-label>Distance override (m)</mat-label>
+                        <input [(ngModel)]="selectedChannelRaw.customDistance" matInput matTooltip="Leave empty to use the automatic distance." max="20" min="0.1" placeholder="Auto" step="0.01"
+                               type="number">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                        <mat-label>Level override (dB)</mat-label>
+                        <input [(ngModel)]="selectedChannelRaw.customLevel" matInput matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty." max="12" min="-12" placeholder="Auto" step="0.5"
+                               type="number">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                        <mat-label>Trim Adjustment (dB)</mat-label>
+                        <input (input)="updateChart()" [(ngModel)]="selectedChannelRaw.trimAdjustment" matInput matTooltip="Level adjustment relative to the default value"
+                               pattern="^-?[0-9]*[.]?[0-9]+">
+                    </mat-form-field>
+
+                    @if (!isSubwoofer(selectedChannelRaw)) { <!-- Hide these controls for subwoofers -->
+                        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                            <mat-label>Custom Crossover</mat-label>
+                            <mat-select (selectionChange)="updateCrossover()" [(ngModel)]="selectedChannelRaw.customCrossover" matTooltip="Low frequency crossover to a subwoofer. If you want to use the default crossover, set Auto." placeholder="Auto">
+                                <mat-option [value]="undefined">Auto</mat-option>
+                                <mat-option [value]="'40'">40 Hz</mat-option>
+                                <mat-option [value]="'60'">60 Hz</mat-option>
+                                <mat-option [value]="'80'">80 Hz</mat-option>
+                                <mat-option [value]="'90'">90 Hz</mat-option>
+                                <mat-option [value]="'10'">100 Hz</mat-option>
+                                <mat-option [value]="'11'">110 Hz</mat-option>
+                                <mat-option [value]="'12'">120 Hz</mat-option>
+                                <mat-option [value]="'15'">150 Hz</mat-option>
+                                <mat-option [value]="'20'">200 Hz</mat-option>
+                                <mat-option [value]="'25'">250 Hz</mat-option>
+                                <mat-option [value]="'F'">Full Band</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+                            <mat-label>Custom Speaker Type</mat-label>
+                            <mat-select (selectionChange)="updateSpeakerType()" [(ngModel)]="selectedChannelRaw.customSpeakerType" matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. If you want to use the default type, choose Auto." placeholder="Auto">
+                                <mat-option [value]="undefined">Auto</mat-option>
+                                <mat-option [value]="'S'">Small</mat-option>
+                                <mat-option [value]="'L'">Large</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-checkbox style="margin-bottom: -16px" (change)="updateTargetCurve()" [(ngModel)]="selectedChannelRaw.midrangeCompensation" matTooltip="Applies midrange dip to the correction curve, which can reduce harshness near a speaker's crossover region.">
+                            Midrange Compensation
+                        </mat-checkbox>
+                    }
+
+                    <mat-checkbox [(ngModel)]="selectedChannelRaw.channelReport.isReversePolarity">Reverse Polarity</mat-checkbox>
+                </section>
             }
         </mat-expansion-panel>
 
         <mat-expansion-panel>
-            <mat-expansion-panel-header>
+            <mat-expansion-panel-header [matTooltip]="sharedSubwooferOutputs.length > 1 ? 'Shared curve: edits apply to ' + sharedSubwooferOutputNames + '.' : ''">
                 <mat-panel-title>
                     Target Curve Points
                 </mat-panel-title>
@@ -232,11 +254,13 @@
                     Frequency (Hz), Gain (dB)
                 </div>
 
-                @defer (when selectedChannel) {
-                    <app-target-curve-points
-                        (curvePointsChange)="updateTargetCurve()"
-                        [(curvePoints)]="selectedChannel!.customTargetCurvePoints"
-                    />
+                @if (selectedChannel; as curve) {
+                    @defer (on idle) {
+                        <app-target-curve-points
+                            (curvePointsChange)="updateTargetCurve()"
+                            [(curvePoints)]="curve.customTargetCurvePoints"
+                        />
+                    }
                 }
             </ng-template>
         </mat-expansion-panel>
@@ -244,26 +268,26 @@
 
     <mat-card class="chart-card">
         @if (selectedChannel) {
-          <mat-card-header>
-              <mat-form-field appearance="outline" class="chart-channel-select">
-                <mat-select [(ngModel)]="selectedChannel" (selectionChange)="updateChart()" >
-                  @for (channel of audysseyData.detectedChannels; track $index) {
-                    <mat-option [value]="channel">
-                      {{ channel.commandId | decodeChannelName }}
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-          </mat-card-header>
+            <mat-card-header>
+                <mat-form-field appearance="outline" class="chart-channel-select">
+                    <mat-select (selectionChange)="selectCorrectionChannel($event.value)" [matTooltip]="correctionCurveTooltip" [value]="selectedChannel" aria-label="Correction curve">
+                        @for (channel of correctionChannels; track channel.enChannelType) {
+                            <mat-option [value]="channel">
+                                {{ correctionChannelName(channel) }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </mat-card-header>
         }
 
         <mat-card-content>
-          @defer (on idle) {
-            <highcharts-chart
-                  [options]="chartOptions"
-                  (chartInstance)="chartCallback($event)"
-            />
-          }
+            @defer (on idle) {
+                <highcharts-chart
+                    (chartInstance)="chartCallback($event)"
+                    [options]="chartOptions"
+                />
+            }
         </mat-card-content>
     </mat-card>
 </main>

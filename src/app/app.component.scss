@@ -7,10 +7,6 @@ highcharts-chart {
     max-height: 80vw;
 }
 
-.tagline {
-    display: none;
-}
-
 .title-row {
     display: flex;
     align-items: baseline;
@@ -41,6 +37,10 @@ highcharts-chart {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px 24px;
+}
+
+.header-actions button.flat-btn {
+    font: inherit;
 }
 
 .header-actions .icon-link:first-of-type {
@@ -121,19 +121,41 @@ mat-card mat-card-header {
     --mat-expansion-header-text-size: 16px;
 }
 
-.curve-points-container {
-    max-height: 432px;
-    overflow-y: auto;
-}
-
-.curve-points-text-field {
-    font-size: large;
-    border: none;
-}
-
 .expansion-panel-first-line {
     margin-top: -4px;
     margin-bottom: 20px;
+}
+
+.section-label {
+    margin: 0;
+    font-weight: 600;
+}
+
+.subwoofer-output-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.channel-section {
+    display: grid;
+    gap: 16px;
+}
+
+.channel-section + .channel-section {
+    margin-top: 12px;
+    //padding-top: 20px;
+    //border-top: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.channel-section mat-form-field {
+    width: 100%;
+}
+
+.channel-meta {
+    margin: 0 0 0 16px;
+    font-size: 13px;
+    //opacity: 0.7;
 }
 
 .chart-card {
@@ -141,7 +163,6 @@ mat-card mat-card-header {
     min-width: 0;
     --mat-form-field-outlined-focus-outline-width: 1px;
     --mat-form-field-outlined-outline-color: white;
-    //--mat-form-field-outlined-focus-outline-width: 1px;
     --mat-select-trigger-text-weight: 700;
     --mat-select-enabled-trigger-text-color: transparent;
     --mat-select-trigger-text-size: 20px;
@@ -167,7 +188,7 @@ mat-card mat-card-header {
 }
 
 .chart-card ::ng-deep .mdc-text-field--outlined .mat-mdc-form-field-infix {
-    width: 190px;
+    width: 240px;
 }
 
 .chart-channel-select ::ng-deep .mat-mdc-select-value {
@@ -187,9 +208,7 @@ mat-card mat-card-header {
 // Dark theme layout and visual treatment.
 :host-context(.dark-theme) {
     max-width: 1680px;
-    //min-height: 100vh;
     margin: 0 auto;
-    //padding: 22px;
 }
 
 :host-context(.dark-theme) highcharts-chart {
@@ -216,7 +235,6 @@ mat-card mat-card-header {
 }
 
 :host-context(.dark-theme) .header {
-    //z-index: 1;
     gap: 28px;
     padding: 22px 24px;
 }
@@ -235,15 +253,6 @@ mat-card mat-card-header {
 
 :host-context(.dark-theme) .version {
     color: #72829a;
-}
-
-:host-context(.dark-theme) .tagline {
-    display: block;
-    margin: 7px 0 0;
-    color: var(--ady-amber);
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
 }
 
 :host-context(.dark-theme) .header-actions {
