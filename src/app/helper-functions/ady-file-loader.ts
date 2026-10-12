@@ -1,5 +1,6 @@
 import type { AudysseyInterface } from '../interfaces/audyssey-interface';
 import { validateAdy } from './validate-ady';
+import { normalizeAdyChannels } from './normalize-ady-channels';
 
 interface AdyLoadHandlers {
     accepted: (data: AudysseyInterface, filename?: string) => void;
@@ -58,6 +59,12 @@ export class AdyFileLoader {
             return false;
         }
         const data = json as AudysseyInterface;
+        try {
+            normalizeAdyChannels(data.detectedChannels);
+        } catch (cause) {
+            this.handlers.error(cause instanceof Error ? cause.message : 'Invalid .ady channel data.', cause);
+            return false;
+        }
         this.activeWorker?.terminate();
         this.activeWorker = undefined;
         this.handlers.accepted(data, filename);

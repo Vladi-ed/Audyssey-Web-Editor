@@ -1,0 +1,134 @@
+@let channel = selectedChannel();
+
+@if (correctionCurveChannel()) {
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Correction limit (Hz)</mat-label>
+        <input
+            [formField]="settingsForm.frequencyRangeRolloff"
+            matInput
+            matTooltip="Correction limit from 20 to 20,000 Hz. Use 20,000 Hz for the full range."
+            type="number"
+        >
+    </mat-form-field>
+}
+
+@if (sharedSubwooferOutputs().length > 1) {
+    <mat-radio-group
+        (change)="subwooferOutputSelected.emit($event.value)"
+        [value]="channel"
+        aria-label="Subwoofer output"
+        class="subwoofer-output-selector"
+    >
+        @for (subwoofer of sharedSubwooferOutputs(); track subwoofer.enChannelType) {
+            <mat-radio-button
+                [aria-label]="'Subwoofer ' + (subwoofer.enChannelType - 53)"
+                [matTooltip]="'Subwoofer ' + (subwoofer.enChannelType - 53) + ': settings apply to this output only.'"
+                [value]="subwoofer">
+                SW{{ subwoofer.enChannelType - 53 }}
+            </mat-radio-button>
+        }
+    </mat-radio-group>
+}
+
+@if (channel.channelReport.distance > 0) {
+    <p [matTooltip]="(channel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'" class="channel-meta">
+        Measured distance: {{ channel.channelReport.distance | number: '1.2-3' }} m
+    </p>
+}
+
+<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+    <mat-label>Distance override (m)</mat-label>
+    <input
+        [formField]="settingsForm.customDistance"
+        matInput
+        matTooltip="Leave empty to use the automatic distance."
+        placeholder="Auto"
+        step="0.01"
+        type="number"
+    >
+</mat-form-field>
+<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+    <mat-label>Level override (dB)</mat-label>
+    <input
+        [formField]="settingsForm.customLevel"
+        matInput
+        matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty."
+        placeholder="Auto"
+        step="0.5"
+        type="number"
+    >
+</mat-form-field>
+<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+    <mat-label>Trim Adjustment (dB)</mat-label>
+    <input
+        (blur)="resetEmptyTrimAdjustment()"
+        [formField]="settingsForm.trimAdjustment"
+        inputmode="decimal"
+        matInput
+        matTooltip="Level adjustment from -12 to +12 dB relative to the default value. Clearing the field resets it to 0 dB."
+        step="any"
+        type="number"
+    >
+    @for (error of settingsForm.trimAdjustment().errors(); track error.kind) {
+        <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
+    }
+</mat-form-field>
+
+@if (!isSubwoofer(channel)) {
+    <!-- Hide these controls for subwoofers -->
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Custom Crossover</mat-label>
+        <mat-select
+            (selectionChange)="updateCrossover($event.value)"
+            [formField]="settingsForm.customCrossover"
+            matTooltip="Low frequency crossover to a subwoofer. If you want to use the default crossover, set Auto."
+            placeholder="Auto"
+        >
+            @if (unavailableCrossover(); as crossover) {
+                <mat-option [value]="crossover.value" disabled>{{ crossover.label }}</mat-option>
+            }
+            <mat-option value="">Auto</mat-option>
+            @for (option of crossoverOptions(); track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Custom Speaker Type</mat-label>
+        <mat-select
+            (selectionChange)="updateSpeakerType($event.value)"
+            [formField]="settingsForm.customSpeakerType"
+            matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. If you want to use the default type, choose Auto."
+            placeholder="Auto"
+        >
+            @let speakerType = settingsForm.customSpeakerType().value();
+            @if (speakerType && speakerType !== 'S' && speakerType !== 'L') {
+                <mat-option [value]="speakerType" disabled>
+                    @switch (speakerType) {
+                        @case ('E') {
+                            Present
+                        }
+                        @case ('N') {
+                            None
+                        }
+                        @case ('Wireless') {
+                            Wireless
+                        }
+                        @case ('WirelessStereo') {
+                            Wireless Stereo
+                        }
+                    }
+                </mat-option>
+            }
+            <mat-option value="">Auto</mat-option>
+            <mat-option [value]="'S'">Small</mat-option>
+            <mat-option [value]="'L'">Large</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-checkbox [formField]="settingsForm.midrangeCompensation" matTooltip="Applies midrange dip to the correction curve, which can reduce harshness near a speaker's crossover region." style="margin-bottom: -16px">
+        Midrange Compensation
+    </mat-checkbox>
+}
+
+<mat-checkbox [formField]="settingsForm.isReversePolarity">Reverse Polarity</mat-checkbox>

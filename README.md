@@ -127,6 +127,21 @@ npm run ng -- <command>
 
 ## 🔧 Development
 
+### HTML template formatting
+
+Tags with more than three attributes use one attribute per line. Boolean attributes,
+Angular bindings, and event handlers all count as attributes. Tags with three
+or fewer attributes keep their existing layout.
+
+```html
+<input
+    [disabled]="disabled()"
+    [ngModel]="channel.trimAdjustment"
+    matInput
+    name="trimAdjustment"
+>
+```
+
 ### Architecture
 
 The application follows Angular's component-based architecture with:

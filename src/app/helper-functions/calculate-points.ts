@@ -1,7 +1,7 @@
 import FFT from 'fft.js'
-import { LinSpacedFracOctaveSmooth } from "./afr-line-smoothing";
+import { LinSpacedFracOctaveSmooth } from './afr-line-smoothing';
 
-export function calculatePoints(responseData: string[]) {
+export function calculatePoints(responseData: number[]) {
   if (!responseData || !responseData.length) return [];
 
   const count = responseData.length;
@@ -11,7 +11,7 @@ export function calculatePoints(responseData: string[]) {
   const sample_rate = 48000;
 
   for (let j = 0; j < count; j++) {
-    cValues[j] = parseFloat(responseData[j]);
+    cValues[j] = responseData[j];
     frequencies[j] = j / count * sample_rate;
   }
 

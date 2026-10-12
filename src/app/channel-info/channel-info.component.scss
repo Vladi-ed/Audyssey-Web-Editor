@@ -1,0 +1,24 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.subwoofer-output-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.channel-meta {
+    margin: 0 0 0 16px;
+    font-size: 13px;
+}
+
+:host-context(.dark-theme) mat-form-field {
+    margin-bottom: 3px;
+}

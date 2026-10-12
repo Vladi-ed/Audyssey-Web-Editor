@@ -19,8 +19,9 @@ import { FormsModule } from '@angular/forms';
 import { MatSelect } from '@angular/material/select';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ChannelSelectorComponent } from './channel-selector/channel-selector.component';
+import { ChannelInfoComponent } from './channel-info/channel-info.component';
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
-import { DecimalPipe, DOCUMENT } from '@angular/common';
+import { DOCUMENT } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -29,9 +30,9 @@ import { AdyFileLoader } from './helper-functions/ady-file-loader';
 import {
     getCorrectionChannels,
     getSharedSubwooferOutputs,
+    isSubwoofer,
     resolveCorrectionChannel
 } from './helper-functions/correction-channel';
-import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 @Component({
     selector: 'app-root',
@@ -42,7 +43,7 @@ import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecimalPipe, DecodeEqTypePipe, MatTooltip, MatRadioButton, MatRadioGroup]
+    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, ChannelInfoComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecodeEqTypePipe, MatTooltip]
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
@@ -50,6 +51,7 @@ export class AppComponent implements OnDestroy {
     private snackBar = inject(MatSnackBar);
     private cdr = inject(ChangeDetectorRef);
     private document = inject(DOCUMENT);
+
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
 
@@ -92,6 +94,8 @@ export class AppComponent implements OnDestroy {
             if (cause) console.warn(cause);
         },
     });
+
+    isSubwoofer = isSubwoofer;
 
     get isLoading(): boolean {
         return this.fileLoader.isLoading;
@@ -144,10 +148,6 @@ export class AppComponent implements OnDestroy {
         this.updateChart();
     }
 
-    isSubwoofer(channel: DetectedChannel): boolean {
-        // All recovered ADY subwoofer indices: LFE, directional, mixed, and four-sub LFE.
-        return channel.enChannelType >= 42 && channel.enChannelType <= 65;
-    }
 
     // Updates context menu items for the chart based on the option's current state
     updateChartMenuItems() {
@@ -372,6 +372,7 @@ export class AppComponent implements OnDestroy {
         if (!this.isSubwoofer(selectedChannel) &&
             selectedChannel.customCrossover &&
             selectedChannel.customCrossover !== 'F' &&
+            selectedChannel.customCrossover !== 'U' &&
             this.chartLogarithmicScale) {
             xAxisBands.push({
                 from: XMin,
@@ -468,34 +469,6 @@ export class AppComponent implements OnDestroy {
 
     loadExample() {
         return this.fileLoader.loadExample();
-    }
-
-    updateCrossover() {
-        if (this.isLoading || !this.selectedChannelRaw) return;
-
-        if (this.selectedChannelRaw.customCrossover) {
-            if (this.selectedChannelRaw.customCrossover === 'F')
-                this.selectedChannelRaw.customSpeakerType = 'L';
-            else
-                this.selectedChannelRaw.customSpeakerType = 'S';
-        }
-        else this.selectedChannelRaw.customSpeakerType = undefined;
-
-        this.updateChart();
-    }
-
-    updateSpeakerType() {
-        if (this.isLoading || !this.selectedChannelRaw) return;
-
-        if (this.selectedChannelRaw.customSpeakerType) {
-            if (this.selectedChannelRaw.customSpeakerType === 'L')
-                this.selectedChannelRaw.customCrossover = 'F'
-            else
-                this.selectedChannelRaw.customCrossover = '80';
-        }
-        else this.selectedChannelRaw.customCrossover = undefined;
-
-        this.updateChart();
     }
 
     protected onDragDrop(event: DragEvent) {

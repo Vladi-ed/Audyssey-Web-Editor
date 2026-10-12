@@ -131,33 +131,6 @@ mat-card mat-card-header {
     font-weight: 600;
 }
 
-.subwoofer-output-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.channel-section {
-    display: grid;
-    gap: 16px;
-}
-
-.channel-section + .channel-section {
-    margin-top: 12px;
-    //padding-top: 20px;
-    //border-top: 1px solid rgba(128, 128, 128, 0.3);
-}
-
-.channel-section mat-form-field {
-    width: 100%;
-}
-
-.channel-meta {
-    margin: 0 0 0 16px;
-    font-size: 13px;
-    //opacity: 0.7;
-}
-
 .chart-card {
     flex-grow: 1;
     min-width: 0;
