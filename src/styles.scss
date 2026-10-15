@@ -139,6 +139,8 @@ body.dark-theme {
     --ady-amber: #ffbd54;
     --ady-glow: 0 0 24px rgba(41, 150, 255, 0.13);
     --mat-snack-bar-button-color: var(--ady-cyan);
+    --mat-snack-bar-container-color: #0b1b34;
+    --mat-snack-bar-supporting-text-color: var(--ady-text);
     --mat-checkbox-selected-checkmark-color: #02111f;
 
     &::before {
@@ -270,9 +272,8 @@ body.dark-theme {
         background: rgba(46, 137, 255, 0.16) !important;
     }
 
-    .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+    .mat-mdc-snack-bar-container .mat-mdc-snackbar-surface {
         border: 1px solid var(--ady-border-strong);
-        background: #0b1b34 !important;
     }
 
     .mat-mdc-tooltip .mdc-tooltip__surface {
