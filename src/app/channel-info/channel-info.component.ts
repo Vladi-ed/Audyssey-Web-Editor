@@ -1,6 +1,6 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, input, linkedSignal, output, untracked } from '@angular/core';
-import { form, FormField, max, min, required, validate } from '@angular/forms/signals';
+import { disabled, form, FormField, max, min, required, validate } from '@angular/forms/signals';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatOption } from '@angular/material/core';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
@@ -25,24 +25,29 @@ export class ChannelInfoComponent {
     // Correction settings can belong to a different channel than the physical output.
     selectedChannel = input.required<DetectedChannel>();
     correctionCurveChannel = input<DetectedChannel>();
-    sharedSubwooferOutputs = input<readonly DetectedChannel[]>([]);
+    sharedSubwooferOutputs = input<DetectedChannel[]>([]);
     receiverModelName = input<string>();
 
     chartSettingsChanged = output<void>();
     midrangeCompensationChanged = output<void>();
     subwooferOutputSelected = output<DetectedChannel>();
 
-    private readonly formValue = linkedSignal<ChannelSettingsValue>(() =>
+    private formValue = linkedSignal<ChannelSettingsValue>(() =>
         readChannelSettings(this.selectedChannel(), this.correctionCurveChannel()));
 
-    protected readonly settingsForm = form(this.formValue, path => {
-        required(path.frequencyRangeRolloff);
-        min(path.frequencyRangeRolloff, channelSettingsLimits.frequency.min);
-        max(path.frequencyRangeRolloff, channelSettingsLimits.frequency.max);
-        min(path.customDistance, channelSettingsLimits.distance.min);
-        max(path.customDistance, channelSettingsLimits.distance.max);
-        min(path.customLevel, channelSettingsLimits.level.min);
-        max(path.customLevel, channelSettingsLimits.level.max);
+    settingsForm = form(this.formValue, path => {
+        disabled(path.frequencyRangeRolloff, { when: () => !this.correctionCurveChannel() });
+        required(path.frequencyRangeRolloff, { message: 'Use a value from 20 to 20,000' });
+        min(path.frequencyRangeRolloff, channelSettingsLimits.frequency.min, { message: 'Use a value from 20 to 20,000' });
+        max(path.frequencyRangeRolloff, channelSettingsLimits.frequency.max, { message: 'Use a value from 20 to 20,000' });
+        min(path.customDistance, channelSettingsLimits.distance.min, { message: 'Use a distance from 0 to 18 m, or leave empty for Auto.' });
+        max(path.customDistance, channelSettingsLimits.distance.max, { message: 'Use a distance from 0 to 18 m, or leave empty for Auto.' });
+        min(path.customLevel, channelSettingsLimits.level.min, { message: 'Use a level from −12 to +12 dB, or leave empty for Auto.' });
+        max(path.customLevel, channelSettingsLimits.level.max, { message: 'Use a level from −12 to +12 dB, or leave empty for Auto.' });
+        for (const numericPath of [path.frequencyRangeRolloff, path.customDistance, path.customLevel, path.trimAdjustment]) {
+            validate(numericPath, ({ value }) => value() === null || Number.isFinite(value()) ? null
+                : { kind: 'finite', message: 'Enter a finite number.' });
+        }
         validate(path.customLevel, ({ value }) => {
             const level = value();
             return level === null || Number.isInteger(level * 2) ? null
@@ -52,17 +57,37 @@ export class ChannelInfoComponent {
         const trimRangeMessage = `Use a value from ${minTrim} to +${maxTrim} dB.`;
         min(path.trimAdjustment, minTrim, { message: trimRangeMessage });
         max(path.trimAdjustment, maxTrim, { message: trimRangeMessage });
-        validate(path.trimAdjustment, ({ value }) => {
-            const trim = value();
-            return trim === null || Number.isFinite(trim) ? null
-                : { kind: 'finite', message: 'Enter a finite number.' };
+        disabled(path.trimAdjustment, {
+            when: ({ valueOf }) => {
+                const level = valueOf(path.customLevel);
+                return level !== null && Number.isFinite(level);
+            }
         });
     });
 
-    protected readonly isSubwoofer = isSubwoofer;
-    protected readonly crossoverOptions = computed(() =>
+    // Imported values remain untouched; only invalid user edits block export.
+    hasInvalidEdits = computed(() => [
+        this.settingsForm.frequencyRangeRolloff(), this.settingsForm.customDistance(),
+        this.settingsForm.customLevel(), this.settingsForm.trimAdjustment(),
+    ].some(field => !field.disabled() && field.invalid()
+        && (field.dirty() || field.errors().some(error => error.kind === 'parse'))));
+
+    fieldErrorStateMatcher(key: 'frequencyRangeRolloff' | 'customDistance' | 'customLevel' | 'trimAdjustment') {
+        return { isErrorState: () => {
+            const field = this.settingsForm[key]();
+            return !field.disabled() && field.invalid()
+                && (field.dirty() || field.errors().some(error => error.kind === 'parse'));
+        } };
+    }
+
+    trimTooltip = computed(() => this.settingsForm.trimAdjustment().disabled()
+        ? 'Inactive while a level override is set: Original App uses that absolute level and ignores trim. The stored trim is preserved. Clear the level override to use automatic level plus trim.'
+        : 'Adjustment added to the automatic level. This editor allows −12 to +12 dB; Original App rounds the final level to 0.5 dB and clamps it to −12 to +12 dB. Clearing resets trim to 0 dB.');
+
+    isSubwoofer = isSubwoofer;
+    crossoverOptions = computed(() =>
         getReceiverCrossoverOptions(this.receiverModelName()));
-    protected readonly unavailableCrossover = computed(() => {
+    unavailableCrossover = computed(() => {
         const value = this.formValue().customCrossover;
         if (!value || this.crossoverOptions().some(option => option.value === value)) return undefined;
         return { value, label: value === 'U' ? 'Unsupported' : `${decodeCrossover(value)} Hz (not supported)` };
@@ -78,19 +103,26 @@ export class ChannelInfoComponent {
 
         effect(() => {
             const value = this.formValue();
+            const previous = readChannelSettings(this.selectedChannel(), this.correctionCurveChannel());
+            const validValue = { ...value };
+            for (const key of ['frequencyRangeRolloff', 'customDistance', 'customLevel', 'trimAdjustment'] as const) {
+                const field = this.settingsForm[key]();
+                // Native parsing errors can yield null too; those must not clear an override.
+                if (field.invalid() || field.disabled()) validValue[key] = previous[key];
+            }
             untracked(() => {
                 // Bridge the signal form to the existing mutable ADY data used by charts/export.
                 const { chartChanged, midrangeChanged } = writeChannelSettings(
-                    value, this.selectedChannel(), this.correctionCurveChannel());
+                    validValue, this.selectedChannel(), this.correctionCurveChannel());
                 if (chartChanged) this.chartSettingsChanged.emit();
                 else if (midrangeChanged) this.midrangeCompensationChanged.emit();
             });
         });
     }
 
-    protected resetEmptyTrimAdjustment(): void {
-        const trim = this.settingsForm.trimAdjustment().value;
-        if (trim() === null) trim.set(0);
+    resetEmptyTrimAdjustment(): void {
+        const field = this.settingsForm.trimAdjustment();
+        if (field.value() === null && !field.invalid()) field.value.set(0);
     }
 
     updateCrossover(value: CustomCrossover | ''): void {
@@ -107,7 +139,7 @@ export class ChannelInfoComponent {
             ...current,
             customSpeakerType: value,
             customCrossover: value === 'L' ? 'F' : value
-                ? (current.customCrossover && current.customCrossover !== 'F' ? current.customCrossover : '40') : '',
+                ? (current.customCrossover && current.customCrossover !== 'F' ? current.customCrossover : '80') : '',
         }));
     }
 }

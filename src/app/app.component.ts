@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnDestroy, viewChild } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName } from './helper-functions/decode-channel-name';
@@ -47,6 +47,10 @@ import {
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
+    private channelInfo = viewChild(ChannelInfoComponent);
+    private targetCurvePoints = viewChild(TargetCurvePointsComponent);
+    hasInvalidEdits = computed(() => !!this.channelInfo()?.hasInvalidEdits()
+        || !!this.targetCurvePoints()?.hasInvalidEdits());
     private chartObj?: Highcharts.Chart;
     private snackBar = inject(MatSnackBar);
     private cdr = inject(ChangeDetectorRef);
@@ -464,6 +468,10 @@ export class AppComponent implements OnDestroy {
 
     exportFile() {
         if (this.isLoading || !this.audysseyData.detectedChannels.length) return;
+        if (this.hasInvalidEdits()) {
+            this.snackBar.open('Fix invalid values before exporting.', 'Dismiss', { duration: 5000 });
+            return;
+        }
         exportFile(this.audysseyData, this.audysseyData.title, 'ady');
     }
 
@@ -471,7 +479,7 @@ export class AppComponent implements OnDestroy {
         return this.fileLoader.loadExample();
     }
 
-    protected onDragDrop(event: DragEvent) {
+    onDragDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
     }

@@ -1,28 +1,53 @@
 <form #pointsForm="ngForm" class="container">
-    @if (localPoints.length < 100) {
+    @if (localPoints.length < 100 && !hasRawPointErrors()) {
         @for (point of (localPoints | convertPoints); track $index) {
             <div class="point-row" animate.leave="row-remove">
                 <mat-form-field appearance="outline">
                     <mat-label>Hz</mat-label>
-                    <input matInput [(ngModel)]="point.Hz" (input)="changeItem(point, $index)"
-                           required inputmode="decimal"
-                           autocomplete="Frequency"
-                           pattern="^([2-9]\d|[1-9]\d{2,3}|1\d{4}|20000)(\.\d+)?$"
-                           maxlength="18"
-                           [name]="'Frequency' + $index"
+                    <input
+                        matInput
+                        [(ngModel)]="point.Hz"
+                        (ngModelChange)="changeItem(point, $index)"
+                        required
+                        inputmode="decimal"
+                        autocomplete="Frequency"
+                        [pattern]="frequencyPattern"
+                        maxlength="18"
+                        [name]="'Frequency' + $index"
+                        [matTooltip]="rowErrors()[$index]?.frequency"
+                        [errorStateMatcher]="fieldErrorStateMatcher($index, 'frequency')"
                     >
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>Gain</mat-label>
-                    <input matInput [(ngModel)]="point.vol" (input)="changeItem(point, $index)"
-                           required type="number" inputmode="decimal" min="-12" max="12" step="0.1"
-                           [name]="'Gain' + $index"
+                    <input
+                        matInput
+                        [(ngModel)]="point.vol"
+                        (ngModelChange)="changeItem(point, $index)"
+                        required
+                        type="number"
+                        inputmode="decimal"
+                        min="-12"
+                        max="12"
+                        step="0.1"
+                        [name]="'Gain' + $index"
+                        [matTooltip]="rowErrors()[$index]?.gain"
+                        [errorStateMatcher]="fieldErrorStateMatcher($index, 'gain')"
                     >
                 </mat-form-field>
 
-                <button class="remove-btn" matRipple (click)="removePoint($index)" type="button">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="55" viewBox="0 96 960 960" width="48">
-                        <path d="m361 757 119-121 120 121 47-48-119-121 119-121-47-48-120 121-119-121-48 48 120 121-120 121 48 48ZM261 936q-24 0-42-18t-18-42V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306Zm-438 0v570-570Z"/>
+                <button
+                    class="remove-btn"
+                    matRipple
+                    (click)="removePoint($index)"
+                    type="button"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="55"
+                        viewBox="0 96 960 960"
+                        width="48"
+                    > <path d="m361 757 119-121 120 121 47-48-119-121 119-121-47-48-120 121-119-121-48 48 120 121-120 121 48 48ZM261 936q-24 0-42-18t-18-42V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306Zm-438 0v570-570Z"/>
                     </svg>
                 </button>
             </div>
@@ -30,9 +55,16 @@
     } @else {
         <cdk-virtual-scroll-viewport itemSize="25" class="virtual-scroll-container">
             <div *cdkVirtualFor="let point of localPoints; let i = index" >
-                <input #inputPoint
-                       [value]="point"
-                       (input)="changeItemString(inputPoint.value, i)">
+                <input
+                    #inputPoint
+                    [value]="point"
+                    [matTooltip]="rowErrors()[i] ? (rowErrors()[i]!.raw || rowErrors()[i]!.frequency || rowErrors()[i]!.gain || '') : ''"
+                    [style.border-color]="rowErrors()[i] ? 'red': ''"
+                    [attr.aria-invalid]="!!rowErrors()[i]"
+                    [attr.aria-describedby]="rowErrors()[i] ? 'point-error-' + i : null"
+                    [attr.aria-label]="'Target curve point ' + (i + 1)"
+                    (input)="changeItemString(inputPoint.value, i)"
+                >
                 <button class="remove-btn" (click)="removePoint(i)">
                     ✖
                 </button>
@@ -41,11 +73,22 @@
     }
 
     <div class="buttons-save-container" [style.margin-top]="localPoints.length < 100 ? 0 : 22 + 'px'">
-        <button matRipple type="button" class="flat-btn add-btn" (click)="addPoint()">
+        <button
+            matRipple
+            type="button"
+            class="flat-btn add-btn"
+            (click)="addPoint()"
+        >
             Add new Point
         </button>
         @if (showSaveBtn) {
-            <button matRipple type="submit" class="flat-btn save-btn" (click)="save()" [disabled]="pointsForm.invalid">
+            <button
+                matRipple
+                type="button"
+                class="flat-btn save-btn"
+                (click)="save()"
+                [disabled]="hasInvalidEdits()"
+            >
                 Save
             </button>
         }

@@ -47,7 +47,8 @@ export function writeChannelSettings(value: ChannelSettingsValue, channel: Detec
     const limitChanged = !!curve && inRange(value.frequencyRangeRolloff, channelSettingsLimits.frequency)
         && value.frequencyRangeRolloff !== previous.frequencyRangeRolloff;
     const trim = value.trimAdjustment ?? 0;
-    const trimChanged = inRange(trim, channelSettingsLimits.trim)
+    const hasLevelOverride = value.customLevel !== null && Number.isFinite(value.customLevel);
+    const trimChanged = !hasLevelOverride && inRange(trim, channelSettingsLimits.trim)
         && trim !== previous.trimAdjustment;
     const crossoverChanged = value.customCrossover !== previous.customCrossover;
     const speakerTypeChanged = value.customSpeakerType !== previous.customSpeakerType;

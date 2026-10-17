@@ -1,6 +1,6 @@
 import type { CustomCrossover } from '../interfaces/detected-channel';
 
-// Recovered Android Utility model groups; see docs/ady-channel-settings.md.
+// Recovered Original App Utility model groups; see docs/ady-channel-settings.md.
 // Use known supported models rather than treating every unknown model as newer.
 const modelsWith70Hz = new Set([
     // FY23 / FY23 flagships
@@ -13,7 +13,9 @@ const modelsWith70Hz = new Set([
     'CINEMA 70S SERIES 2', 'CINEMA 60 SERIES 2', 'CINEMA 50 SERIES 2',
 ]);
 
-const olderModelsWith180Hz = new Set([
+const modelsWith180Hz = new Set([
+    // Original App substitutes 200 Hz at upload on these models if live Dolby is < 1.6.
+    'AVR-X8500H', 'AVC-X8500H', 'AV8805',
     // FY20
     'AVR-S750H', 'AVR-S950H', 'AVR-X1600H', 'AVR-X2600H', 'AVR-X3600H',
     'NR1710', 'SR5014', 'SR6014',
@@ -39,14 +41,13 @@ const allCrossoverOptions = [
     { value: '20', label: '200 Hz' },
     { value: '25', label: '250 Hz' },
     { value: 'F', label: 'Full Band' },
-] as const satisfies readonly { value: CustomCrossover; label: string }[];
+] as const satisfies { value: CustomCrossover; label: string }[];
 
 export function getReceiverCrossoverOptions(targetModelName?: string) {
     const model = (targetModelName ?? '').trim().replace(/^\*/, '').replace(/^(Denon|Marantz)\s+/i, '')
         .replace(/\s+/g, ' ').toUpperCase();
     const supports70Hz = modelsWith70Hz.has(model);
-    // Original X8500H / AV8805 models stay excluded regardless of recorded firmware.
-    const supports180Hz = supports70Hz || olderModelsWith180Hz.has(model);
+    const supports180Hz = supports70Hz || modelsWith180Hz.has(model);
 
     return allCrossoverOptions.filter(option =>
         (option.value !== '70' || supports70Hz) && (option.value !== '18' || supports180Hz));

@@ -15,7 +15,7 @@ export class AdyFileLoader {
     private requestId = 0;
     private activeWorker?: Worker;
 
-    constructor(private readonly handlers: AdyLoadHandlers) {}
+    constructor(private handlers: AdyLoadHandlers) {}
 
     get isLoading(): boolean {
         return this.readingFile || this.activeWorker !== undefined;

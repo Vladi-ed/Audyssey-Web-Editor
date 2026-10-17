@@ -5,10 +5,15 @@
         <mat-label>Correction limit (Hz)</mat-label>
         <input
             [formField]="settingsForm.frequencyRangeRolloff"
+            [errorStateMatcher]="fieldErrorStateMatcher('frequencyRangeRolloff')"
             matInput
             matTooltip="Correction limit from 20 to 20,000 Hz. Use 20,000 Hz for the full range."
+            step="any"
             type="number"
         >
+        @for (error of settingsForm.frequencyRangeRolloff().errors(); track error.kind) {
+            <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
+        }
     </mat-form-field>
 }
 
@@ -40,32 +45,45 @@
     <mat-label>Distance override (m)</mat-label>
     <input
         [formField]="settingsForm.customDistance"
+        [errorStateMatcher]="fieldErrorStateMatcher('customDistance')"
         matInput
         matTooltip="Leave empty to use the automatic distance."
         placeholder="Auto"
         step="0.01"
         type="number"
     >
+    @for (error of settingsForm.customDistance().errors(); track error.kind) {
+        <mat-error>{{ error.message ?? 'Enter a finite distance, or leave empty for Auto.' }}</mat-error>
+    }
 </mat-form-field>
 <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
     <mat-label>Level override (dB)</mat-label>
     <input
         [formField]="settingsForm.customLevel"
+        [errorStateMatcher]="fieldErrorStateMatcher('customLevel')"
         matInput
-        matTooltip="Absolute level in dB. If you want to use the default level, leave this field empty."
+        matTooltip="Absolute level from −12 to +12 dB in 0.5 dB steps. Overrides automatic level and trim. Leave empty to use automatic level plus trim."
         placeholder="Auto"
         step="0.5"
         type="number"
     >
+    @for (error of settingsForm.customLevel().errors(); track error.kind) {
+        <mat-error>{{ error.message ?? 'Enter a finite level, or leave empty for Auto.' }}</mat-error>
+    }
 </mat-form-field>
-<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+<mat-form-field
+    appearance="outline"
+    floatLabel="always"
+    subscriptSizing="dynamic"
+    [matTooltip]="trimTooltip()"
+>
     <mat-label>Trim Adjustment (dB)</mat-label>
     <input
         (blur)="resetEmptyTrimAdjustment()"
         [formField]="settingsForm.trimAdjustment"
+        [errorStateMatcher]="fieldErrorStateMatcher('trimAdjustment')"
         inputmode="decimal"
         matInput
-        matTooltip="Level adjustment from -12 to +12 dB relative to the default value. Clearing the field resets it to 0 dB."
         step="any"
         type="number"
     >
@@ -81,7 +99,7 @@
         <mat-select
             (selectionChange)="updateCrossover($event.value)"
             [formField]="settingsForm.customCrossover"
-            matTooltip="Low frequency crossover to a subwoofer. If you want to use the default crossover, set Auto."
+            matTooltip="Low frequency crossover to a subwoofer"
             placeholder="Auto"
         >
             @if (unavailableCrossover(); as crossover) {
@@ -98,7 +116,7 @@
         <mat-select
             (selectionChange)="updateSpeakerType($event.value)"
             [formField]="settingsForm.customSpeakerType"
-            matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. If you want to use the default type, choose Auto."
+            matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. Auto resets both speaker type and crossover to automatic."
             placeholder="Auto"
         >
             @let speakerType = settingsForm.customSpeakerType().value();
@@ -131,4 +149,7 @@
     </mat-checkbox>
 }
 
-<mat-checkbox [formField]="settingsForm.isReversePolarity">Reverse Polarity</mat-checkbox>
+<mat-checkbox
+    [formField]="settingsForm.isReversePolarity" matTooltip="Polarity reported during measurement. Original App uses this flag when calculating automatic distance; changing it does not directly invert the receiver's audio output.">
+    Reversed polarity
+</mat-checkbox>

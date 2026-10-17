@@ -125,7 +125,7 @@
 
             <button
                 (click)="exportFile()"
-                [disabled]="isLoading || !audysseyData.detectedChannels.length"
+                [disabled]="isLoading || !audysseyData.detectedChannels.length || hasInvalidEdits()"
                 class="flat-btn"
                 matRipple
                 matTooltip="Save to a new .ady file"
@@ -142,6 +142,9 @@
                 </svg>
                 Export
             </button>
+            @if (hasInvalidEdits()) {
+                <span role="status">Fix invalid values before exporting.</span>
+            }
         </div>
     </mat-card-content>
 </mat-card>
