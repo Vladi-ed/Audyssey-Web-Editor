@@ -7,7 +7,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/app/helper-functions/calculate-points-mathjs.ts"
+    "src/**/*.spec.ts"
   ]
 }

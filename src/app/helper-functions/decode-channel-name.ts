@@ -48,7 +48,7 @@ const CHANNEL_NAMES: Record<string, string> = {
     // whereas internal SWMix1-4 indices refer to output entries. Resolve groups
     // using enChannelType and setup metadata, never these labels alone.
     // Group ownership is resolved in correction-channel.ts, outside this label
-    // dictionary. See docs/multeq-subwoofer-groups.md for the recovered behavior.
+    // dictionary.
     'SWMIX': 'Subwoofer Group',
     'SWMIX1': 'Subwoofer Mix 1',
     'SWMIX2': 'Subwoofer Mix 2',

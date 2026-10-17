@@ -1,6 +1,5 @@
 import type { CustomCrossover } from '../interfaces/detected-channel';
 
-// Recovered Original App Utility model groups; see docs/ady-channel-settings.md.
 // Use known supported models rather than treating every unknown model as newer.
 const modelsWith70Hz = new Set([
     // FY23 / FY23 flagships
