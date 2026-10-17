@@ -125,7 +125,7 @@
 
             <button
                 (click)="exportFile()"
-                [disabled]="isLoading || !audysseyData.detectedChannels.length || hasInvalidEdits()"
+                [disabled]="isLoading || isSaving || !audysseyData.detectedChannels.length || hasInvalidEdits()"
                 class="flat-btn"
                 matRipple
                 matTooltip="Save to a new .ady file"

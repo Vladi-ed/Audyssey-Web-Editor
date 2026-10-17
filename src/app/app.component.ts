@@ -59,6 +59,7 @@ export class AppComponent implements OnDestroy {
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
     showSupportPrompt = false;
+    isSaving = false;
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
@@ -467,13 +468,22 @@ export class AppComponent implements OnDestroy {
         this.chartObj?.update(this.chartOptions, true);
     }
 
-    exportFile() {
-        if (this.isLoading || !this.audysseyData.detectedChannels.length) return;
+    async exportFile() {
+        if (this.isLoading || this.isSaving || !this.audysseyData.detectedChannels.length) return;
         if (this.hasInvalidEdits()) {
             this.snackBar.open('Fix invalid values before exporting.', 'Dismiss', { duration: 5000 });
             return;
         }
-        exportFile(this.audysseyData, this.audysseyData.title, 'ady');
+        this.isSaving = true;
+        try {
+            const saved = await exportFile(this.audysseyData, this.audysseyData.title, 'ady');
+            if (!saved) return;
+        } catch {
+            this.snackBar.open('Could not save the file. Please try again.', 'Dismiss', { duration: 5000 });
+            return;
+        } finally {
+            this.isSaving = false;
+        }
 
         try {
             const key = 'ady-export-count';
