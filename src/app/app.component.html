@@ -266,8 +266,8 @@
                 @if (selectedChannel; as curve) {
                     @defer (on idle) {
                         <app-target-curve-points
-                            (curvePointsChange)="updateTargetCurve()"
-                            [(curvePoints)]="curve.customTargetCurvePoints"
+                            (curvePointsChange)="curve.customTargetCurvePoints = $event; updateTargetCurve()"
+                            [curvePoints]="curve.customTargetCurvePoints"
                         />
                     }
                 }

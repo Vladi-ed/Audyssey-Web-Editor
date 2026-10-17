@@ -408,7 +408,8 @@ export class AppComponent implements OnDestroy {
         };
 
         this.updateSubwooferSeries(selectedChannel);
-        this.updateTargetCurve();
+        this.chartOptions.series![2] = this.getTargetCurveOptions();
+        this.chartObj?.update(this.chartOptions, true);
     }
 
     addSubwooferToTheGraph(checked: boolean) {
@@ -434,20 +435,26 @@ export class AppComponent implements OnDestroy {
     }
 
     updateTargetCurve() {
-        const targetCurve = 2;
-        const selectedChannel = this.selectedChannel;
+        const options = this.getTargetCurveOptions();
+        this.chartOptions.series![2] = options;
+        const targetCurve = this.chartObj?.series[2];
+        if (!targetCurve) return;
 
-        if (!selectedChannel) {
-            // no selected channel, clear target curve
-            this.chartOptions.series![targetCurve] = { data: [], type: 'spline' };
-
-            this.chartObj?.update(this.chartOptions, true);
-            return;
+        // Rebuild the series only when switching between normal and dense curves.
+        if (targetCurve.type !== options.type) {
+            targetCurve.update({ type: options.type }, false);
         }
+        targetCurve.setData(options.data ?? [], false, false);
+        this.chartObj?.redraw(false);
+    }
+
+    private getTargetCurveOptions(): Highcharts.SeriesLineOptions | Highcharts.SeriesSplineOptions {
+        const selectedChannel = this.selectedChannel;
+        if (!selectedChannel) return { data: [], type: 'spline' };
 
         // condition for Audyssey One modified files
         if (selectedChannel.customTargetCurvePoints && selectedChannel.customTargetCurvePoints.length > 1000) {
-            this.chartOptions.series![targetCurve] = {
+            return {
                 data: selectedChannel.customTargetCurvePoints.map(point => {
                     const coordinates = point.replace(/[{}]/g, '').split(',');
                     return [Number.parseFloat(coordinates[0]), Number.parseFloat(coordinates[1])]
@@ -455,7 +462,7 @@ export class AppComponent implements OnDestroy {
                 type: 'line'
             }
         }
-        else this.chartOptions.series![targetCurve] = {
+        return {
             data: calculateTargetCurve(
                 this.audysseyData.enTargetCurveType,
                 selectedChannel.midrangeCompensation,
@@ -464,8 +471,6 @@ export class AppComponent implements OnDestroy {
             ),
             type: 'spline',
         };
-
-        this.chartObj?.update(this.chartOptions, true);
     }
 
     async exportFile() {
