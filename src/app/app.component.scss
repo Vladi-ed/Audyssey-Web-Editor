@@ -103,6 +103,8 @@ mat-card {
 }
 
 mat-card.header-card {
+    position: relative;
+    z-index: 2;
     margin-top: -2px;
     border-top-right-radius: 0;
     border-top-left-radius: 0;

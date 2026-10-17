@@ -147,6 +147,9 @@
             }
         </div>
     </mat-card-content>
+    @if (showSupportPrompt) {
+        <app-export-support (dismissed)="dismissSupportPrompt()"/>
+    }
 </mat-card>
 
 <main [attr.aria-busy]="isLoading" [attr.inert]="isLoading ? '' : null">

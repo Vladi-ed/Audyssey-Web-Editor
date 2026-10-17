@@ -1,0 +1,99 @@
+:host {
+    display: contents;
+}
+
+.export-support-card {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 24px;
+    box-sizing: border-box;
+    width: min(375px, calc(100vw - 64px));
+    padding: 22px;
+    color: light-dark(#252a32, #eef5ff);
+    border: 1px solid light-dark(#d4d7dc, #304864);
+    border-radius: 12px;
+    background: light-dark(white, #10233f);
+    box-shadow: 0 12px 36px light-dark(#00000026, #00000066);
+}
+
+.export-support-card h2 {
+    margin: 0 20px 8px 0;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.export-support-card p {
+    margin: 0;
+    color: light-dark(#454b54, #9baac1);
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.support-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.support-actions .support-link {
+    gap: 8px;
+    min-height: 44px;
+    height: auto;
+    color: light-dark(white, #02111f);
+    font-size: 13px;
+    text-decoration: none;
+    border-color: light-dark(#3f51b5, #45d7ff);
+    background: light-dark(#3f51b5, #45d7ff);
+}
+
+.support-link img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.support-close,
+.support-dismiss {
+    min-height: 44px;
+    padding: 0 12px;
+    color: light-dark(#626b78, #9baac1);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+}
+
+.support-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 44px;
+    padding: 0;
+    font-size: 24px;
+}
+
+.support-close:hover,
+.support-dismiss:hover {
+    color: light-dark(#252a32, #eef5ff);
+    background: light-dark(#f2f3fb, rgba(69, 215, 255, 0.1));
+}
+
+.support-actions a:focus-visible,
+.support-close:focus-visible,
+.support-dismiss:focus-visible {
+    outline: 2px solid light-dark(#3f51b5, #45d7ff);
+    outline-offset: 3px;
+}
+
+@media (max-width: 680px) {
+    .export-support-card {
+        right: 0;
+        width: 100%;
+        padding: 20px;
+    }
+}

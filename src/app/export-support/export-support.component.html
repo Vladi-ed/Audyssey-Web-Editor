@@ -1,0 +1,29 @@
+<section
+    (keydown.escape)="dismissed.emit(); $event.stopPropagation()"
+    aria-labelledby="export-support-title"
+    class="export-support-card"
+    role="region"
+>
+    <button
+        (click)="dismissed.emit()"
+        aria-label="Dismiss support request"
+        class="support-close"
+        type="button"
+    >
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h2 id="export-support-title">Enjoying the editor?</h2>
+    <p>I build ADY Web Editor in my spare time. If it helped you fine-tune your setup, a coffee helps me keep improving it.</p>
+    <div class="support-actions">
+        <a
+            class="flat-btn support-link"
+            href="https://ko-fi.com/vladi_ed"
+            rel="noopener noreferrer"
+            target="_blank"
+        >
+            <img alt="" src="assets/cup-border.webp"/>
+            Buy me a coffee
+        </a>
+        <button (click)="dismissed.emit()" class="support-dismiss" type="button">Dismiss</button>
+    </div>
+</section>

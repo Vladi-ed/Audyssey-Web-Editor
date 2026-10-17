@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, inject, OnDestroy, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, ElementRef, inject, OnDestroy, viewChild } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName } from './helper-functions/decode-channel-name';
@@ -27,6 +27,7 @@ import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/toolt
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
+import { ExportSupportComponent } from './export-support/export-support.component';
 import {
     getCorrectionChannels,
     getSharedSubwooferOutputs,
@@ -43,7 +44,7 @@ import {
         '(drop)': 'onDragDrop($event)',
     },
     providers: [{ provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipOptions }],
-    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, ChannelInfoComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecodeEqTypePipe, MatTooltip]
+    imports: [MatCard, MatCardContent, MatRipple, MatExpansionModule, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, ChannelSelectorComponent, ChannelInfoComponent, TargetCurvePointsComponent, MatCardHeader, HighchartsChartComponent, DecodeEqTypePipe, MatTooltip, ExportSupportComponent]
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
@@ -55,9 +56,9 @@ export class AppComponent implements OnDestroy {
     private snackBar = inject(MatSnackBar);
     private cdr = inject(ChangeDetectorRef);
     private document = inject(DOCUMENT);
-
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
+    showSupportPrompt = false;
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
@@ -473,6 +474,19 @@ export class AppComponent implements OnDestroy {
             return;
         }
         exportFile(this.audysseyData, this.audysseyData.title, 'ady');
+
+        try {
+            const key = 'ady-export-count';
+            const count = Number(localStorage.getItem(key)) + 1;
+            localStorage.setItem(key, String(count));
+            if (count % 2 == 0) this.showSupportPrompt = true;
+        } catch {
+            // Export still works when browser storage is unavailable.
+        }
+    }
+
+    dismissSupportPrompt() {
+        this.showSupportPrompt = false;
     }
 
     loadExample() {
