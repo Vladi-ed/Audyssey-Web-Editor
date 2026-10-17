@@ -15,6 +15,7 @@ import { PointsConverterPipe } from './points-converter.pipe';
 import { MatInput } from '@angular/material/input';
 import { MatRipple } from '@angular/material/core';
 import { MatTooltip } from '@angular/material/tooltip';
+import { prepareTargetCurvePointsForSave } from '../helper-functions/target-curve-boundaries';
 
 @Component({
     selector: 'app-target-curve-points',
@@ -94,16 +95,7 @@ export class TargetCurvePointsComponent {
 
     save() {
         if (this.hasInvalidEdits()) return;
-        // Need to ensure points are sorted for export at the least, but it's nice
-        // to keep them sorted in the UI as well when users are done editing
-        if (this.localPoints.length) {
-            this.sortPoints();
-            const [firstFreq] = this.localPoints[0].substring(1).split(',');
-            if (Number(firstFreq) > 20) this.localPoints = ['{20, 0}', ...this.localPoints];
-
-            const [lastFreq] = this.localPoints.at(-1)!.substring(1).split(',');
-            if (Number(lastFreq) < 20000) this.localPoints.push('{20000, 0}');
-        }
+        this.localPoints = prepareTargetCurvePointsForSave(this.localPoints);
         this.curvePoints.set(this.localPoints);
         this.showSaveBtn = false;
     }
@@ -133,13 +125,6 @@ export class TargetCurvePointsComponent {
         this.localPoints[index] = point;
         this.setRowError(index, this.validatePoint(point));
         this.showSaveBtn = true;
-    }
-
-    private sortPoints() {
-        this.localPoints.sort((a, b) => {
-            const getFreq = (str: string) => Number.parseFloat(str.substring(1).split(',')[0]);
-            return getFreq(a) - getFreq(b);
-        });
     }
 
     private setRowError(index: number, error: ReturnType<TargetCurvePointsComponent['validatePoint']>) {

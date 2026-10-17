@@ -10,6 +10,7 @@ import { tooltipOptions } from './helper-functions/material-options';
 import { decodeCrossover } from './helper-functions/decode-crossover';
 import { exportFile } from './helper-functions/export-file';
 import { calculateTargetCurve, getBaseCurveValue } from './helper-functions/calculate-target-curve';
+import { prepareTargetCurvePointsForSave } from './helper-functions/target-curve-boundaries';
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
 import { MatOption, MatRipple } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -198,7 +199,7 @@ export class AppComponent implements OnDestroy {
                                 ? `{${frequency}, ${Math.max(-12, Math.min(12, y - baseline))}}` : point;
                         });
                         // Highcharts redraws the moving handle and this preview together.
-                        const preview = this.getTargetCurveData(points);
+                        const preview = this.getTargetCurveData(prepareTargetCurvePointsForSave(points));
                         chart.series[2].setData(preview.line, false, false);
                     },
                     drop: (event) => {
@@ -237,7 +238,7 @@ export class AppComponent implements OnDestroy {
                             } else newCurvePoints[i] = point;
                         });
 
-                        selectedChannel.customTargetCurvePoints = newCurvePoints;
+                        selectedChannel.customTargetCurvePoints = prepareTargetCurvePointsForSave(newCurvePoints);
                         this.cdr.markForCheck();
 
                         // Rebuild interpolation after Highcharts completes its default point drop.

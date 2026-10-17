@@ -1,4 +1,5 @@
 import type { PointOptionsObject } from 'highcharts';
+import { getTargetCurveBoundaryPoints } from './target-curve-boundaries';
 
 // Linear interpolation helper
 function interpolate(x: number, x0: number, y0: number, x1: number, y1: number): number {
@@ -45,18 +46,12 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
     return { x: parseFloat(coords[0]), y: parseFloat(coords[1]) }; // y is the OFFSET here
   }).sort((a, b) => a.x - b.x);
 
-  // 3. Anchor Logic
-  // If user hasn't defined 20Hz or 20kHz, we assume 0dB offset at those extremes
-  // to prevent the curve from "flying away" outside user points.
-  // Use a separate array for interpolation so we don't corrupt the "real" user points (which are draggable)
-  const interpolationPoints = [...userPoints];
-
-  if (interpolationPoints.length === 0 || interpolationPoints[0].x > 20) {
-    interpolationPoints.unshift({ x: 20, y: 0 });
-  }
-  if (interpolationPoints[interpolationPoints.length - 1].x < 20000) {
-    interpolationPoints.push({ x: 20000, y: 0 });
-  }
+  // Add implicit boundaries only when no point is within half an octave.
+  // Imported points stay intact; their stored zero endpoints still apply.
+  const interpolationPoints = [
+    ...userPoints,
+    ...getTargetCurveBoundaryPoints(userPoints.map(point => point.x))
+  ].sort((a, b) => a.x - b.x);
 
   // 4. Generate Display Curve
   // We need to combine Base Curve keypoints AND User Curve keypoints to ensure smooth lines.
