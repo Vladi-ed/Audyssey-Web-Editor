@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, ElementRef, inject, OnDestroy, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnDestroy, viewChild } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName } from './helper-functions/decode-channel-name';
@@ -172,14 +172,34 @@ export class AppComponent implements OnDestroy {
     }
 
     chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
-        // console.log('Highcharts callback one time on graph init');
+        // Hide before Highcharts handles movement so its showDelay restarts.
+        // const hideTooltip = () => chart.tooltip?.hide(0);
+        // chart.container.addEventListener('mousemove', hideTooltip, true);
+        // chart.container.addEventListener('mousedown', hideTooltip, true);
         let draggedPointX: number;
-        chart.series[2].update({
-            type: 'spline',
+        // draggable point series
+        chart.series[3].update({
+            type: 'scatter',
             point: {
                 events: {
                     dragStart: function () {
                         draggedPointX = this.x as number;
+                    },
+                    drag: (event) => {
+                        const selectedChannel = this.selectedChannel;
+                        const values = event.newPointId ? event.newPoints[event.newPointId]?.newValues : undefined;
+                        const y = values?.['y'];
+                        if (this.isLoading || !selectedChannel || typeof y !== 'number') return;
+                        const baseline = getBaseCurveValue(draggedPointX,
+                            this.audysseyData.enTargetCurveType, selectedChannel.midrangeCompensation);
+                        const points = selectedChannel.customTargetCurvePoints.map(point => {
+                            const frequency = Number.parseFloat(point.substring(1));
+                            return Math.abs(frequency - draggedPointX) < 0.01
+                                ? `{${frequency}, ${Math.max(-12, Math.min(12, y - baseline))}}` : point;
+                        });
+                        // Highcharts redraws the moving handle and this preview together.
+                        const preview = this.getTargetCurveData(points);
+                        chart.series[2].setData(preview.line, false, false);
                     },
                     drop: (event) => {
                         if (this.isLoading) return false;
@@ -269,7 +289,7 @@ export class AppComponent implements OnDestroy {
 
         this.chartObj.update(this.darkThemeEnabled ? darkChartTheme : lightChartTheme, false);
 
-        const [measurement, subwoofer, targetCurve] = this.chartObj.series;
+        const [measurement, subwoofer, targetCurve, targetHandles] = this.chartObj.series;
         measurement?.update((this.darkThemeEnabled ? {
             color: '#45d7ff',
             lineWidth: 2,
@@ -291,9 +311,13 @@ export class AppComponent implements OnDestroy {
             lineWidth: this.darkThemeEnabled ? 1.5 : 0.8,
         }, false);
         targetCurve?.update({
-            type: 'spline',
+            type: targetCurve.type === 'line' ? 'line' : 'spline',
             color: this.darkThemeEnabled ? '#9a5cff' : '#008000',
             lineWidth: this.darkThemeEnabled ? 2.4 : 2,
+        }, false);
+        targetHandles?.update({
+            type: 'scatter',
+            color: this.darkThemeEnabled ? '#9a5cff' : '#008000',
             marker: this.darkThemeEnabled ? {
                 lineWidth: 1.5,
                 lineColor: '#f3edff',
@@ -408,7 +432,9 @@ export class AppComponent implements OnDestroy {
         };
 
         this.updateSubwooferSeries(selectedChannel);
-        this.chartOptions.series![2] = this.getTargetCurveOptions();
+        const target = this.getTargetCurveData();
+        this.chartOptions.series![2] = { type: target.type, data: target.line };
+        this.chartOptions.series![3] = { type: 'scatter', data: target.handles };
         this.chartObj?.update(this.chartOptions, true);
     }
 
@@ -435,41 +461,47 @@ export class AppComponent implements OnDestroy {
     }
 
     updateTargetCurve() {
-        const options = this.getTargetCurveOptions();
-        this.chartOptions.series![2] = options;
+        const target = this.getTargetCurveData();
+        this.chartOptions.series![2] = { type: target.type, data: target.line };
+        this.chartOptions.series![3] = { type: 'scatter', data: target.handles };
         const targetCurve = this.chartObj?.series[2];
-        if (!targetCurve) return;
-
-        // Rebuild the series only when switching between normal and dense curves.
-        if (targetCurve.type !== options.type) {
-            targetCurve.update({ type: options.type }, false);
+        if (targetCurve && targetCurve.type !== target.type) {
+            targetCurve.update({ type: target.type }, false);
         }
-        targetCurve.setData(options.data ?? [], false, false);
+        this.chartObj?.series[2].setData(target.line, false, false);
+        this.chartObj?.series[3].setData(target.handles, false, false);
         this.chartObj?.redraw(false);
     }
 
-    private getTargetCurveOptions(): Highcharts.SeriesLineOptions | Highcharts.SeriesSplineOptions {
+    private getTargetCurveData(customPoints?: string[]): {
+        type: 'spline' | 'line';
+        line: [number, number][];
+        handles: Highcharts.PointOptionsObject[];
+    } {
         const selectedChannel = this.selectedChannel;
-        if (!selectedChannel) return { data: [], type: 'spline' };
+        if (!selectedChannel) return { type: 'spline', line: [], handles: [] };
 
         // condition for Audyssey One modified files
         if (selectedChannel.customTargetCurvePoints && selectedChannel.customTargetCurvePoints.length > 1000) {
             return {
-                data: selectedChannel.customTargetCurvePoints.map(point => {
+                type: 'line',
+                line: selectedChannel.customTargetCurvePoints.map(point => {
                     const coordinates = point.replace(/[{}]/g, '').split(',');
                     return [Number.parseFloat(coordinates[0]), Number.parseFloat(coordinates[1])]
                 }),
-                type: 'line'
+                handles: [],
             }
         }
+        const points = calculateTargetCurve(
+            this.audysseyData.enTargetCurveType,
+            selectedChannel.midrangeCompensation,
+            customPoints ?? selectedChannel.customTargetCurvePoints,
+            selectedChannel.frequencyRangeRolloff
+        );
         return {
-            data: calculateTargetCurve(
-                this.audysseyData.enTargetCurveType,
-                selectedChannel.midrangeCompensation,
-                selectedChannel.customTargetCurvePoints,
-                selectedChannel.frequencyRangeRolloff
-            ),
             type: 'spline',
+            line: points.map(point => [Number(point.x), point.y!]),
+            handles: points.filter(point => point.dragDrop?.draggableY),
         };
     }
 

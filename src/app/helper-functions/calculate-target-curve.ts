@@ -1,4 +1,4 @@
-import {PointOptionsObject} from "highcharts";
+import type { PointOptionsObject } from 'highcharts';
 
 // Linear interpolation helper
 function interpolate(x: number, x0: number, y0: number, x1: number, y1: number): number {
@@ -6,42 +6,36 @@ function interpolate(x: number, x0: number, y0: number, x1: number, y1: number):
   return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
 }
 
-// Get Y value from a sorted array of points for a specific X
-function getValueAtX(x: number, points: number[][]): number {
-  // Find segment
-  const i = points.findIndex(p => p[0] >= x);
-  if (i === -1) return points[points.length - 1][1]; // past end
-  if (i === 0) return points[0][1]; // before start
+// A few rounded anchors are enough for this approximate visual target.
+function getBaseCurvePoints(curveType?: 1|2, midrangeComp?: boolean): number[][] {
+  const points = curveType == 1 ?
+    [[20, 0], [3600, midrangeComp ? -0.47 : -0.02],
+      [9910, midrangeComp ? -1.87 : -1.85], [13300, midrangeComp ? -2.79 : -2.78],
+      [16380, -4.25], [20000, -6.91]] :
+    [[20, 0], [3600, midrangeComp ? -0.47 : -0.02], [20000, -6.11]];
 
-  const p0 = points[i - 1];
-  const p1 = points[i];
-  return interpolate(x, p0[0], p0[1], p1[0], p1[1]);
+  if (midrangeComp) {
+    points.push([1000, -0.31], [1800, -3.39], [2000, -3.55], [3100, -0.84]);
+    points.sort((a, b) => a[0] - b[0]);
+  }
+  return points;
+}
+
+function getValueAtX(x: number, points: number[][]): number {
+  const index = points.findIndex(point => point[0] >= x);
+  if (index === -1) return points[points.length - 1][1];
+  if (index === 0) return points[0][1];
+  const [x0, y0] = points[index - 1];
+  const [x1, y1] = points[index];
+  return interpolate(x, x0, y0, x1, y1);
 }
 
 export function getBaseCurveValue(x: number, curveType?: 1|2, midrangeComp?: boolean): number {
-  let standardCurve = curveType == 1 ?
-    [[20, 0],  [3600, 0], [9910, -2], [13300, -2.9], [16380, -4], [20000, -6.5]] :
-    [[20, 0],  [3600, 0], [20000, -6]];
-
-  if (midrangeComp) {
-    standardCurve.push([1000, 0], [1800, -3.6], [2000, -3.6], [3100, 0]);
-    standardCurve.sort((a, b) => a[0] - b[0]);
-  }
-
-  return getValueAtX(x, standardCurve);
+  return getValueAtX(x, getBaseCurvePoints(curveType, midrangeComp));
 }
 
 export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, customPoints?: string[], frequencyLimit?: number): PointOptionsObject[] {
-  // 1. Build Base Curve (System Points)
-  let standardCurve = curveType == 1 ?
-    [[20, 0],  [3600, 0], [9910, -2], [13300, -2.9], [16380, -4], [20000, -6.5]] :
-    [[20, 0],  [3600, 0], [20000, -6]];
-
-  if (midrangeComp) {
-    // Insert MRC points, sort is needed because insertion might be out of order relative to standard curve
-    standardCurve.push([1000, 0], [1800, -3.6], [2000, -3.6], [3100, 0]);
-    standardCurve.sort((a, b) => a[0] - b[0]);
-  }
+  const standardCurve = getBaseCurvePoints(curveType, midrangeComp);
 
   // 2. Parse User Control Points
   // These are explicit points the user added.
@@ -68,7 +62,7 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
   // We need to combine Base Curve keypoints AND User Curve keypoints to ensure smooth lines.
   // We collect all unique X coordinates from both.
   const allX = new Set<number>();
-  standardCurve.forEach(p => allX.add(p[0]));
+  standardCurve.forEach(point => allX.add(point[0]));
   interpolationPoints.forEach(p => allX.add(p.x));
 
   let finalCurvePoints: {x: number, y: number, isUserPoint: boolean}[] = [];

@@ -1,4 +1,6 @@
-import { Options, Point, SeriesOptionsType } from 'highcharts';
+import type { Options, Point, SeriesOptionsType } from 'highcharts';
+
+const tooltipHeaderFormat = '<div class="tooltip-header">{series.name}</div>';
 
 export const initOptions: Options = {
   // Highcharts 13 defaults to adapting its palette to the system color scheme.
@@ -32,24 +34,7 @@ export const initOptions: Options = {
     panKey: 'shift',
     panning: {
       enabled: true,
-      // type: 'x'
     },
-    // events: {
-    //   // add points on CLick
-    //   click: function (e) {
-    //     // @ts-ignore
-    //     const x = Math.round(e.xAxis[0].value);
-    //     // @ts-ignore
-    //     const y = Math.round(e.yAxis[0].value);
-    //
-    //     console.log(x, y);
-    //     console.log(e);
-    //
-    //     this.series[2].addPoint({
-    //       x, y
-    //     });
-    //   }
-    // }
   },
   // boost: {
   //   // allowForce: true,
@@ -68,7 +53,6 @@ export const initOptions: Options = {
       //   text: 'Play'
       // },
       xScaleBtn: { text: 'Switch to Linear scale' },
-      dataSmoothingBtn: { text: 'Data Smoothing' },
       graphSmoothingBtn: { text: 'Graph Smoothing' }
     },
     buttons: {
@@ -119,12 +103,13 @@ export const initOptions: Options = {
     style: { color: '#666666', fontSize: '12px' }
   },
   tooltip: {
+    showDelay: 200,
+    hideDelay: 0,
     backgroundColor: '#ffffff',
     borderColor: '#999999',
     borderRadius: 3,
     style: { color: '#333333' },
-    // headerFormat: '<b>{point.x:,.0f}</b> Hz<br/>',
-    headerFormat: '<div class="tooltip-header">{series.name}</div>',
+    headerFormat: tooltipHeaderFormat,
     pointFormatter: function(this: Point) {
       const freqStr = this!.x > 1000
         ? `${(this!.x / 1000).toFixed(2)} kHz`
@@ -135,8 +120,6 @@ export const initOptions: Options = {
             <div>Amplitude: <b>${this!.y! > 0 ? "+" : ""}${this!.y!.toFixed(1)} dB</b> <span style="color: ${this!.color}; font-size: 17px">●</span></div>
           </div> `;
     },
-    // pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
-    // valueSuffix: ' dB',
     useHTML: true,
   },
   xAxis: {
@@ -150,7 +133,6 @@ export const initOptions: Options = {
     minorGridLineColor: '#f2f2f2',
     labels: { style: { color: '#333333' } },
     crosshair: true,
-    // minRange: 1, // Set the minimum range for zooming - not working
   },
   yAxis: {
     min: -20,
@@ -161,24 +143,6 @@ export const initOptions: Options = {
     labels: { style: { color: '#333333' } },
     crosshair: true,
   },
-  // plotOptions: {
-  //   series: {
-  //     stickyTracking: false,
-  //     marker: {
-  //       enabled: false,
-  //     },
-  //     point: {
-  //       events: {
-  //         click: function (ev) {
-  //           console.log(ev)
-  //           if (this.series.data.length > 1 && ev.ctrlKey) {
-  //             this.remove();
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // },
   legend: { enabled: false },
   credits: { enabled: false }
 }
@@ -188,8 +152,6 @@ export const lightChartTheme: Options = {
   chart: {
     backgroundColor: '#ffffff',
     plotBackgroundColor: '#ffffff',
-    // plotBorderColor: 'transparent',
-    // plotBorderWidth: 0,
     borderRadius: 10,
     style: { fontFamily: 'Roboto, Arial, sans-serif' },
   },
@@ -312,19 +274,29 @@ export const seriesOptions: SeriesOptionsType[] = [
   {
     name: 'Target curve',
     data: [],
-    // lineWidth: 2,
     type: 'spline',
     color: '#008000',
     lineWidth: 2,
+    marker: { enabled: false, states: { hover: { enabled: false } } },
+    enableMouseTracking: false,
+    dragDrop: { draggableX: false, draggableY: false },
+  },
+  {
+    name: 'Target curve',
+    data: [],
+    type: 'scatter',
+    linkedTo: ':previous',
+    color: '#008000',
+    tooltip: { headerFormat: tooltipHeaderFormat },
+    zIndex: 3,
     marker: {
+      enabled: true,
       lineWidth: 0,
       lineColor: '#008000',
       fillColor: '#008000',
       radius: 4,
       symbol: 'circle'
     },
-    // states: { hover: { enabled: false } },
-
     dragDrop: {
       draggableY: true,
       dragMaxY: 12,
@@ -333,7 +305,5 @@ export const seriesOptions: SeriesOptionsType[] = [
       dragPrecisionX: 1,
     },
     stickyTracking: false,
-
-    // enableMouseTracking: false // to disable dragging
   }
 ];
