@@ -1,4 +1,4 @@
-// Loaded editor model: numeric strings become numbers; supported Auto nulls remain.
+// Loaded editor model: editable numeric values become numbers
 export type CustomCrossover = '40' | '60' | '70' | '80' | '90' | '10' | '11' | '12' | '15' | '18' | '20' | '25' | 'F' | 'U';
 // Known data states; a receiver need not support every state as a setting.
 export type CustomSpeakerType = 'S' | 'L' | 'E' | 'N' | 'Wireless' | 'WirelessStereo';
@@ -19,7 +19,7 @@ export interface DetectedChannel {
   referenceCurveFilter?: CurveFilter
   channelReport: ChannelReport
   responseData: ResponseData
-  trimAdjustment?: number | string
+  trimAdjustment: string
   customCrossover?: CustomCrossover | null
   customLevel?: number | null
 }

@@ -4,8 +4,6 @@ export const channelSettingsLimits = {
     frequency: { min: 20, max: 20000 },
     distance: { min: 0, max: 18 },
     level: { min: -12, max: 12 },
-    // Editor limit for the relative offset; Android clamps the final channel level.
-    trim: { min: -12, max: 12 },
 } as const;
 
 // Empty numeric controls use null; optional overrides can store that Auto state.
@@ -13,7 +11,6 @@ export interface ChannelSettingsValue {
     frequencyRangeRolloff: number | null;
     customDistance: number | null;
     customLevel: number | null;
-    trimAdjustment: number | null;
     customCrossover: CustomCrossover | '';
     customSpeakerType: CustomSpeakerType | '';
     midrangeCompensation: boolean;
@@ -32,7 +29,6 @@ export function readChannelSettings(channel: DetectedChannel, curve?: DetectedCh
         frequencyRangeRolloff: curve ? normalizeCorrectionLimit(curve.frequencyRangeRolloff) : null,
         customDistance: channel.customDistance ?? null,
         customLevel: channel.customLevel ?? null,
-        trimAdjustment: Number(channel.trimAdjustment ?? 0),
         customCrossover: channel.customCrossover ?? '',
         customSpeakerType: channel.customSpeakerType ?? '',
         midrangeCompensation: channel.midrangeCompensation ?? false,
@@ -46,10 +42,6 @@ export function writeChannelSettings(value: ChannelSettingsValue, channel: Detec
         numeric !== null && Number.isFinite(numeric) && numeric >= limits.min && numeric <= limits.max;
     const limitChanged = !!curve && inRange(value.frequencyRangeRolloff, channelSettingsLimits.frequency)
         && value.frequencyRangeRolloff !== previous.frequencyRangeRolloff;
-    const trim = value.trimAdjustment ?? 0;
-    const hasLevelOverride = value.customLevel !== null && Number.isFinite(value.customLevel);
-    const trimChanged = !hasLevelOverride && inRange(trim, channelSettingsLimits.trim)
-        && trim !== previous.trimAdjustment;
     const crossoverChanged = value.customCrossover !== previous.customCrossover;
     const speakerTypeChanged = value.customSpeakerType !== previous.customSpeakerType;
     const midrangeChanged = value.midrangeCompensation !== previous.midrangeCompensation;
@@ -64,7 +56,6 @@ export function writeChannelSettings(value: ChannelSettingsValue, channel: Detec
         || (inRange(value.customLevel, channelSettingsLimits.level) && Number.isInteger(value.customLevel * 2)))) {
         channel.customLevel = value.customLevel;
     }
-    if (trimChanged) channel.trimAdjustment = trim;
     if (crossoverChanged) {
         if (value.customCrossover) channel.customCrossover = value.customCrossover;
         else delete channel.customCrossover;
@@ -76,5 +67,5 @@ export function writeChannelSettings(value: ChannelSettingsValue, channel: Detec
     if (midrangeChanged) channel.midrangeCompensation = value.midrangeCompensation;
     if (value.isReversePolarity !== previous.isReversePolarity) channel.channelReport.isReversePolarity = value.isReversePolarity;
 
-    return { chartChanged: limitChanged || trimChanged || crossoverChanged || speakerTypeChanged, midrangeChanged };
+    return { chartChanged: limitChanged || crossoverChanged || speakerTypeChanged, midrangeChanged };
 }

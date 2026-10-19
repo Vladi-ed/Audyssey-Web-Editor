@@ -148,9 +148,9 @@ or fewer attributes keep their existing layout.
 ```html
 <input
     [disabled]="disabled()"
-    [ngModel]="channel.trimAdjustment"
+    [ngModel]="channel.customDistance"
     matInput
-    name="trimAdjustment"
+    name="customDistance"
 >
 ```
 

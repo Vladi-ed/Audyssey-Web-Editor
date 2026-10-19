@@ -79,9 +79,11 @@
         matTooltip="Leave empty to use the automatic distance."
     >
 </div>
-<p class="channel-meta setting-row" matTooltip="Calibration offset stored in the ADY file. Sub EQ HT can supply this value during measurement; 0 dB means no additional offset. Added to the automatic level unless a level override is set.">
-    Calibration trim: {{ settingsForm.trimAdjustment().value() }}&nbsp;dB
-</p>
+@if (channel.trimAdjustment) {
+    <p class="channel-meta" matTooltip="Calibration offset added to the automatic level calculation unless Level override is set.">
+        Calibration trim: {{ channel.trimAdjustment | number: '1.2-3' }}&nbsp;dB
+    </p>
+}
 <div class="setting-row">
     <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>Level override (dB)</mat-label>
@@ -103,7 +105,7 @@
         width="15"
         alt="About level override"
         class="info-icon"
-        matTooltip="Manual speaker level. Replaces the automatic level including calibration trim. Leave empty to use the automatic level based on calibration trim."
+        matTooltip="Manual speaker level. Replaces the automatic level including calibration trim. Leave empty to use the automatic level based on Calibration trim."
     >
 </div>
 

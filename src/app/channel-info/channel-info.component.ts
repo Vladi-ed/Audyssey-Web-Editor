@@ -37,7 +37,6 @@ export class ChannelInfoComponent {
 
     settingsForm = form(this.formValue, path => {
         disabled(path.frequencyRangeRolloff, { when: () => !this.correctionCurveChannel() });
-        disabled(path.trimAdjustment);
         required(path.frequencyRangeRolloff, { message: 'Use a value from 20 to 20,000' });
         min(path.frequencyRangeRolloff, channelSettingsLimits.frequency.min, { message: 'Use a value from 20 to 20,000' });
         max(path.frequencyRangeRolloff, channelSettingsLimits.frequency.max, { message: 'Use a value from 20 to 20,000' });
@@ -92,7 +91,7 @@ export class ChannelInfoComponent {
             const value = this.formValue();
             const previous = readChannelSettings(this.selectedChannel(), this.correctionCurveChannel());
             const validValue = { ...value };
-            for (const key of ['frequencyRangeRolloff', 'customDistance', 'customLevel', 'trimAdjustment'] as const) {
+            for (const key of ['frequencyRangeRolloff', 'customDistance', 'customLevel'] as const) {
                 const field = this.settingsForm[key]();
                 // Native parsing errors can yield null too; those must not clear an override.
                 if (field.invalid() || field.disabled()) validValue[key] = previous[key];

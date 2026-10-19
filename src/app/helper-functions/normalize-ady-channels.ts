@@ -18,11 +18,11 @@ function numericArray(value: unknown, property: string): number[] {
 }
 
 // Called before charts/forms receive data. The TypeScript interface describes the
-// normalized model; raw JSON can still contain numeric strings/nulls.
+// normalized model; calibration trim keeps its original string representation.
 export function normalizeAdyChannels(channels: DetectedChannel[]): void {
     for (const channel of channels) {
         channel.frequencyRangeRolloff = normalizeCorrectionLimit(channel.frequencyRangeRolloff);
-        for (const property of ['customDistance', 'customLevel', 'delayAdjustment', 'trimAdjustment'] as const) {
+        for (const property of ['customDistance', 'customLevel', 'delayAdjustment'] as const) {
             const raw: unknown = channel[property];
             // accepts explicit Auto nulls for these overrides.
             if (raw === null && (property === 'customDistance' || property === 'customLevel')) continue;
