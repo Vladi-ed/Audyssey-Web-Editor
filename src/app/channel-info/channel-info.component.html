@@ -47,7 +47,8 @@
 @if (channel.channelReport.distance > 0) {
     <p class="channel-meta setting-row">
         <span>
-            Measured distance: <span [matTooltip]="(channel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'">
+            Measured distance:
+            <span [matTooltip]="(channel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'">
                 {{ channel.channelReport.distance | number: '1.2-3' }}&nbsp;m
             </span>
         </span>
@@ -78,6 +79,9 @@
         matTooltip="Leave empty to use the automatic distance."
     >
 </div>
+<p class="channel-meta setting-row" matTooltip="Calibration offset stored in the ADY file. Sub EQ HT can supply this value during measurement; 0 dB means no additional offset. Added to the automatic level unless a level override is set.">
+    Calibration trim: {{ settingsForm.trimAdjustment().value() }}&nbsp;dB
+</p>
 <div class="setting-row">
     <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>Level override (dB)</mat-label>
@@ -99,32 +103,7 @@
         width="15"
         alt="About level override"
         class="info-icon"
-        matTooltip="Absolute level from −12 to +12 dB in 0.5 dB steps. Overrides automatic level and trim. Leave empty to use automatic level plus trim."
-    >
-</div>
-<div class="setting-row">
-    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-        <mat-label>Trim Adjustment (dB)</mat-label>
-        <input
-            (blur)="resetEmptyTrimAdjustment()"
-            [formField]="settingsForm.trimAdjustment"
-            [errorStateMatcher]="fieldErrorStateMatcher('trimAdjustment')"
-            inputmode="decimal"
-            matInput
-            step="any"
-            type="number"
-        >
-        @for (error of settingsForm.trimAdjustment().errors(); track error.kind) {
-            <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
-        }
-    </mat-form-field>
-    <img
-        ngSrc="assets/info-icon.svg"
-        height="15"
-        width="15"
-        alt="About trim adjustment"
-        class="info-icon"
-        [matTooltip]="trimTooltip()"
+        matTooltip="Manual speaker level. Replaces the automatic level including calibration trim. Leave empty to use the automatic level based on calibration trim."
     >
 </div>
 

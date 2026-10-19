@@ -37,6 +37,7 @@ export class ChannelInfoComponent {
 
     settingsForm = form(this.formValue, path => {
         disabled(path.frequencyRangeRolloff, { when: () => !this.correctionCurveChannel() });
+        disabled(path.trimAdjustment);
         required(path.frequencyRangeRolloff, { message: 'Use a value from 20 to 20,000' });
         min(path.frequencyRangeRolloff, channelSettingsLimits.frequency.min, { message: 'Use a value from 20 to 20,000' });
         max(path.frequencyRangeRolloff, channelSettingsLimits.frequency.max, { message: 'Use a value from 20 to 20,000' });
@@ -44,7 +45,7 @@ export class ChannelInfoComponent {
         max(path.customDistance, channelSettingsLimits.distance.max, { message: 'Use a distance from 0 to 18 m, or leave empty for Auto.' });
         min(path.customLevel, channelSettingsLimits.level.min, { message: 'Use a level from −12 to +12 dB, or leave empty for Auto.' });
         max(path.customLevel, channelSettingsLimits.level.max, { message: 'Use a level from −12 to +12 dB, or leave empty for Auto.' });
-        for (const numericPath of [path.frequencyRangeRolloff, path.customDistance, path.customLevel, path.trimAdjustment]) {
+        for (const numericPath of [path.frequencyRangeRolloff, path.customDistance, path.customLevel]) {
             validate(numericPath, ({ value }) => value() === null || Number.isFinite(value()) ? null
                 : { kind: 'finite', message: 'Enter a finite number.' });
         }
@@ -53,36 +54,22 @@ export class ChannelInfoComponent {
             return level === null || Number.isInteger(level * 2) ? null
                 : { kind: 'step', message: 'Use 0.5 dB increments.' };
         });
-        const { min: minTrim, max: maxTrim } = channelSettingsLimits.trim;
-        const trimRangeMessage = `Use a value from ${minTrim} to +${maxTrim} dB.`;
-        min(path.trimAdjustment, minTrim, { message: trimRangeMessage });
-        max(path.trimAdjustment, maxTrim, { message: trimRangeMessage });
-        disabled(path.trimAdjustment, {
-            when: ({ valueOf }) => {
-                const level = valueOf(path.customLevel);
-                return level !== null && Number.isFinite(level);
-            }
-        });
     });
 
     // Imported values remain untouched; only invalid user edits block export.
     hasInvalidEdits = computed(() => [
         this.settingsForm.frequencyRangeRolloff(), this.settingsForm.customDistance(),
-        this.settingsForm.customLevel(), this.settingsForm.trimAdjustment(),
+        this.settingsForm.customLevel(),
     ].some(field => !field.disabled() && field.invalid()
         && (field.dirty() || field.errors().some(error => error.kind === 'parse'))));
 
-    fieldErrorStateMatcher(key: 'frequencyRangeRolloff' | 'customDistance' | 'customLevel' | 'trimAdjustment') {
+    fieldErrorStateMatcher(key: 'frequencyRangeRolloff' | 'customDistance' | 'customLevel') {
         return { isErrorState: () => {
             const field = this.settingsForm[key]();
             return !field.disabled() && field.invalid()
                 && (field.dirty() || field.errors().some(error => error.kind === 'parse'));
         } };
     }
-
-    trimTooltip = computed(() => this.settingsForm.trimAdjustment().disabled()
-        ? 'Inactive while a level override is set: Original App uses that absolute level and ignores trim. The stored trim is preserved. Clear the level override to use automatic level plus trim.'
-        : 'Adjustment added to the automatic level. This editor allows −12 to +12 dB; Original App rounds the final level to 0.5 dB and clamps it to −12 to +12 dB. Clearing resets trim to 0 dB.');
 
     isSubwoofer = isSubwoofer;
     crossoverOptions = computed(() =>
@@ -118,11 +105,6 @@ export class ChannelInfoComponent {
                 else if (midrangeChanged) this.midrangeCompensationChanged.emit();
             });
         });
-    }
-
-    resetEmptyTrimAdjustment(): void {
-        const field = this.settingsForm.trimAdjustment();
-        if (field.value() === null && !field.invalid()) field.value.set(0);
     }
 
     updateCrossover(value: CustomCrossover | '') {
