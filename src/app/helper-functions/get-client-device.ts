@@ -1,21 +1,8 @@
-export function getClientDevice(userAgent: string): { device: string; browser: string } {
-    let device = 'unknown';
+export function getClientDevice(userAgent: string | null, clientHints: string | null) {
+    userAgent ??= '';
+    clientHints ??= '';
 
-    if (/iPad/i.test(userAgent)) {
-        device = 'iPad';
-    } else if (/iPhone|iPod/i.test(userAgent)) {
-        device = 'iPhone / iPod';
-    } else if (/Android/i.test(userAgent)) {
-        device = /Mobile/i.test(userAgent) ? 'Android phone' : 'Android tablet';
-    } else if (/Windows NT/i.test(userAgent)) {
-        device = 'Windows PC';
-    } else if (/CrOS/i.test(userAgent)) {
-        device = 'Chromebook';
-    } else if (/Macintosh|Mac OS X/i.test(userAgent)) {
-        device = 'Mac';
-    } else if (/Linux/i.test(userAgent)) {
-        device = 'Linux computer';
-    }
+    const device = getDevice(userAgent);
 
     // Check Chromium variants before Chrome, and Safari last because their headers overlap.
     const browsers: [string, RegExp][] = [
@@ -23,16 +10,59 @@ export function getClientDevice(userAgent: string): { device: string; browser: s
         ['Opera', /(?:OPR|OPiOS)\/([\d.]+)/i],
         ['Samsung Internet', /SamsungBrowser\/([\d.]+)/i],
         ['Chrome', /(?:Chrome|CriOS)\/([\d.]+)/i],
-        ['Firefox', /(?:Firefox|FxiOS)\/([\d.]+)/i],
-        ['Safari', /Version\/([\d.]+).*Safari/i]
+        ['Firefox', /(?:Firefox|FxiOS)\/([\d.]+)/i]
     ];
+
+    let browser = 'unknown';
+    let version = '';
 
     for (const [name, pattern] of browsers) {
         const match = pattern.exec(userAgent);
         if (match) {
-            return { device, browser: `${name} ${match[1]}` };
+            browser = name;
+            version = match[1].split('.')[0];
+            break;
         }
     }
 
-    return { device, browser: 'unknown' };
+    if (browser === 'unknown' && /Safari/i.test(userAgent)) {
+        const match = /Version\/([\d.]+)/i.exec(userAgent);
+        if (match) {
+            browser = 'Safari';
+            version = match[1].split('.')[0];
+        }
+    }
+
+    const brands: [string, string][] = [
+        ['Microsoft Edge', 'Edge'],
+        ['Opera', 'Opera'],
+        ['Samsung Internet', 'Samsung Internet'],
+        ['Brave', 'Brave'],
+        ['Google Chrome', 'Chrome'],
+        ['Chromium', 'Chromium']
+    ];
+    const hints = [...clientHints.matchAll(/"([^"]+)"\s*;\s*v="(\d+)(?:\.[\d.]+)?"/g)];
+
+    for (const [brand, name] of brands) {
+        const hint = hints.find(match => match[1] === brand);
+        if (hint && (browser === 'unknown' || browser === 'Chrome' || browser === name)) {
+            browser = name;
+            version = hint[2];
+            break;
+        }
+    }
+
+    return { device, browser: version ? `${browser} ${version}` : browser };
+}
+
+function getDevice(userAgent: string): string {
+    if (/iPad/i.test(userAgent)) return 'iPad';
+    if (/iPhone|iPod/i.test(userAgent)) return 'iPhone / iPod';
+    if (/Android/i.test(userAgent)) return /Mobile/i.test(userAgent) ? 'Android phone' : 'Android tablet';
+    if (/Windows NT/i.test(userAgent)) return 'Windows';
+    if (/CrOS/i.test(userAgent)) return 'Chromebook';
+    if (/Macintosh|Mac OS X/i.test(userAgent)) return 'Mac';
+    if (/Linux/i.test(userAgent)) return 'Linux';
+
+    return 'unknown';
 }
