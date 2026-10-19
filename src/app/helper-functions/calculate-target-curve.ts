@@ -96,10 +96,16 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
   // 5. Convert to Highcharts format
   let highchartsSeries: PointOptionsObject[] = finalCurvePoints.map(p => {
     if (p.isUserPoint) {
+      const baseline = getValueAtX(p.x, standardCurve);
       return {
         x: p.x,
         y: p.y,
-        dragDrop: {draggableY: true, draggableX: false},
+        dragDrop: {
+          draggableY: true,
+          draggableX: false,
+          dragMinY: baseline - 12,
+          dragMaxY: baseline + 12,
+        },
         marker: {enabled: true, radius: 4, states: {hover: {enabled: true}}},
         className: 'draggable-cursor'
       };
