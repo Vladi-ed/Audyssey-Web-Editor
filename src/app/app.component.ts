@@ -11,6 +11,7 @@ import { decodeCrossover } from './helper-functions/decode-crossover';
 import { exportFile } from './helper-functions/export-file';
 import { calculateTargetCurve, getBaseCurveValue } from './helper-functions/calculate-target-curve';
 import { prepareTargetCurvePointsForSave } from './helper-functions/target-curve-boundaries';
+import { estimateTargetCutoffs } from './helper-functions/target-curve-cutoff';
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
 import { MatOption, MatRipple } from '@angular/material/core';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -66,6 +67,7 @@ export class AppComponent implements OnDestroy {
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     loadedFileName?: string;
     calculatedChannelsData?: Map<number, number[][]>
+    private targetCurveCutoffs = new Map<number, number>();
     selectedChannelRaw?: DetectedChannel;
     private chartLogarithmicScale = true;
     private graphSmoothEnabled = false;
@@ -84,12 +86,14 @@ export class AppComponent implements OnDestroy {
             this.loadedFileName = filename;
             this.selectedChannelRaw = undefined;
             this.calculatedChannelsData = undefined;
+            this.targetCurveCutoffs.clear();
             this.subwooferOverlayEnabled = false;
             this.updateChart();
             this.chartObj?.zoomOut();
         },
         processed: measurements => {
             this.calculatedChannelsData = measurements;
+            this.targetCurveCutoffs = estimateTargetCutoffs(this.correctionChannels, measurements);
             this.selectedChannelRaw = this.selectionToRestore
                 .map(id => this.audysseyData.detectedChannels.find(channel => channel.enChannelType === id))
                 .find(channel => channel !== undefined) ?? this.correctionChannels[0];
@@ -111,6 +115,10 @@ export class AppComponent implements OnDestroy {
     // The correction owner can differ from the selected physical output.
     get selectedChannel(): DetectedChannel | undefined {
         return resolveCorrectionChannel(this.selectedChannelRaw, this.audysseyData.detectedChannels, this.audysseyData.subwooferMode);
+    }
+
+    private get selectedChannelCutoff(): number {
+        return this.targetCurveCutoffs.get(this.selectedChannel?.enChannelType ?? -1) ?? 0;
     }
 
     get correctionChannels(): DetectedChannel[] {
@@ -192,7 +200,7 @@ export class AppComponent implements OnDestroy {
                         const y = values?.['y'];
                         if (this.isLoading || !selectedChannel || typeof y !== 'number') return;
                         const baseline = getBaseCurveValue(draggedPointX,
-                            this.audysseyData.enTargetCurveType, selectedChannel.midrangeCompensation);
+                            this.audysseyData.enTargetCurveType, selectedChannel.midrangeCompensation, this.selectedChannelCutoff);
                         const points = selectedChannel.customTargetCurvePoints.map(point => {
                             const frequency = Number.parseFloat(point.substring(1));
                             return Math.abs(frequency - draggedPointX) < 0.01
@@ -215,7 +223,8 @@ export class AppComponent implements OnDestroy {
                         const baseVal = getBaseCurveValue(
                             x,
                             this.audysseyData.enTargetCurveType,
-                            selectedChannel.midrangeCompensation
+                            selectedChannel.midrangeCompensation,
+                            this.selectedChannelCutoff
                         );
 
                         let newOffset = absY - baseVal;
@@ -497,7 +506,8 @@ export class AppComponent implements OnDestroy {
             this.audysseyData.enTargetCurveType,
             selectedChannel.midrangeCompensation,
             customPoints ?? selectedChannel.customTargetCurvePoints,
-            selectedChannel.frequencyRangeRolloff
+            selectedChannel.frequencyRangeRolloff,
+            this.selectedChannelCutoff
         );
         return {
             type: 'spline',

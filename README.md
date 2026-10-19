@@ -124,6 +124,15 @@ npm run ng -- <command>
 - Curve point manipulation
 - Mathematical curve fitting
 
+The displayed target includes an estimated low-frequency rolloff, using the first
+measurement's FFT response to fit the cutoff candidates recovered from Android.
+Left/right speakers share the higher estimate; subwoofers use their own low-end
+reference band. Cutoffs below 40 Hz leave the target unfiltered. The estimate is
+independent of manual crossover settings and is never saved into the ADY file.
+Custom gains use Android's quadratic interpolation in logarithmic frequency.
+The rounded base/MRC anchors and measurement processing remain approximations;
+this does not reproduce Audyssey's native DSP or generate receiver filters.
+
 
 ## 🔧 Development
 
