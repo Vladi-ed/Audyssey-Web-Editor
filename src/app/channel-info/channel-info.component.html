@@ -1,20 +1,29 @@
 @let channel = selectedChannel();
 
 @if (correctionCurveChannel()) {
-    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-        <mat-label>Correction limit (Hz)</mat-label>
-        <input
-            [formField]="settingsForm.frequencyRangeRolloff"
-            [errorStateMatcher]="fieldErrorStateMatcher('frequencyRangeRolloff')"
-            matInput
+    <div class="setting-row">
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>Correction limit (Hz)</mat-label>
+            <input
+                [formField]="settingsForm.frequencyRangeRolloff"
+                [errorStateMatcher]="fieldErrorStateMatcher('frequencyRangeRolloff')"
+                matInput
+                step="any"
+                type="number"
+            >
+            @for (error of settingsForm.frequencyRangeRolloff().errors(); track error.kind) {
+                <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
+            }
+        </mat-form-field>
+        <img
+            ngSrc="assets/info-icon.svg"
+            height="15"
+            width="15"
+            alt="About correction limit"
+            class="info-icon"
             matTooltip="Correction limit from 20 to 20,000 Hz. Use 20,000 Hz for the full range."
-            step="any"
-            type="number"
         >
-        @for (error of settingsForm.frequencyRangeRolloff().errors(); track error.kind) {
-            <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
-        }
-    </mat-form-field>
+    </div>
 }
 
 @if (sharedSubwooferOutputs().length > 1) {
@@ -36,120 +45,175 @@
 }
 
 @if (channel.channelReport.distance > 0) {
-    <p [matTooltip]="(channel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'" class="channel-meta">
-        Measured distance: {{ channel.channelReport.distance | number: '1.2-3' }} m
+    <p class="channel-meta setting-row">
+        <span>
+            Measured distance: <span [matTooltip]="(channel.channelReport.distance * 39.37 | number: '1.2-2') + ' inches'">
+                {{ channel.channelReport.distance | number: '1.2-3' }}&nbsp;m
+            </span>
+        </span>
     </p>
 }
 
-<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-    <mat-label>Distance override (m)</mat-label>
-    <input
-        [formField]="settingsForm.customDistance"
-        [errorStateMatcher]="fieldErrorStateMatcher('customDistance')"
-        matInput
+<div class="setting-row">
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Distance override (m)</mat-label>
+        <input
+            [formField]="settingsForm.customDistance"
+            [errorStateMatcher]="fieldErrorStateMatcher('customDistance')"
+            matInput
+            placeholder="Auto"
+            step="0.01"
+            type="number"
+        >
+        @for (error of settingsForm.customDistance().errors(); track error.kind) {
+            <mat-error>{{ error.message ?? 'Enter a finite distance, or leave empty for Auto.' }}</mat-error>
+        }
+    </mat-form-field>
+    <img
+        ngSrc="assets/info-icon.svg"
+        height="15"
+        width="15"
+        alt="About distance override"
+        class="info-icon"
         matTooltip="Leave empty to use the automatic distance."
-        placeholder="Auto"
-        step="0.01"
-        type="number"
     >
-    @for (error of settingsForm.customDistance().errors(); track error.kind) {
-        <mat-error>{{ error.message ?? 'Enter a finite distance, or leave empty for Auto.' }}</mat-error>
-    }
-</mat-form-field>
-<mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-    <mat-label>Level override (dB)</mat-label>
-    <input
-        [formField]="settingsForm.customLevel"
-        [errorStateMatcher]="fieldErrorStateMatcher('customLevel')"
-        matInput
+</div>
+<div class="setting-row">
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Level override (dB)</mat-label>
+        <input
+            [formField]="settingsForm.customLevel"
+            [errorStateMatcher]="fieldErrorStateMatcher('customLevel')"
+            matInput
+            placeholder="Auto"
+            step="0.5"
+            type="number"
+        >
+        @for (error of settingsForm.customLevel().errors(); track error.kind) {
+            <mat-error>{{ error.message ?? 'Enter a finite level, or leave empty for Auto.' }}</mat-error>
+        }
+    </mat-form-field>
+    <img
+        ngSrc="assets/info-icon.svg"
+        height="15"
+        width="15"
+        alt="About level override"
+        class="info-icon"
         matTooltip="Absolute level from −12 to +12 dB in 0.5 dB steps. Overrides automatic level and trim. Leave empty to use automatic level plus trim."
-        placeholder="Auto"
-        step="0.5"
-        type="number"
     >
-    @for (error of settingsForm.customLevel().errors(); track error.kind) {
-        <mat-error>{{ error.message ?? 'Enter a finite level, or leave empty for Auto.' }}</mat-error>
-    }
-</mat-form-field>
-<mat-form-field
-    appearance="outline"
-    floatLabel="always"
-    subscriptSizing="dynamic"
-    [matTooltip]="trimTooltip()"
->
-    <mat-label>Trim Adjustment (dB)</mat-label>
-    <input
-        (blur)="resetEmptyTrimAdjustment()"
-        [formField]="settingsForm.trimAdjustment"
-        [errorStateMatcher]="fieldErrorStateMatcher('trimAdjustment')"
-        inputmode="decimal"
-        matInput
-        step="any"
-        type="number"
+</div>
+<div class="setting-row">
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+        <mat-label>Trim Adjustment (dB)</mat-label>
+        <input
+            (blur)="resetEmptyTrimAdjustment()"
+            [formField]="settingsForm.trimAdjustment"
+            [errorStateMatcher]="fieldErrorStateMatcher('trimAdjustment')"
+            inputmode="decimal"
+            matInput
+            step="any"
+            type="number"
+        >
+        @for (error of settingsForm.trimAdjustment().errors(); track error.kind) {
+            <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
+        }
+    </mat-form-field>
+    <img
+        ngSrc="assets/info-icon.svg"
+        height="15"
+        width="15"
+        alt="About trim adjustment"
+        class="info-icon"
+        [matTooltip]="trimTooltip()"
     >
-    @for (error of settingsForm.trimAdjustment().errors(); track error.kind) {
-        <mat-error>{{ error.message ?? 'Enter a finite number.' }}</mat-error>
-    }
-</mat-form-field>
+</div>
 
 @if (!isSubwoofer(channel)) {
     <!-- Hide these controls for subwoofers -->
-    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-        <mat-label>Custom Crossover</mat-label>
-        <mat-select
-            (selectionChange)="updateCrossover($event.value)"
-            [formField]="settingsForm.customCrossover"
+    <div class="setting-row">
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>Custom Crossover</mat-label>
+            <mat-select
+                (selectionChange)="updateCrossover($event.value)"
+                [formField]="settingsForm.customCrossover"
+                placeholder="Auto"
+            >
+                @if (unavailableCrossover(); as crossover) {
+                    <mat-option [value]="crossover.value" disabled>{{ crossover.label }}</mat-option>
+                }
+                <mat-option value="">Auto</mat-option>
+                @for (option of crossoverOptions(); track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <img
+            ngSrc="assets/info-icon.svg"
+            height="15"
+            width="15"
+            alt="About custom crossover"
+            class="info-icon"
             matTooltip="Low frequency crossover to a subwoofer"
-            placeholder="Auto"
         >
-            @if (unavailableCrossover(); as crossover) {
-                <mat-option [value]="crossover.value" disabled>{{ crossover.label }}</mat-option>
-            }
-            <mat-option value="">Auto</mat-option>
-            @for (option of crossoverOptions(); track option.value) {
-                <mat-option [value]="option.value">{{ option.label }}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
-        <mat-label>Custom Speaker Type</mat-label>
-        <mat-select
-            (selectionChange)="updateSpeakerType($event.value)"
-            [formField]="settingsForm.customSpeakerType"
+    </div>
+
+    <div class="setting-row">
+        <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic">
+            <mat-label>Custom Speaker Type</mat-label>
+            <mat-select
+                (selectionChange)="updateSpeakerType($event.value)"
+                [formField]="settingsForm.customSpeakerType"
+                placeholder="Auto"
+            >
+                @let speakerType = settingsForm.customSpeakerType().value();
+                @if (speakerType && speakerType !== 'S' && speakerType !== 'L') {
+                    <mat-option [value]="speakerType" disabled>
+                        @switch (speakerType) {
+                            @case ('E') {
+                                Present
+                            }
+                            @case ('N') {
+                                None
+                            }
+                            @case ('Wireless') {
+                                Wireless
+                            }
+                            @case ('WirelessStereo') {
+                                Wireless Stereo
+                            }
+                        }
+                    </mat-option>
+                }
+                <mat-option value="">Auto</mat-option>
+                <mat-option [value]="'S'">Small</mat-option>
+                <mat-option [value]="'L'">Large</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <img
+            ngSrc="assets/info-icon.svg"
+            height="15"
+            width="15"
+            alt="About custom speaker type"
+            class="info-icon"
             matTooltip="Choose 'Large' to disable a subwoofer crossover for this channel. Auto resets both speaker type and crossover to automatic."
-            placeholder="Auto"
         >
-            @let speakerType = settingsForm.customSpeakerType().value();
-            @if (speakerType && speakerType !== 'S' && speakerType !== 'L') {
-                <mat-option [value]="speakerType" disabled>
-                    @switch (speakerType) {
-                        @case ('E') {
-                            Present
-                        }
-                        @case ('N') {
-                            None
-                        }
-                        @case ('Wireless') {
-                            Wireless
-                        }
-                        @case ('WirelessStereo') {
-                            Wireless Stereo
-                        }
-                    }
-                </mat-option>
-            }
-            <mat-option value="">Auto</mat-option>
-            <mat-option [value]="'S'">Small</mat-option>
-            <mat-option [value]="'L'">Large</mat-option>
-        </mat-select>
-    </mat-form-field>
+    </div>
 
     <mat-checkbox [formField]="settingsForm.midrangeCompensation" matTooltip="Applies midrange dip to the correction curve, which can reduce harshness near a speaker's crossover region." style="margin-bottom: -16px">
         Midrange Compensation
     </mat-checkbox>
 }
 
-<mat-checkbox
-    [formField]="settingsForm.isReversePolarity" matTooltip="Polarity reported during measurement. Original App uses this flag when calculating automatic distance; changing it does not directly invert the receiver's audio output.">
-    Reversed polarity
-</mat-checkbox>
+<div class="setting-row">
+    <mat-checkbox [formField]="settingsForm.isReversePolarity">
+        Reversed polarity
+    </mat-checkbox>
+    <img
+        ngSrc="assets/info-icon.svg"
+        height="15"
+        width="15"
+        alt="About reversed polarity"
+        class="info-icon"
+        matTooltip="Polarity reported during measurement. Original App uses this flag when calculating automatic distance; changing it does not directly invert the receiver's audio output."
+    >
+</div>

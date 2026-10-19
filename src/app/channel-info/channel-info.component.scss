@@ -12,13 +12,24 @@
 
 mat-form-field {
     width: 100%;
+
+    :host-context(.dark-theme) & {
+        margin-bottom: 3px;
+    }
+}
+
+.setting-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15px;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-icon {
+    margin-left: 2px;
 }
 
 .channel-meta {
     margin: 0 0 0 16px;
     font-size: 13px;
-}
-
-:host-context(.dark-theme) mat-form-field {
-    margin-bottom: 3px;
 }

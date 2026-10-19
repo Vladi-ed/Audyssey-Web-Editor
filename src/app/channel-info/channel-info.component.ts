@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, computed, effect, input, linkedSignal, output, untracked } from '@angular/core';
 import { disabled, form, FormField, max, min, required, validate } from '@angular/forms/signals';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -16,7 +16,7 @@ import { getReceiverCrossoverOptions } from '../helper-functions/receiver-crosso
 import { decodeCrossover } from '../helper-functions/decode-crossover';
 
 @Component({
-    imports: [DecimalPipe, FormField, MatCheckbox, MatOption, MatError, MatFormField, MatLabel, MatInput, MatRadioButton, MatRadioGroup, MatSelect, MatTooltip],
+    imports: [DecimalPipe, FormField, MatCheckbox, MatOption, MatError, MatFormField, MatLabel, MatInput, MatRadioButton, MatRadioGroup, MatSelect, MatTooltip, NgOptimizedImage],
     selector: 'app-channel-info',
     styleUrl: './channel-info.component.scss',
     templateUrl: './channel-info.component.html',
@@ -125,7 +125,7 @@ export class ChannelInfoComponent {
         if (field.value() === null && !field.invalid()) field.value.set(0);
     }
 
-    updateCrossover(value: CustomCrossover | ''): void {
+    updateCrossover(value: CustomCrossover | '') {
         if (value && !this.crossoverOptions().some(option => option.value === value)) return;
         this.formValue.update(current => ({
             ...current,
@@ -134,12 +134,20 @@ export class ChannelInfoComponent {
         }));
     }
 
-    updateSpeakerType(value: CustomSpeakerType | ''): void {
-        this.formValue.update(current => ({
-            ...current,
-            customSpeakerType: value,
-            customCrossover: value === 'L' ? 'F' : value
-                ? (current.customCrossover && current.customCrossover !== 'F' ? current.customCrossover : '80') : '',
-        }));
+    updateSpeakerType(value: CustomSpeakerType) {
+        this.formValue.update(current => {
+            let customCrossover: any = '';
+            if (value === 'L') customCrossover = 'F';
+            else if (value) {
+                customCrossover = current.customCrossover && current.customCrossover !== 'F'
+                    ? current.customCrossover : '80';
+            }
+
+            return {
+                ...current,
+                customSpeakerType: value,
+                customCrossover,
+            };
+        });
     }
 }
