@@ -544,5 +544,6 @@ export class AppComponent implements OnDestroy {
     onDragDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
+        return this.onUpload(event.dataTransfer?.files ?? null);
     }
 }
