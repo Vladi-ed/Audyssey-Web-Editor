@@ -47,9 +47,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
                     ? new Intl.DisplayNames(["en"], { type: "region" }).of(request.cf.country) ?? request.cf.country
                     : "unknown",
                 city: request.cf?.city || "unknown",
-                ...getClientDevice(request.headers.get("user-agent") || "")
+                ...getClientDevice(request.headers.get("user-agent"), request.headers.get("sec-ch-ua"))
             };
-            await sendToTelegram(data, clientInfo, env);
+            const receiverName = brand === "unknown" ? model : `${brand} ${model}`;
+            await sendToTelegram({ ...data, model: receiverName }, clientInfo, env);
         }
 
         // 4. Return success response
@@ -90,8 +91,7 @@ function formatTelegramMessage(data: any, clientInfo: ClientInfo): string {
     const lines = [
         `<b>📍 Location:</b> ${locationLink}`,
         `<b>🌐 IP:</b> <code>${clientInfo.ip}</code>`,
-        `<b>📱 Device:</b> ${escapeHtml(clientInfo.device)}`,
-        `<b>🌐 Browser:</b> ${escapeHtml(clientInfo.browser)}`
+        `<b>📱 Device:</b> ${escapeHtml(clientInfo.device)} <code>${escapeHtml(clientInfo.browser)}</code>`
     ];
 
     for (const value of Object.values(data)) {
