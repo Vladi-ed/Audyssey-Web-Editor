@@ -129,6 +129,9 @@ measurement's FFT response to fit the cutoff candidates recovered from Android.
 Left/right speakers share the higher estimate; subwoofers use their own low-end
 reference band. Cutoffs below 40 Hz leave the target unfiltered. The estimate is
 independent of manual crossover settings and is never saved into the ADY file.
+When crossover is Auto, the graph shades up to this estimate and labels it
+"Auto crossover". The estimated value is logged to the console without
+receiver-specific rounding. A custom crossover takes precedence.
 Custom gains use Android's quadratic interpolation in logarithmic frequency.
 The rounded base/MRC anchors and measurement processing remain approximations;
 this does not reproduce Audyssey's native DSP or generate receiver filters.

@@ -409,17 +409,20 @@ export class AppComponent implements OnDestroy {
         }
 
         // Add speaker crossover when using a logarithmic scale
+        const customCrossover = selectedChannel.customCrossover;
+        const crossoverFrequency = customCrossover ? decodeCrossover(customCrossover) : this.selectedChannelCutoff;
         if (!this.isSubwoofer(selectedChannel) &&
-            selectedChannel.customCrossover &&
-            selectedChannel.customCrossover !== 'F' &&
-            selectedChannel.customCrossover !== 'U' &&
+            customCrossover !== 'F' &&
+            customCrossover !== 'U' &&
+            crossoverFrequency > 0 &&
             this.chartLogarithmicScale) {
+            if (!customCrossover) console.log(`Auto crossover (${selectedChannelName}): ${crossoverFrequency} Hz`);
             xAxisBands.push({
                 from: XMin,
-                to: decodeCrossover(selectedChannel.customCrossover),
+                to: crossoverFrequency,
                 color: 'rgba(160, 160, 160, 0.1)',
                 label: {
-                    text: 'Crossover',
+                    text: customCrossover ? 'Crossover' : 'Auto crossover',
                     style: { color: '#606060' }
                 }
             });
