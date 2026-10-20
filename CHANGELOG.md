@@ -2,6 +2,8 @@
 
 ## 0.9.6 — 2026-10-20
 
+- Remember the selected light or dark theme across page reloads.
+- Preserve graph theme colors when loading files or examples, switching channels, and updating curves.
 - Add info icons with tooltips to enhance form fields in channel settings
 - Remove trim adjustment logic and simplify channel settings form
 - Added What's new dialog with release highlights. It opens after a version change, remembers dismissal in browser storage, and can be reopened using the header version button.

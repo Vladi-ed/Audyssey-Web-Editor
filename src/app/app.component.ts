@@ -63,12 +63,20 @@ export class AppComponent implements OnDestroy {
     private snackBar = inject(MatSnackBar);
     private cdr = inject(ChangeDetectorRef);
     private document = inject(DOCUMENT);
+    private readonly themeStorageKey = 'ady-editor.theme';
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
     showSupportPrompt = false;
     isSaving = false;
 
     constructor() {
+        try {
+            this.darkThemeEnabled = localStorage.getItem(this.themeStorageKey) === 'dark';
+        } catch {
+            // Keep the default theme when browser storage is unavailable.
+        }
+        this.syncColorScheme();
+
         afterNextRender(() => {
             const timer = setTimeout(() => {
                 let seenVersion: string | null = null;
@@ -121,7 +129,7 @@ export class AppComponent implements OnDestroy {
         }
     }
 
-    chartOptions: Highcharts.Options = { series: seriesOptions };
+    chartOptions: Highcharts.Options = { series: seriesOptions.map(series => ({ ...series })) };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     loadedFileName?: string;
     calculatedChannelsData?: Map<number, number[][]>
@@ -343,6 +351,11 @@ export class AppComponent implements OnDestroy {
     toggleColorScheme() {
         this.darkThemeEnabled = !this.darkThemeEnabled;
         this.syncColorScheme();
+        try {
+            localStorage.setItem(this.themeStorageKey, this.darkThemeEnabled ? 'dark' : 'light');
+        } catch {
+            // Theme switching still works when browser storage is unavailable.
+        }
     }
 
     private syncColorScheme() {
@@ -353,12 +366,7 @@ export class AppComponent implements OnDestroy {
     }
 
     private applyChartTheme() {
-        if (!this.chartObj) return;
-
-        this.chartObj.update(this.darkThemeEnabled ? darkChartTheme : lightChartTheme, false);
-
-        const [measurement, subwoofer, targetCurve, targetHandles] = this.chartObj.series;
-        measurement?.update((this.darkThemeEnabled ? {
+        const seriesThemes = [this.darkThemeEnabled ? {
             color: '#45d7ff',
             lineWidth: 2,
             zones: [],
@@ -372,19 +380,13 @@ export class AppComponent implements OnDestroy {
                 { value: 20, color: '#ff0000' },
                 { color: '#c93737' },
             ],
-        }) as Highcharts.SeriesOptionsType, false);
-        subwoofer?.update({
-            type: 'spline',
+        }, {
             color: this.darkThemeEnabled ? '#ffbd54' : '#000000',
             lineWidth: this.darkThemeEnabled ? 1.5 : 0.8,
-        }, false);
-        targetCurve?.update({
-            type: targetCurve.type === 'line' ? 'line' : 'spline',
+        }, {
             color: this.darkThemeEnabled ? '#fd0000' : '#008000',
             lineWidth: this.darkThemeEnabled ? 2.4 : 2,
-        }, false);
-        targetHandles?.update({
-            type: 'scatter',
+        }, {
             color: this.darkThemeEnabled ? '#9a5cff' : '#008000',
             marker: this.darkThemeEnabled ? {
                 lineWidth: 1.5,
@@ -399,9 +401,15 @@ export class AppComponent implements OnDestroy {
                 radius: 4,
                 symbol: 'circle',
             },
-        }, false);
+        }];
 
-        this.chartObj.redraw();
+        // Keep the saved options themed too, so later data updates retain the colors.
+        this.chartOptions.series = this.chartOptions.series?.map((series, index) => ({
+            ...series,
+            ...seriesThemes[index],
+        })) as Highcharts.SeriesOptionsType[];
+        this.chartObj?.update(this.darkThemeEnabled ? darkChartTheme : lightChartTheme, false);
+        this.chartObj?.update({ series: seriesThemes as Highcharts.SeriesOptionsType[] }, true);
     }
 
     async onUpload(files: FileList | null) {
@@ -451,7 +459,6 @@ export class AppComponent implements OnDestroy {
         const selectedChannelName = this.correctionChannelName(selectedChannel);
 
         this.chartOptions.title = { text: selectedChannelName };
-        this.chartOptions.subtitle = { style: { color: 'white' } };
 
         // Add frequency rolloff only if it's less then 20kHz
         if (selectedChannel.frequencyRangeRolloff && selectedChannel.frequencyRangeRolloff < 20000) {
@@ -497,6 +504,7 @@ export class AppComponent implements OnDestroy {
 
         const measurement = 0;
         this.chartOptions.series![measurement] = {
+            ...this.chartOptions.series![measurement],
             data: [...selectedChannelData],
             type: this.graphSmoothEnabled ? 'spline' : 'line',
             name: selectedChannelName
@@ -504,8 +512,8 @@ export class AppComponent implements OnDestroy {
 
         this.updateSubwooferSeries(selectedChannel);
         const target = this.getTargetCurveData();
-        this.chartOptions.series![2] = { type: target.type, data: target.line };
-        this.chartOptions.series![3] = { type: 'scatter', data: target.handles };
+        this.chartOptions.series![2] = { ...this.chartOptions.series![2], type: target.type, data: target.line };
+        this.chartOptions.series![3] = { ...this.chartOptions.series![3], type: 'scatter', data: target.handles };
         this.chartObj?.update(this.chartOptions, true);
     }
 
@@ -525,6 +533,7 @@ export class AppComponent implements OnDestroy {
         const showOverlay = this.subwooferOverlayEnabled && !this.isSubwoofer(selectedChannel);
 
         this.chartOptions.series![subwoofer] = {
+            ...this.chartOptions.series![subwoofer],
             data: showOverlay ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
             name: 'Subwoofer',
@@ -533,8 +542,8 @@ export class AppComponent implements OnDestroy {
 
     updateTargetCurve() {
         const target = this.getTargetCurveData();
-        this.chartOptions.series![2] = { type: target.type, data: target.line };
-        this.chartOptions.series![3] = { type: 'scatter', data: target.handles };
+        this.chartOptions.series![2] = { ...this.chartOptions.series![2], type: target.type, data: target.line };
+        this.chartOptions.series![3] = { ...this.chartOptions.series![3], type: 'scatter', data: target.handles };
         const targetCurve = this.chartObj?.series[2];
         if (targetCurve && targetCurve.type !== target.type) {
             targetCurve.update({ type: target.type }, false);
