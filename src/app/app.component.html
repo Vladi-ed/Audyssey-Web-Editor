@@ -3,7 +3,13 @@
         <div class="brand-block">
             <div class="title-row">
                 <h1>ADY Web Editor</h1>
-                <small class="version">v{{ appVersion }}</small>
+                <button
+                    class="version"
+                    type="button"
+                    (click)="openWhatsNew()"
+                    matTooltip="What's new"
+                    aria-label="What's new"
+                >v{{ appVersion }}</button>
             </div>
         </div>
 
@@ -163,11 +169,10 @@
 
             @if (audysseyData.targetModelName) {
                 <div class="expansion-panel-first-line" style="margin-bottom: 14px">Device: {{ audysseyData.targetModelName }}</div>
+                <div class="expansion-panel-first-line">
+                    System: {{ audysseyData.enMultEQType | decodeEqType }}
+                </div>
             }
-
-            <div class="expansion-panel-first-line">
-                System: {{ audysseyData.enMultEQType | decodeEqType }}
-            </div>
 
             <mat-form-field appearance="outline">
                 <mat-label>Profile name</mat-label>

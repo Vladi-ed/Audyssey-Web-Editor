@@ -18,9 +18,27 @@ highcharts-chart {
 }
 
 .version {
-    color: #666;
+    color: light-dark(#666, #9baac1);
     font-size: 10px;
     font-weight: normal;
+    font-family: inherit;
+    border: 0;
+    padding: 4px;
+    background: transparent;
+    cursor: pointer;
+    //text-decoration: underline;
+    //text-underline-offset: 3px;
+}
+
+.version:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.version:hover {
+    color: light-dark(#334bb0, #45d7ff);
+    background: light-dark(#edf0fa, #16334e);
+    border-radius: 3px;
 }
 
 .header {

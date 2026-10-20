@@ -1,6 +1,6 @@
 # Rules
 
-Typescript should be simple and human-readable.
+Typescript should be simple and human-readable. No unit-tests required.
 
 # HTML templates
 

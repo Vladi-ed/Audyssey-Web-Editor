@@ -178,6 +178,30 @@ Handles target curve data manipulation with custom pipes for audio processing.
 - **Crossover Processing** - Speaker crossover analysis
 - **Background Calculator** - Web Worker for intensive computations
 
+### Release notes
+
+The version button in the header opens the **What's new** dialog. `MatDialog`
+is injected normally; its content component and release data load together
+through one dynamic import.
+After a version change, it waits 1.5 seconds after the first render before loading
+and opening automatically, showing highlights newer
+than the last acknowledged version. Dismissing it saves the current version in
+`localStorage` under `ady-editor.whats-new.seen-version`. When browser storage is
+unavailable, the dialog remains usable but may appear again on the next visit.
+
+For each release:
+
+1. Update `version` in `package.json` (and the lockfile through npm).
+2. Add significant user-facing highlights to
+   `src/app/whats-new/release-highlights.ts`, newest version first, with an ISO
+   date (`YYYY-MM-DD`) matching the version commit. Versions with
+   only maintenance changes can be omitted from the highlights.
+3. Update `CHANGELOG.md` with detailed changes, using Git commit messages as
+   the source. Move any Unreleased entries into the appropriate version section.
+4. Run `npm run build`.
+   Check automatic opening, dismissal, and reopening through the version button
+   at `http://localhost:4200`.
+
 ### Build Configuration
 
 The project uses Angular's modern build system with:
@@ -216,4 +240,3 @@ Audyssey and MultEQ are trademarks of Audyssey Laboratories, Inc.
 ## 👨‍💻 Author
 
 **Vladi Ed** - Audio engineering and web development
-

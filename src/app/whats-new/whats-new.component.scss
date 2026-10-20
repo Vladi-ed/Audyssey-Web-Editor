@@ -1,0 +1,163 @@
+@use '@angular/material' as mat;
+
+:host {
+    --release-text: light-dark(#172431, #f1f5fb);
+    --release-muted: light-dark(#485b6a, #b4c5d7);
+    --release-accent: light-dark(#334bb0, #45d7ff);
+    --release-line: light-dark(#dce3eb, #33485f);
+    @include mat.dialog-overrides((
+        supporting-text-color: var(--release-text),
+    ));
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    overflow: hidden;
+    color: var(--release-text);
+    font-family: inherit;
+}
+
+.release-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 24px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--release-line);
+}
+
+.release-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.6px;
+    text-wrap: balance;
+}
+
+// The title receives initial focus for screen readers, but is not a control.
+.release-header h2:focus {
+    outline: none;
+}
+
+.release-header p {
+    margin: 0 0 0 auto;
+    text-align: right;
+    color: var(--release-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.release-history {
+    min-height: 0;
+    max-height: none;
+    padding: 0 24px;
+    overscroll-behavior: contain;
+    scrollbar-color: light-dark(#9aabba, #526a84) transparent;
+    scrollbar-width: thin;
+}
+
+.release-history:focus-visible {
+    outline: 2px solid var(--release-accent);
+    outline-offset: -4px;
+}
+
+.release {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 18px;
+    padding: 14px 0;
+}
+
+.release + .release {
+    border-top: 1px solid var(--release-line);
+}
+
+.release-version {
+    border-right: 2px solid var(--release-line);
+    padding-right: 12px;
+}
+
+.release-version time {
+    display: block;
+    margin-top: 2px;
+    color: var(--release-muted);
+    font-size: 12px;
+    //line-height: 1.5;
+}
+
+.release h3 {
+    margin: 0;
+    color: var(--release-muted);
+    font-size: 20px;
+    font-weight: 650;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+}
+
+.version-prefix {
+    font-size: 14px;
+    //font-weight: 400;
+    margin-right: 2px;
+}
+
+.current-release .release-version {
+    //border-color: var(--release-accent);
+}
+
+.current-release h3 {
+    color: var(--release-accent);
+}
+
+.current-label {
+    display: block;
+    margin-top: 4px;
+    //color: var(--release-accent);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.release ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.release li + li {
+    margin-top: 6px;
+}
+
+.release li::marker {
+    color: var(--release-muted);
+    font-size: 10px;
+}
+
+.release-footer {
+    flex-shrink: 0;
+    padding: 12px 24px;
+    border-top: 1px solid var(--release-line);
+}
+
+.flat-btn {
+    font: inherit;
+}
+
+.flat-btn:focus-visible {
+    outline: 2px solid var(--release-accent);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flat-btn {
+        transition: none;
+    }
+
+    .flat-btn:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,29 @@
+<header class="release-header">
+    <h2 id="whats-new-title">What’s new</h2>
+</header>
+<mat-dialog-content
+    class="release-history"
+    tabindex="0"
+    role="region"
+    aria-label="Release history"
+>
+    @for (release of releases; track release.version) {
+        <section class="release" [class.current-release]="release.version === appVersion">
+            <div class="release-version">
+                <h3><span class="version-prefix">v</span>{{ release.version }}</h3>
+                <time [attr.datetime]="release.date">{{ release.displayDate }}</time>
+                @if (release.version === appVersion) {
+                    <span class="current-label">Latest release</span>
+                }
+            </div>
+            <ul>
+                @for (highlight of release.highlights; track highlight) {
+                    <li>{{ highlight }}</li>
+                }
+            </ul>
+        </section>
+    }
+</mat-dialog-content>
+<mat-dialog-actions class="release-footer" align="end">
+    <button class="flat-btn" mat-dialog-close type="button">OK</button>
+</mat-dialog-actions>

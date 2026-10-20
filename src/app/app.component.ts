@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, inject, OnDestroy, viewChild } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, computed, DestroyRef, inject, OnDestroy, viewChild } from '@angular/core';
 import { AudysseyInterface } from './interfaces/audyssey-interface';
 import { DetectedChannel } from './interfaces/detected-channel';
 import { decodeChannelName } from './helper-functions/decode-channel-name';
@@ -27,6 +27,7 @@ import { DOCUMENT } from '@angular/common';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
 import { ExportSupportComponent } from './export-support/export-support.component';
@@ -50,6 +51,10 @@ import {
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
+    private dialog = inject(MatDialog);
+    private destroyRef = inject(DestroyRef);
+    private whatsNewOpen = false;
+    private readonly whatsNewStorageKey = 'ady-editor.whats-new.seen-version';
     private channelInfo = viewChild(ChannelInfoComponent);
     private targetCurvePoints = viewChild(TargetCurvePointsComponent);
     hasInvalidEdits = computed(() => !!this.channelInfo()?.hasInvalidEdits()
@@ -62,6 +67,59 @@ export class AppComponent implements OnDestroy {
     subwooferOverlayEnabled = false;
     showSupportPrompt = false;
     isSaving = false;
+
+    constructor() {
+        afterNextRender(() => {
+            const timer = setTimeout(() => {
+                let seenVersion: string | null = null;
+                try {
+                    seenVersion = localStorage.getItem(this.whatsNewStorageKey);
+                } catch {
+                    // The dialog still works when browser storage is unavailable.
+                }
+                if (seenVersion !== this.appVersion) void this.openWhatsNew(seenVersion);
+            }, 1500);
+            this.destroyRef.onDestroy(() => clearTimeout(timer));
+        });
+    }
+
+    async openWhatsNew(seenVersion: string | null = null) {
+        if (this.whatsNewOpen) return;
+        this.whatsNewOpen = true;
+        try {
+            const { WhatsNewComponent, getReleaseHighlights } = await import('./whats-new/whats-new.component');
+            if (this.destroyRef.destroyed) return;
+            if (getReleaseHighlights(this.appVersion, seenVersion).length === 0) {
+                this.acknowledgeWhatsNew();
+                return;
+            }
+            const dialog = this.dialog.open(WhatsNewComponent, {
+                width: '740px',
+                maxWidth: 'calc(100vw - 48px)',
+                maxHeight: '80vh',
+                panelClass: 'whats-new-panel',
+                ariaLabelledBy: 'whats-new-title',
+                autoFocus: 'first-heading',
+                data: { seenVersion },
+            });
+            dialog.afterClosed().subscribe(() => {
+                this.acknowledgeWhatsNew();
+            });
+        } catch (error) {
+            this.whatsNewOpen = false;
+            console.warn('Could not load release highlights.', error);
+            this.snackBar.open('Could not load what’s new. Please try again.', 'Dismiss', { duration: 5000 });
+        }
+    }
+
+    private acknowledgeWhatsNew() {
+        this.whatsNewOpen = false;
+        try {
+            localStorage.setItem(this.whatsNewStorageKey, this.appVersion);
+        } catch {
+            // Storage restrictions should not prevent dismissing the dialog.
+        }
+    }
 
     chartOptions: Highcharts.Options = { series: seriesOptions };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
@@ -322,7 +380,7 @@ export class AppComponent implements OnDestroy {
         }, false);
         targetCurve?.update({
             type: targetCurve.type === 'line' ? 'line' : 'spline',
-            color: this.darkThemeEnabled ? '#9a5cff' : '#008000',
+            color: this.darkThemeEnabled ? '#fd0000' : '#008000',
             lineWidth: this.darkThemeEnabled ? 2.4 : 2,
         }, false);
         targetHandles?.update({
