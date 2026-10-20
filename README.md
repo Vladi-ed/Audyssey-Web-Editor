@@ -5,12 +5,11 @@ ADY Web Editor is an independent, open-source web application for inspecting, ed
 ## 🎯 Overview
 
 
-ADY Web Editor is a specialized audio engineering tool built with Angular and Highcharts that enables users to:
+ADY Web Editor allows users:
 
 - **Edit MultEQ \*.ady files** - Modify Audyssey room correction calibration files
 - **Analyze speaker frequency response** - Visualize and understand audio equipment performance
 - **Adjust target curves** - Fine-tune audio calibration parameters
-- **Process audio data** - Advanced FFT processing and mathematical calculations
 - **Export configurations** - Save modified calibration settings
 
 ## 🚀 Live Version
@@ -43,10 +42,6 @@ src/
 │   ├── channel-selector/          # Audio channel selection component
 │   ├── target-curve-points/       # Target curve management with custom pipes
 │   ├── helper-functions/          # Audio processing utilities
-│   │   ├── afr-processing.ts      # Audio Frequency Response functions
-│   │   ├── audyssey-interface.ts  # Audyssey file format handling
-│   │   ├── crossover-processing.ts # Audio crossover calculations
-│   │   └── bg-calculator.worker.ts # Web Worker for background processing
 │   ├── interfaces/                # TypeScript type definitions
 │   └── app.component.*            # Main application component
 ├── assets/
@@ -132,7 +127,7 @@ independent of manual crossover settings and is never saved into the ADY file.
 When crossover is Auto, the graph shades up to this estimate and labels it
 "Auto crossover". The estimated value is logged to the console without
 receiver-specific rounding. A custom crossover takes precedence.
-Custom gains use Android's quadratic interpolation in logarithmic frequency.
+Custom gains use quadratic interpolation in logarithmic frequency.
 The rounded base/MRC anchors and measurement processing remain approximations;
 this does not reproduce Audyssey's native DSP or generate receiver filters.
 
@@ -183,11 +178,6 @@ Handles target curve data manipulation with custom pipes for audio processing.
 The version button in the header opens the **What's new** dialog. `MatDialog`
 is injected normally; its content component and release data load together
 through one dynamic import.
-After a version change, it waits 1.5 seconds after the first render before loading
-and opening automatically, showing highlights newer
-than the last acknowledged version. Dismissing it saves the current version in
-`localStorage` under `ady-editor.whats-new.seen-version`. When browser storage is
-unavailable, the dialog remains usable but may appear again on the next visit.
 
 For each release:
 
@@ -201,14 +191,6 @@ For each release:
 4. Run `npm run build`.
    Check automatic opening, dismissal, and reopening through the version button
    at `http://localhost:4200`.
-
-### Build Configuration
-
-The project uses Angular's modern build system with:
-- **ESBuild** - Fast JavaScript bundling
-- **TypeScript compilation** - Type checking and transpilation
-- **SCSS processing** - Styling with Sass
-- **Asset optimization** - Image and resource optimization
 
 ## 📊 Data Visualization
 
@@ -239,4 +221,4 @@ Audyssey and MultEQ are trademarks of Audyssey Laboratories, Inc.
 
 ## 👨‍💻 Author
 
-**Vladi Ed** - Audio engineering and web development
+**Vladi Ed** - Audio engineer and web developer
