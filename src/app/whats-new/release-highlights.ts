@@ -1,7 +1,10 @@
+export type HighlightIcon = 'info' | 'settings' | 'history' | 'upload' | 'curve' | 'check';
+
 export interface ReleaseHighlights {
     version: string;
     date: string;
     highlights: string[];
+    icons?: HighlightIcon[];
 }
 
 // Newest first. Dates match the version commits recorded in CHANGELOG.md.
@@ -9,18 +12,19 @@ export const releaseHighlights: ReleaseHighlights[] = [
     {
         version: '0.9.6',
         date: '2026-10-20',
+        icons: ['settings', 'info'],
         highlights: [
-            'Add info icons with tooltips in channel settings',
-            'Remove trim adjustment logic and simplify channel settings form',
-            'New release highlights appear after startup. Click the version number to open it anytime.',
+            'Simplified channel settings form',
+            'Click the version number to open release highlights anytime',
         ],
     },
     {
         version: '0.9.5',
         date: '2026-10-19',
+        icons: ['upload', 'curve', 'info'],
         highlights: [
             'Drag an ADY file onto the editor to open it.',
-            'Target curves now include an estimated speaker bass rolloff. Auto crossover is shown on the graph when no custom crossover is set.',
+            'Target curves now include Auto speaker bass rolloff',
             'Channel settings include help tooltips, and the obsolete trim adjustment has been removed.',
         ],
     },

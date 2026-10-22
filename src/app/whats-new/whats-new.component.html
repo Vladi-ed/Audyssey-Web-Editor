@@ -1,29 +1,49 @@
-<header class="release-header">
+<header class="release-header" [class.announcement-header]="isAnnouncement">
     <h2 id="whats-new-title">What’s new</h2>
+    @if (isAnnouncement && releases[0]; as release) {
+        <p class="announcement-meta">
+            <span>Version {{ release.version }}</span>
+            <time [attr.datetime]="release.date">{{ release.displayDate }}</time>
+        </p>
+    }
 </header>
 <mat-dialog-content
     class="release-history"
+    [class.announcement-content]="isAnnouncement"
     tabindex="0"
     role="region"
-    aria-label="Release history"
+    [attr.aria-label]="isAnnouncement ? 'Release highlights' : 'Release history'"
 >
-    @for (release of releases; track release.version) {
-        <section class="release" [class.current-release]="release.version === appVersion">
-            <div class="release-version">
-                <h3><span class="version-prefix">v</span>{{ release.version }}</h3>
-                <time [attr.datetime]="release.date">{{ release.displayDate }}</time>
-                @if (release.version === appVersion) {
-                    <span class="current-label">Latest release</span>
-                }
-            </div>
-            <ul>
-                @for (highlight of release.highlights; track highlight) {
-                    <li>{{ highlight }}</li>
-                }
-            </ul>
-        </section>
+    @if (isAnnouncement) {
+        <ul class="announcement-list">
+            @for (highlight of announcementHighlights; track highlight.text) {
+                <li>
+                    <svg aria-hidden="true" viewBox="0 0 24 24">
+                        <path [attr.d]="highlight.iconPath"/>
+                    </svg>
+                    <p>{{ highlight.text }}</p>
+                </li>
+            }
+        </ul>
+    } @else {
+        @for (release of releases; track release.version) {
+            <section class="release" [class.current-release]="release.version === appVersion">
+                <div class="release-version">
+                    <h3><span class="version-prefix">v</span>{{ release.version }}</h3>
+                    <time [attr.datetime]="release.date">{{ release.displayDate }}</time>
+                    @if (release.version === appVersion) {
+                        <span class="current-label">Latest release</span>
+                    }
+                </div>
+                <ul>
+                    @for (highlight of release.highlights; track highlight) {
+                        <li>{{ highlight }}</li>
+                    }
+                </ul>
+            </section>
+        }
     }
 </mat-dialog-content>
-<mat-dialog-actions class="release-footer" align="end">
-    <button class="flat-btn" mat-dialog-close type="button">OK</button>
+<mat-dialog-actions class="release-footer" align="center">
+    <button class="flat-btn continue-button" mat-dialog-close type="button">Continue</button>
 </mat-dialog-actions>

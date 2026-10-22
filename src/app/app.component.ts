@@ -87,13 +87,13 @@ export class AppComponent implements OnDestroy {
                 } catch {
                     // The dialog still works when browser storage is unavailable.
                 }
-                if (seenVersion !== this.appVersion) void this.openWhatsNew(seenVersion);
+                if (seenVersion !== this.appVersion) void this.openWhatsNew(seenVersion, true);
             }, 1500);
             this.destroyRef.onDestroy(() => clearTimeout(timer));
         });
     }
 
-    async openWhatsNew(seenVersion: string | null = null) {
+    async openWhatsNew(seenVersion: string | null = null, announcement = false) {
         if (this.whatsNewOpen) return;
         this.whatsNewOpen = true;
         try {
@@ -104,13 +104,13 @@ export class AppComponent implements OnDestroy {
                 return;
             }
             const dialog = this.dialog.open(WhatsNewComponent, {
-                width: '740px',
+                width: '620px',
                 maxWidth: 'calc(100vw - 48px)',
                 maxHeight: '80vh',
                 panelClass: 'whats-new-panel',
                 ariaLabelledBy: 'whats-new-title',
                 autoFocus: 'first-heading',
-                data: { seenVersion },
+                data: { seenVersion, announcement },
             });
             dialog.afterClosed().subscribe(() => {
                 this.acknowledgeWhatsNew();

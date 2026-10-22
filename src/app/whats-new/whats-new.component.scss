@@ -152,6 +152,80 @@
     outline-offset: 3px;
 }
 
+.announcement-header {
+    display: block;
+    padding: 28px 28px 18px;
+    border-bottom: 0;
+    text-align: center;
+}
+
+.announcement-header .announcement-meta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.announcement-content {
+    padding: 0 28px;
+}
+
+.announcement-list {
+    display: grid;
+    gap: 20px;
+    margin: 4px 0 24px;
+    padding: 0;
+    list-style: none;
+}
+
+.announcement-list li {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+}
+
+.announcement-list svg {
+    width: 26px;
+    height: 26px;
+    margin-top: 2px;
+    fill: none;
+    stroke: var(--release-accent);
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.announcement-list p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.flat-btn.continue-button {
+    min-width: 176px;
+    height: 48px;
+    padding: 0 28px;
+    color: light-dark(#fff, #071827);
+    border: 1px solid var(--release-accent);
+    border-radius: 8px;
+    background: var(--release-accent);
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.flat-btn.continue-button:hover {
+    color: light-dark(#fff, #071827);
+    background: light-dark(#263b91, #7be4ff);
+    border-color: light-dark(#263b91, #7be4ff);
+    box-shadow: none;
+    transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .flat-btn {
         transition: none;
