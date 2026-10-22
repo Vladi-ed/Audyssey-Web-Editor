@@ -24,6 +24,7 @@ import { ChannelSelectorComponent } from './channel-selector/channel-selector.co
 import { ChannelInfoComponent } from './channel-info/channel-info.component';
 import { TargetCurvePointsComponent } from './target-curve-points/target-curve-points.component';
 import { DOCUMENT } from '@angular/common';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { DecodeEqTypePipe } from './helper-functions/decode-eq-type.pipe';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -51,6 +52,7 @@ import {
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
+    readonly basicInfoExpanded = !inject(BreakpointObserver).isMatched('(max-width: 680px)');
     private dialog = inject(MatDialog);
     private destroyRef = inject(DestroyRef);
     private whatsNewOpen = false;

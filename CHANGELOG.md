@@ -8,6 +8,7 @@
 - Remove trim adjustment logic and simplify channel settings form
 - Added What's new dialog with release highlights. It opens after a version change, remembers dismissal in browser storage, and can be reopened using the header version button.
 - Added this detailed historical changelog and documented how to maintain release notes.
+- Updated mobile and tablet layouts for better usability.
 
 ## 0.9.5 — 2026-10-19
 

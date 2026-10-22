@@ -132,6 +132,7 @@
             <button
                 (click)="exportFile()"
                 [disabled]="isLoading || isSaving || !audysseyData.detectedChannels.length || hasInvalidEdits()"
+                [class.mobile-hidden]="!audysseyData.detectedChannels.length"
                 class="flat-btn"
                 matRipple
                 matTooltip="Save to a new .ady file"
@@ -160,7 +161,7 @@
 
 <main [attr.aria-busy]="isLoading" [attr.inert]="isLoading ? '' : null">
     <mat-accordion class="info-panels">
-        <mat-expansion-panel expanded>
+        <mat-expansion-panel [expanded]="basicInfoExpanded">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     Basic info

@@ -345,6 +345,12 @@ body.dark-theme {
     }
 }
 
+@media (max-width: 680px) {
+    body {
+        margin: 0 0 40px;
+    }
+}
+
 @media (max-width: 500px) {
     .flat-btn {
         font-size: 14px;
