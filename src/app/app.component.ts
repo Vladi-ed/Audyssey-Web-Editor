@@ -423,7 +423,11 @@ export class AppComponent implements OnDestroy {
         fetch('/stats.api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: data.targetModelName, channels: data.detectedChannels.map(channel => channel.commandId) })
+            body: JSON.stringify({
+                model: data.targetModelName,
+                channels: data.detectedChannels.map(channel => channel.commandId),
+                screenSize: `${window.screen.width} × ${window.screen.height}`
+            })
         }).catch(console.error);
     }
 

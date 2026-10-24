@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
         }
 
         // 2. Parse and validate the JSON
-        const data: {model: string, channels?: string[]} = await request.json();
+        const data: {model: string, channels?: string[], screenSize?: string} = await request.json();
 
         if (!data || typeof data !== "object" || Array.isArray(data) || Object.keys(data).length === 0) {
             return new Response("Error: JSON body is empty or invalid", { status: 400 });
@@ -94,7 +94,12 @@ function formatTelegramMessage(data: any, clientInfo: ClientInfo): string {
         `🖥️ ${escapeHtml(clientInfo.device)} - ${escapeHtml(clientInfo.browser)}`
     ];
 
-    for (const value of Object.values(data)) {
+    const { screenSize, ...stats } = data;
+    if (typeof screenSize === "string" && screenSize) {
+        lines.push(`📐 Screen: ${escapeHtml(screenSize)} CSS px`);
+    }
+
+    for (const value of Object.values(stats)) {
         let displayValue: string;
         if (Array.isArray(value)) {
             displayValue = value
