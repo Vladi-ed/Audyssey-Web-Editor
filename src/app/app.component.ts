@@ -232,22 +232,6 @@ export class AppComponent implements OnDestroy {
     }
 
 
-    // Updates context menu items for the chart based on the option's current state
-    updateChartMenuItems() {
-        this.chartObj?.update({
-            exporting: {
-                menuItemDefinitions: {
-                    xScaleBtn: {
-                        text: `Switch to ${this.chartLogarithmicScale ? 'Linear' : 'Logarithmic'} Scale`
-                    },
-                    graphSmoothingBtn: {
-                        text: `${this.graphSmoothEnabled ? '✔️' : ''} Graph Smoothing`
-                    },
-                }
-            }
-        });
-    }
-
     chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
         // Hide before Highcharts handles movement so its showDelay restarts.
         // const hideTooltip = () => chart.tooltip?.hide(0);
@@ -337,12 +321,10 @@ export class AppComponent implements OnDestroy {
                 this.chartLogarithmicScale = !this.chartLogarithmicScale;
                 this.updateChart();
                 chart.update({ xAxis: { type: this.chartLogarithmicScale ? 'logarithmic' : 'linear' } });
-                this.updateChartMenuItems(); // updateChart() doesn't update menus
             }
             graphSmoothingBtn.onclick = () => {
                 this.graphSmoothEnabled = !this.graphSmoothEnabled;
                 chart.series[0].update({ type: this.graphSmoothEnabled ? 'spline' : 'line' });
-                this.updateChartMenuItems();
             }
         }
         this.chartObj = chart;

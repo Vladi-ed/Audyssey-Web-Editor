@@ -52,8 +52,8 @@ export const initOptions: Options = {
       //   },
       //   text: 'Play'
       // },
-      xScaleBtn: { text: 'Switch to Linear scale' },
-      graphSmoothingBtn: { text: 'Graph Smoothing' }
+      xScaleBtn: { text: 'Toggle linear/logarithmic scale' },
+      graphSmoothingBtn: { text: 'Toggle graph smoothing' }
     },
     buttons: {
       contextButton: {
