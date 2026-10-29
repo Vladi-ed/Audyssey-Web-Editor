@@ -38,9 +38,9 @@ export const initOptions: Options = {
   },
   // boost: {
   //   // allowForce: true,
-  //   pixelRatio: 1, // 2 makes that graph sharper but line width become 0.5
-  //   seriesThreshold: 1,
-  //   useGPUTranslations: true
+  //   // pixelRatio: 1, // 2 makes that graph sharper but line width become 0.5
+  //   // seriesThreshold: 1,
+  //   // useGPUTranslations: true
   // },
   exporting: {
     sourceWidth: 1920,
@@ -71,8 +71,7 @@ export const initOptions: Options = {
           fontFamily: 'Roboto, Arial, sans-serif',
           fontSize: '22px'
         }
-      },
-      credits: { enabled: false }
+      }
     }
   },
   // sonification: {
@@ -144,7 +143,6 @@ export const initOptions: Options = {
     crosshair: true,
   },
   legend: { enabled: false },
-  credits: { enabled: false }
 }
 
 export const lightChartTheme: Options = {
