@@ -31,6 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
+import type { ChannelGraphData } from './helper-functions/calculate-points';
 import { ExportSupportComponent } from './export-support/export-support.component';
 import {
     getCorrectionChannels,
@@ -68,6 +69,7 @@ export class AppComponent implements OnDestroy {
     private readonly themeStorageKey = 'ady-editor.theme';
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
+    averageMeasurementsEnabled = false;
     showSupportPrompt = false;
     isSaving = false;
 
@@ -134,7 +136,7 @@ export class AppComponent implements OnDestroy {
     chartOptions: Highcharts.Options = { series: seriesOptions.map(series => ({ ...series })) };
     audysseyData: AudysseyInterface = { detectedChannels: [] };
     loadedFileName?: string;
-    calculatedChannelsData?: Map<number, number[][]>
+    calculatedChannelsData?: Map<number, ChannelGraphData>;
     private targetCurveCutoffs = new Map<number, number>();
     selectedChannelRaw?: DetectedChannel;
     private chartLogarithmicScale = true;
@@ -156,12 +158,16 @@ export class AppComponent implements OnDestroy {
             this.calculatedChannelsData = undefined;
             this.targetCurveCutoffs.clear();
             this.subwooferOverlayEnabled = false;
+            this.averageMeasurementsEnabled = false;
             this.updateChart();
             this.chartObj?.zoomOut();
         },
         processed: measurements => {
             this.calculatedChannelsData = measurements;
-            this.targetCurveCutoffs = estimateTargetCutoffs(this.correctionChannels, measurements);
+            const firstMeasurements = new Map(
+                Array.from(measurements, ([channelType, data]) => [channelType, data.first])
+            );
+            this.targetCurveCutoffs = estimateTargetCutoffs(this.correctionChannels, firstMeasurements);
             this.selectedChannelRaw = this.selectionToRestore
                 .map(id => this.audysseyData.detectedChannels.find(channel => channel.enChannelType === id))
                 .find(channel => channel !== undefined) ?? this.correctionChannels[0];
@@ -187,6 +193,32 @@ export class AppComponent implements OnDestroy {
 
     private get selectedChannelCutoff(): number {
         return this.targetCurveCutoffs.get(this.selectedChannel?.enChannelType ?? -1) ?? 0;
+    }
+
+    get selectedChannelMeasurementCount(): number {
+        const selectedChannel = this.selectedChannel;
+        if (!selectedChannel) return 0;
+        return this.calculatedChannelsData?.get(selectedChannel.enChannelType)?.measurementCount ?? 0;
+    }
+
+    get canAverageSelectedChannel(): boolean {
+        return this.selectedChannelMeasurementCount > 1;
+    }
+
+    get showAveragedChannel(): boolean {
+        return this.averageMeasurementsEnabled && this.canAverageSelectedChannel;
+    }
+
+    get averageMeasurementsLabel(): string {
+        const count = this.selectedChannelMeasurementCount;
+        return count > 0 ? `Show average (${count})` : 'Show average';
+    }
+
+    get averageMeasurementsTooltip(): string {
+        const count = this.selectedChannelMeasurementCount;
+        if (count === 0) return 'No measurements available for this channel';
+        if (count === 1) return 'Only 1 measurement available for this channel';
+        return `Show RMS average of all ${count} measurements`;
     }
 
     get correctionChannels(): DetectedChannel[] {
@@ -228,6 +260,12 @@ export class AppComponent implements OnDestroy {
         if (this.isLoading) return;
         if (!this.sharedSubwooferOutputs.includes(channel)) return;
         this.selectedChannelRaw = channel;
+        this.updateChart();
+    }
+
+    toggleAverageMeasurements(checked: boolean) {
+        if (!this.selectedChannel) return;
+        this.averageMeasurementsEnabled = checked;
         this.updateChart();
     }
 
@@ -488,14 +526,16 @@ export class AppComponent implements OnDestroy {
             plotBands: xAxisBands
         };
 
-        const selectedChannelData = this.calculatedChannelsData?.get(selectedChannel.enChannelType) ?? [];
+        const channelGraphData = this.calculatedChannelsData?.get(selectedChannel.enChannelType);
+        const showAverage = this.showAveragedChannel;
+        const selectedChannelData = (showAverage ? channelGraphData?.average : channelGraphData?.first) ?? [];
 
         const measurement = 0;
         this.chartOptions.series![measurement] = {
             ...this.chartOptions.series![measurement],
             data: [...selectedChannelData],
             type: this.graphSmoothEnabled ? 'spline' : 'line',
-            name: selectedChannelName
+            name: showAverage ? `${selectedChannelName} (avg)` : selectedChannelName,
         };
 
         this.updateSubwooferSeries(selectedChannel);
@@ -516,7 +556,9 @@ export class AppComponent implements OnDestroy {
 
     private updateSubwooferSeries(selectedChannel: DetectedChannel) {
         const subCutOff = Number.parseInt('200 Hz') / 3;
-        const subDataPoints = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
+        const subGraphData = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
+        const useSubAverage = this.showAveragedChannel && (subGraphData?.measurementCount ?? 0) > 1;
+        const subDataPoints = useSubAverage ? subGraphData?.average : subGraphData?.first;
         const subwoofer = 1; // series number
         const showOverlay = this.subwooferOverlayEnabled && !this.isSubwoofer(selectedChannel);
 
@@ -524,7 +566,7 @@ export class AppComponent implements OnDestroy {
             ...this.chartOptions.series![subwoofer],
             data: showOverlay ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
-            name: 'Subwoofer',
+            name: useSubAverage ? 'Subwoofer (avg)' : 'Subwoofer',
         };
     }
 

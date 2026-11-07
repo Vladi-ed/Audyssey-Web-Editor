@@ -221,11 +221,25 @@
                 />
             }
 
-            @if (selectedChannelRaw && !isSubwoofer(selectedChannelRaw)) {
-                <mat-checkbox (change)="addSubwooferToTheGraph($event.checked)" [checked]="subwooferOverlayEnabled" matTooltip="Add subwoofer overlay to the graph">
-                    Add subwoofer
-                </mat-checkbox>
-            }
+            <div class="channel-options">
+                @if (selectedChannel) {
+                    <mat-checkbox
+                        (change)="toggleAverageMeasurements($event.checked)"
+                        [checked]="showAveragedChannel"
+                        [disabled]="!canAverageSelectedChannel"
+                        [matTooltip]="averageMeasurementsTooltip"
+                        disabledInteractive
+                    >
+                        {{ averageMeasurementsLabel }}
+                    </mat-checkbox>
+                }
+
+                @if (selectedChannelRaw && !isSubwoofer(selectedChannelRaw)) {
+                    <mat-checkbox (change)="addSubwooferToTheGraph($event.checked)" [checked]="subwooferOverlayEnabled" matTooltip="Add subwoofer overlay to the graph">
+                        Add subwoofer
+                    </mat-checkbox>
+                }
+            </div>
 
         </mat-expansion-panel>
 

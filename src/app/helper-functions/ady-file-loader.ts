@@ -1,10 +1,11 @@
 import type { AudysseyInterface } from '../interfaces/audyssey-interface';
+import type { ChannelGraphData } from './calculate-points';
 import { validateAdy } from './validate-ady';
 import { normalizeAdyChannels } from './normalize-ady-channels';
 
 interface AdyLoadHandlers {
     accepted: (data: AudysseyInterface, filename?: string) => void;
-    processed: (measurements: Map<number, number[][]>) => void;
+    processed: (measurements: Map<number, ChannelGraphData>) => void;
     loadingChanged: () => void;
     error: (message: string, cause?: unknown) => void;
 }
@@ -78,7 +79,7 @@ export class AdyFileLoader {
         try {
             const worker = new Worker(new URL('./bg-calculator.worker', import.meta.url));
             this.activeWorker = worker;
-            worker.onmessage = ({ data }: MessageEvent<Map<number, number[][]>>) => {
+            worker.onmessage = ({ data }: MessageEvent<Map<number, ChannelGraphData>>) => {
                 worker.terminate();
                 if (this.activeWorker !== worker) return;
                 this.activeWorker = undefined;
