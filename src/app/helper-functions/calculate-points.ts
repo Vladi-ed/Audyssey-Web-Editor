@@ -2,9 +2,11 @@ import FFT from 'fft.js';
 import { LinSpacedFracOctaveSmooth } from './afr-line-smoothing';
 import type { ResponseData } from '../interfaces/detected-channel';
 
+export type AverageAlgorithm = 'rms' | 'db' | 'linear';
+
 export interface ChannelGraphData {
     first: number[][];
-    average: number[][];
+    average: Record<AverageAlgorithm, number[][]>;
     measurementCount: number;
 }
 
@@ -54,20 +56,24 @@ export function calculatePoints(responseData: number[]): number[][] {
 }
 
 export function calculateChannelGraphData(responseData?: ResponseData): ChannelGraphData {
-    if (!responseData) return { first: [], average: [], measurementCount: 0 };
+    const empty: ChannelGraphData = {
+        first: [],
+        average: { rms: [], db: [], linear: [] },
+        measurementCount: 0,
+    };
+    if (!responseData) return empty;
 
     const measurements = Object.entries(responseData)
         .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
         .map(([, samples]) => samples)
         .filter(samples => samples.length > 1 && (samples.length & (samples.length - 1)) === 0);
 
-    if (measurements.length === 0) {
-        return { first: [], average: [], measurementCount: 0 };
-    }
+    if (measurements.length === 0) return empty;
 
     const firstSamples = measurements[0];
     const count = firstSamples.length;
     const compatibleMeasurements = measurements.filter(samples => samples.length === count);
+    const measurementCount = compatibleMeasurements.length;
 
     const fft = getFft(count);
     const out = fft.createComplexArray();
@@ -76,39 +82,63 @@ export function calculateChannelGraphData(responseData?: ResponseData): ChannelG
     const binCount = count / 2 - 1;
     const firstAmplitudes = new Array<number>(binCount);
     const powerSum = new Float64Array(binCount);
+    const linearSum = new Float64Array(binCount);
 
     for (let b = 0; b < binCount; b++) {
         const re = out[b * 2];
         const im = out[b * 2 + 1];
         const power = re * re + im * im;
-        firstAmplitudes[b] = Math.sqrt(power);
+        const amplitude = Math.sqrt(power);
+        firstAmplitudes[b] = amplitude;
         powerSum[b] = power;
+        linearSum[b] = amplitude;
     }
 
     const first = formatSmoothedPoints(firstAmplitudes, count);
 
-    if (compatibleMeasurements.length === 1) {
-        return { first, average: first, measurementCount: 1 };
+    if (measurementCount === 1) {
+        return {
+            first,
+            average: { rms: first, db: first, linear: first },
+            measurementCount: 1,
+        };
     }
 
-    for (let m = 1; m < compatibleMeasurements.length; m++) {
+    const dbSums = first.map(([, db]) => db);
+    const amplitudes = new Array<number>(binCount);
+
+    for (let m = 1; m < measurementCount; m++) {
         fft.realTransform(out, compatibleMeasurements[m]);
         for (let b = 0; b < binCount; b++) {
             const re = out[b * 2];
             const im = out[b * 2 + 1];
-            powerSum[b] += re * re + im * im;
+            const power = re * re + im * im;
+            const amplitude = Math.sqrt(power);
+            amplitudes[b] = amplitude;
+            powerSum[b] += power;
+            linearSum[b] += amplitude;
+        }
+        const points = formatSmoothedPoints(amplitudes, count);
+        for (let p = 0; p < points.length; p++) {
+            dbSums[p] += points[p][1];
         }
     }
 
-    const averageAmplitudes = new Array<number>(binCount);
+    const rmsAmplitudes = new Array<number>(binCount);
+    const linearAmplitudes = new Array<number>(binCount);
     for (let b = 0; b < binCount; b++) {
-        averageAmplitudes[b] = Math.sqrt(powerSum[b] / compatibleMeasurements.length);
+        rmsAmplitudes[b] = Math.sqrt(powerSum[b] / measurementCount);
+        linearAmplitudes[b] = linearSum[b] / measurementCount;
     }
 
     return {
         first,
-        average: formatSmoothedPoints(averageAmplitudes, count),
-        measurementCount: compatibleMeasurements.length,
+        average: {
+            rms: formatSmoothedPoints(rmsAmplitudes, count),
+            db: first.map(([frequency], p) => [frequency, dbSums[p] / measurementCount]),
+            linear: formatSmoothedPoints(linearAmplitudes, count),
+        },
+        measurementCount,
     };
 }
 

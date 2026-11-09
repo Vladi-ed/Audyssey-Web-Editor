@@ -31,7 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
-import type { ChannelGraphData } from './helper-functions/calculate-points';
+import type { AverageAlgorithm, ChannelGraphData } from './helper-functions/calculate-points';
 import { ExportSupportComponent } from './export-support/export-support.component';
 import {
     getCorrectionChannels,
@@ -70,6 +70,12 @@ export class AppComponent implements OnDestroy {
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
     averageMeasurementsEnabled = false;
+    averageAlgorithm: AverageAlgorithm = 'rms';
+    readonly averageAlgorithmOptions: { value: AverageAlgorithm; label: string; shortLabel: string }[] = [
+        { value: 'rms', label: 'RMS (power)', shortLabel: 'RMS avg' },
+        { value: 'db', label: 'dB average', shortLabel: 'dB avg' },
+        { value: 'linear', label: 'Linear amplitude', shortLabel: 'Linear avg' },
+    ];
     showSupportPrompt = false;
     isSaving = false;
 
@@ -218,7 +224,11 @@ export class AppComponent implements OnDestroy {
         const count = this.selectedChannelMeasurementCount;
         if (count === 0) return 'No measurements available for this channel';
         if (count === 1) return 'Only 1 measurement available for this channel';
-        return `Show RMS average of all ${count} measurements`;
+        return `Average all ${count} measurements`;
+    }
+
+    private get averageAlgorithmShortLabel(): string {
+        return this.averageAlgorithmOptions.find(opt => opt.value === this.averageAlgorithm)?.shortLabel ?? 'avg';
     }
 
     get correctionChannels(): DetectedChannel[] {
@@ -266,6 +276,15 @@ export class AppComponent implements OnDestroy {
     toggleAverageMeasurements(checked: boolean) {
         if (!this.selectedChannel) return;
         this.averageMeasurementsEnabled = checked;
+        this.updateChart();
+    }
+
+    selectAverageAlgorithm(algorithm: AverageAlgorithm) {
+        if (!this.selectedChannel) return;
+        this.averageAlgorithm = algorithm;
+        if (this.canAverageSelectedChannel) {
+            this.averageMeasurementsEnabled = true;
+        }
         this.updateChart();
     }
 
@@ -528,14 +547,14 @@ export class AppComponent implements OnDestroy {
 
         const channelGraphData = this.calculatedChannelsData?.get(selectedChannel.enChannelType);
         const showAverage = this.showAveragedChannel;
-        const selectedChannelData = (showAverage ? channelGraphData?.average : channelGraphData?.first) ?? [];
+        const selectedChannelData = (showAverage ? channelGraphData?.average[this.averageAlgorithm] : channelGraphData?.first) ?? [];
 
         const measurement = 0;
         this.chartOptions.series![measurement] = {
             ...this.chartOptions.series![measurement],
             data: [...selectedChannelData],
             type: this.graphSmoothEnabled ? 'spline' : 'line',
-            name: showAverage ? `${selectedChannelName} (avg)` : selectedChannelName,
+            name: showAverage ? `${selectedChannelName} (${this.averageAlgorithmShortLabel})` : selectedChannelName,
         };
 
         this.updateSubwooferSeries(selectedChannel);
@@ -558,7 +577,7 @@ export class AppComponent implements OnDestroy {
         const subCutOff = Number.parseInt('200 Hz') / 3;
         const subGraphData = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
         const useSubAverage = this.showAveragedChannel && (subGraphData?.measurementCount ?? 0) > 1;
-        const subDataPoints = useSubAverage ? subGraphData?.average : subGraphData?.first;
+        const subDataPoints = useSubAverage ? subGraphData?.average[this.averageAlgorithm] : subGraphData?.first;
         const subwoofer = 1; // series number
         const showOverlay = this.subwooferOverlayEnabled && !this.isSubwoofer(selectedChannel);
 
@@ -566,7 +585,7 @@ export class AppComponent implements OnDestroy {
             ...this.chartOptions.series![subwoofer],
             data: showOverlay ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
-            name: useSubAverage ? 'Subwoofer (avg)' : 'Subwoofer',
+            name: useSubAverage ? `Subwoofer (${this.averageAlgorithmShortLabel})` : 'Subwoofer',
         };
     }
 

@@ -232,6 +232,19 @@
                     >
                         {{ averageMeasurementsLabel }}
                     </mat-checkbox>
+
+                    <mat-form-field appearance="outline" class="average-algorithm-field" subscriptSizing="dynamic">
+                        <mat-label>Average algorithm</mat-label>
+                        <mat-select
+                            (selectionChange)="selectAverageAlgorithm($event.value)"
+                            [disabled]="!canAverageSelectedChannel"
+                            [value]="averageAlgorithm"
+                        >
+                            @for (option of averageAlgorithmOptions; track option.value) {
+                                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
                 }
 
                 @if (selectedChannelRaw && !isSubwoofer(selectedChannelRaw)) {
