@@ -341,6 +341,7 @@ export class AppComponent implements OnDestroy {
             }
         }
         this.chartObj = chart;
+        this.updateChartMenuItems();
         this.applyChartTheme();
         this.syncLoading();
     }
@@ -350,13 +351,13 @@ export class AppComponent implements OnDestroy {
             exporting: {
                 menuItemDefinitions: {
                     xScaleBtn: {
-                        text: `${this.chartLogarithmicScale ? '✔️ ' : ''}Logarithmic scale`,
+                        text: `${this.chartLogarithmicScale ? '✔️ ' : '⬜️ '}Logarithmic scale`,
                     },
                     graphSmoothingBtn: {
-                        text: `${this.graphSmoothEnabled ? '✔️ ' : ''}Graph smoothing`,
+                        text: `${this.graphSmoothEnabled ? '✔️ ' : '⬜️ '}Graph smoothing`,
                     },
                     averageMeasurementsBtn: {
-                        text: `${this.averageMeasurementsEnabled ? '✔️ ' : ''}Average measurements`,
+                        text: `${this.averageMeasurementsEnabled ? '✔️ ' : '⬜️ '}All measurements AVG`,
                     },
                 },
             },
