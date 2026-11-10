@@ -31,7 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
-import type { AverageAlgorithm, ChannelGraphData } from './helper-functions/calculate-points';
+import type { ChannelGraphData } from './helper-functions/calculate-points';
 import { ExportSupportComponent } from './export-support/export-support.component';
 import {
     getCorrectionChannels,
@@ -69,13 +69,6 @@ export class AppComponent implements OnDestroy {
     private readonly themeStorageKey = 'ady-editor.theme';
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
-    averageMeasurementsEnabled = false;
-    averageAlgorithm: AverageAlgorithm = 'rms';
-    readonly averageAlgorithmOptions: { value: AverageAlgorithm; label: string; shortLabel: string }[] = [
-        { value: 'rms', label: 'RMS (power)', shortLabel: 'RMS avg' },
-        { value: 'db', label: 'dB average', shortLabel: 'dB avg' },
-        { value: 'linear', label: 'Linear amplitude', shortLabel: 'Linear avg' },
-    ];
     showSupportPrompt = false;
     isSaving = false;
 
@@ -147,6 +140,7 @@ export class AppComponent implements OnDestroy {
     selectedChannelRaw?: DetectedChannel;
     private chartLogarithmicScale = true;
     private graphSmoothEnabled = false;
+    private averageMeasurementsEnabled = false;
     private selectionToRestore: number[] = [];
     private fileLoader = new AdyFileLoader({
         accepted: (data, filename) => {
@@ -164,7 +158,6 @@ export class AppComponent implements OnDestroy {
             this.calculatedChannelsData = undefined;
             this.targetCurveCutoffs.clear();
             this.subwooferOverlayEnabled = false;
-            this.averageMeasurementsEnabled = false;
             this.updateChart();
             this.chartObj?.zoomOut();
         },
@@ -199,36 +192,6 @@ export class AppComponent implements OnDestroy {
 
     private get selectedChannelCutoff(): number {
         return this.targetCurveCutoffs.get(this.selectedChannel?.enChannelType ?? -1) ?? 0;
-    }
-
-    get selectedChannelMeasurementCount(): number {
-        const selectedChannel = this.selectedChannel;
-        if (!selectedChannel) return 0;
-        return this.calculatedChannelsData?.get(selectedChannel.enChannelType)?.measurementCount ?? 0;
-    }
-
-    get canAverageSelectedChannel(): boolean {
-        return this.selectedChannelMeasurementCount > 1;
-    }
-
-    get showAveragedChannel(): boolean {
-        return this.averageMeasurementsEnabled && this.canAverageSelectedChannel;
-    }
-
-    get averageMeasurementsLabel(): string {
-        const count = this.selectedChannelMeasurementCount;
-        return count > 0 ? `Show average (${count})` : 'Show average';
-    }
-
-    get averageMeasurementsTooltip(): string {
-        const count = this.selectedChannelMeasurementCount;
-        if (count === 0) return 'No measurements available for this channel';
-        if (count === 1) return 'Only 1 measurement available for this channel';
-        return `Average all ${count} measurements`;
-    }
-
-    private get averageAlgorithmShortLabel(): string {
-        return this.averageAlgorithmOptions.find(opt => opt.value === this.averageAlgorithm)?.shortLabel ?? 'avg';
     }
 
     get correctionChannels(): DetectedChannel[] {
@@ -270,21 +233,6 @@ export class AppComponent implements OnDestroy {
         if (this.isLoading) return;
         if (!this.sharedSubwooferOutputs.includes(channel)) return;
         this.selectedChannelRaw = channel;
-        this.updateChart();
-    }
-
-    toggleAverageMeasurements(checked: boolean) {
-        if (!this.selectedChannel) return;
-        this.averageMeasurementsEnabled = checked;
-        this.updateChart();
-    }
-
-    selectAverageAlgorithm(algorithm: AverageAlgorithm) {
-        if (!this.selectedChannel) return;
-        this.averageAlgorithm = algorithm;
-        if (this.canAverageSelectedChannel) {
-            this.averageMeasurementsEnabled = true;
-        }
         this.updateChart();
     }
 
@@ -373,20 +321,46 @@ export class AppComponent implements OnDestroy {
             const menuItems = chart.options.exporting.menuItemDefinitions as Record<string, Highcharts.ExportingMenuObject>;
             const scaleBtn = menuItems['xScaleBtn'];
             const graphSmoothingBtn = menuItems['graphSmoothingBtn'];
+            const averageMeasurementsBtn = menuItems['averageMeasurementsBtn'];
 
             scaleBtn.onclick = () => {
                 this.chartLogarithmicScale = !this.chartLogarithmicScale;
                 this.updateChart();
                 chart.update({ xAxis: { type: this.chartLogarithmicScale ? 'logarithmic' : 'linear' } });
+                this.updateChartMenuItems();
             }
             graphSmoothingBtn.onclick = () => {
                 this.graphSmoothEnabled = !this.graphSmoothEnabled;
                 chart.series[0].update({ type: this.graphSmoothEnabled ? 'spline' : 'line' });
+                this.updateChartMenuItems();
+            }
+            averageMeasurementsBtn.onclick = () => {
+                this.averageMeasurementsEnabled = !this.averageMeasurementsEnabled;
+                this.updateChart();
+                this.updateChartMenuItems();
             }
         }
         this.chartObj = chart;
         this.applyChartTheme();
         this.syncLoading();
+    }
+
+    private updateChartMenuItems() {
+        this.chartObj?.update({
+            exporting: {
+                menuItemDefinitions: {
+                    xScaleBtn: {
+                        text: `${this.chartLogarithmicScale ? '✔️ ' : ''}Logarithmic scale`,
+                    },
+                    graphSmoothingBtn: {
+                        text: `${this.graphSmoothEnabled ? '✔️ ' : ''}Graph smoothing`,
+                    },
+                    averageMeasurementsBtn: {
+                        text: `${this.averageMeasurementsEnabled ? '✔️ ' : ''}Average measurements`,
+                    },
+                },
+            },
+        });
     }
 
     toggleColorScheme() {
@@ -546,15 +520,15 @@ export class AppComponent implements OnDestroy {
         };
 
         const channelGraphData = this.calculatedChannelsData?.get(selectedChannel.enChannelType);
-        const showAverage = this.showAveragedChannel;
-        const selectedChannelData = (showAverage ? channelGraphData?.average[this.averageAlgorithm] : channelGraphData?.first) ?? [];
+        const showAverage = this.averageMeasurementsEnabled && (channelGraphData?.measurementCount ?? 0) > 1;
+        const selectedChannelData = (showAverage ? channelGraphData?.average : channelGraphData?.first) ?? [];
 
         const measurement = 0;
         this.chartOptions.series![measurement] = {
             ...this.chartOptions.series![measurement],
             data: [...selectedChannelData],
             type: this.graphSmoothEnabled ? 'spline' : 'line',
-            name: showAverage ? `${selectedChannelName} (${this.averageAlgorithmShortLabel})` : selectedChannelName,
+            name: showAverage ? `${selectedChannelName} (avg)` : selectedChannelName,
         };
 
         this.updateSubwooferSeries(selectedChannel);
@@ -576,8 +550,8 @@ export class AppComponent implements OnDestroy {
     private updateSubwooferSeries(selectedChannel: DetectedChannel) {
         const subCutOff = Number.parseInt('200 Hz') / 3;
         const subGraphData = this.calculatedChannelsData?.get(54) || this.calculatedChannelsData?.get(42);
-        const useSubAverage = this.showAveragedChannel && (subGraphData?.measurementCount ?? 0) > 1;
-        const subDataPoints = useSubAverage ? subGraphData?.average[this.averageAlgorithm] : subGraphData?.first;
+        const useSubAverage = this.averageMeasurementsEnabled && (subGraphData?.measurementCount ?? 0) > 1;
+        const subDataPoints = useSubAverage ? subGraphData?.average : subGraphData?.first;
         const subwoofer = 1; // series number
         const showOverlay = this.subwooferOverlayEnabled && !this.isSubwoofer(selectedChannel);
 
@@ -585,7 +559,7 @@ export class AppComponent implements OnDestroy {
             ...this.chartOptions.series![subwoofer],
             data: showOverlay ? (subDataPoints?.slice(0, subCutOff) ?? []) : [],
             type: 'spline',
-            name: useSubAverage ? `Subwoofer (${this.averageAlgorithmShortLabel})` : 'Subwoofer',
+            name: useSubAverage ? 'Subwoofer (avg)' : 'Subwoofer',
         };
     }
 

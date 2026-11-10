@@ -52,12 +52,13 @@ export const initOptions: Options = {
       //   },
       //   text: 'Play'
       // },
-      xScaleBtn: { text: 'Toggle linear/logarithmic scale' },
-      graphSmoothingBtn: { text: 'Toggle graph smoothing' }
+      xScaleBtn: { text: '✔️ Logarithmic scale' },
+      graphSmoothingBtn: { text: 'Graph smoothing' },
+      averageMeasurementsBtn: { text: 'Average measurements' }
     },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'xScaleBtn', 'graphSmoothingBtn'],
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'xScaleBtn', 'graphSmoothingBtn', 'averageMeasurementsBtn'],
         symbolStroke: '#666666',
         theme: {
           fill: 'transparent',
