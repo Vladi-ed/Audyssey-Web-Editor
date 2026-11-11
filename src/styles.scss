@@ -343,11 +343,73 @@ body.dark-theme {
     .highcharts-root {
         font-family: Inter, Roboto, sans-serif !important;
     }
+
+    .about-footer {
+        margin: 18px 0 0;
+        padding: 16px 22px;
+        color: var(--ady-text-muted);
+        border: 1px solid var(--ady-border);
+        border-radius: 16px;
+        background: linear-gradient(145deg, rgba(12, 27, 50, 0.8), rgba(5, 15, 31, 0.8));
+        box-shadow: var(--ady-glow);
+        backdrop-filter: blur(14px);
+    }
+
+    .about-footer h2,
+    .about-footer strong {
+        color: var(--ady-text);
+    }
+
+    .about-footer code {
+        color: var(--ady-cyan);
+        background: rgba(69, 215, 255, 0.1);
+    }
+}
+
+.about-footer {
+    margin: 10px;
+    padding: 14px 20px;
+    color: #4a4f57;
+    font-size: 13px;
+    line-height: 1.55;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.about-footer h2 {
+    margin: 0 0 6px;
+    color: #262b33;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.about-footer p {
+    margin: 0 0 6px;
+}
+
+.about-footer p:last-child {
+    margin-bottom: 0;
+}
+
+.about-footer strong {
+    font-weight: 500;
+}
+
+.about-footer code {
+    padding: 1px 5px;
+    font-size: 12px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.06);
 }
 
 @media (max-width: 680px) {
     body {
         margin: 0 0 40px;
+    }
+
+    body.dark-theme .about-footer {
+        margin: 12px 0 0;
+        padding: 14px 16px;
     }
 }
 

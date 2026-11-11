@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://audyssey.pages.dev/sitemap.xml
