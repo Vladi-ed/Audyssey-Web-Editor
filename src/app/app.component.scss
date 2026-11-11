@@ -57,19 +57,20 @@ highcharts-chart {
     gap: 10px 24px;
 }
 
-.header-actions button.flat-btn {
+.header-actions button {
     font: inherit;
-}
-
-.header-actions .icon-link:first-of-type {
-    margin-left: auto;
 }
 
 .icon-link {
     display: flex;
+    align-items: center;
     gap: 8px;
-    padding-top: 2px;
-    text-decoration: none;
+    margin-left: auto;
+    padding: 2px 0 0;
+    color: #323842;
+    cursor: pointer;
+    border: 0;
+    background: none;
 }
 
 .icon-link img {

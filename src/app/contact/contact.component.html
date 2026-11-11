@@ -1,0 +1,58 @@
+<header class="contact-header">
+    <h2 id="contact-title">Contact</h2>
+</header>
+
+<mat-dialog-content class="contact-content">
+    <mat-radio-group [(ngModel)]="type" aria-label="Request type" class="contact-type-group">
+        <mat-radio-button value="question">Question</mat-radio-button>
+        <mat-radio-button value="feature">Feature request</mat-radio-button>
+        <mat-radio-button value="bug">Bug report</mat-radio-button>
+    </mat-radio-group>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Message</mat-label>
+        <textarea
+            [(ngModel)]="message"
+            [disabled]="isSubmitting"
+            [maxLength]="maxMessageLength"
+            cdkFocusInitial
+            matInput
+            placeholder="Describe your question, feature idea, or bug…"
+            required
+            rows="5"
+        ></textarea>
+        <mat-hint align="end">{{ message.length }} / {{ maxMessageLength }}</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>How can I contact you back?</mat-label>
+        <input
+            [(ngModel)]="contact"
+            [disabled]="isSubmitting"
+            matInput
+            maxlength="200"
+            placeholder="Email, Telegram, etc. (optional)"
+        >
+    </mat-form-field>
+
+    @if (hasAdyData) {
+        <mat-checkbox [(ngModel)]="sendStats" [disabled]="isSubmitting">
+            Send ADY stats
+        </mat-checkbox>
+    }
+</mat-dialog-content>
+
+<mat-dialog-actions class="contact-footer" align="end">
+    <button
+        [disabled]="isSubmitting"
+        class="flat-btn cancel-button"
+        mat-dialog-close
+        type="button"
+    >Cancel</button>
+    <button
+        (click)="submit()"
+        [disabled]="isSubmitting || !message.trim()"
+        class="flat-btn send-button"
+        type="button"
+    >{{ isSubmitting ? 'Sending…' : 'Send' }}</button>
+</mat-dialog-actions>

@@ -33,6 +33,7 @@ import { version } from '../../package.json';
 import { AdyFileLoader } from './helper-functions/ady-file-loader';
 import type { ChannelGraphData } from './helper-functions/calculate-points';
 import { ExportSupportComponent } from './export-support/export-support.component';
+import { ContactComponent } from './contact/contact.component';
 import {
     getCorrectionChannels,
     getSharedSubwooferOutputs,
@@ -91,6 +92,29 @@ export class AppComponent implements OnDestroy {
                 if (seenVersion !== this.appVersion) void this.openWhatsNew(seenVersion, true);
             }, 1500);
             this.destroyRef.onDestroy(() => clearTimeout(timer));
+        });
+    }
+
+    openContact() {
+        const multEqTypes: Record<number, string> = {
+            0: 'MultiEQ',
+            1: 'MultiEQ XT',
+            2: 'MultiEQ XT32',
+        };
+        this.dialog.open(ContactComponent, {
+            width: '520px',
+            maxWidth: 'calc(100vw - 48px)',
+            maxHeight: '85vh',
+            panelClass: 'whats-new-panel',
+            ariaLabelledBy: 'contact-title',
+            data: {
+                model: this.audysseyData.targetModelName,
+                multEqType: this.audysseyData.enMultEQType !== undefined
+                    ? multEqTypes[this.audysseyData.enMultEQType]
+                    : undefined,
+                channels: this.audysseyData.detectedChannels.map(channel => channel.commandId),
+                appVersion: this.appVersion,
+            },
         });
     }
 
