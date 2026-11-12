@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.7 — 2026-11-12
+
+- Add an “All measurements AVG” chart-menu toggle to switch between the first measurement and the linear-amplitude average of compatible measurements, including the subwoofer overlay. Averaged series are marked “(avg)”. (`282dfbc`, `d7370c5`, `b8895f3`)
+- Clarify chart-menu labels for frequency scale and smoothing, and apply their current state when the chart initializes. (`af9cfae`, `b8895f3`)
+- Replace the direct Telegram link with an in-app contact form for questions, feature requests, and bug reports, with optional reply details and calibration metadata. Add a validated server endpoint to deliver feedback. (`824cf79`)
+- Improve mobile and tablet layouts with a compact header, chart-first mobile layout, collapsed Basic info panel, and an Export button hidden until a file is loaded on mobile. (`11e56a2`, `625c8c2`)
+- Redesign the automatic What’s new announcement with icons and a Continue button, while keeping release history accessible through the version button. (`625c8c2`)
+- Improve search and link previews with SEO metadata, structured data, a sitemap, robots.txt, optimized font loading, and a descriptive footer shown on mobile. (`ceb5006`, `ba8846c`, `1c00725`)
+- Include screen dimensions in usage statistics. (`ae5a191`)
+- Hide the Donate link in the header and restore the default Highcharts attribution. (`acc8e15`, `0814b16`)
+- Refresh locked dependency versions.
+
 ## 0.9.6 — 2026-10-20
 
 - Remember the selected light or dark theme across page reloads.

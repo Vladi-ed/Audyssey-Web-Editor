@@ -10,6 +10,17 @@ export interface ReleaseHighlights {
 // Newest first. Dates match the version commits recorded in CHANGELOG.md.
 export const releaseHighlights: ReleaseHighlights[] = [
     {
+        version: '0.9.7',
+        date: '2026-11-12',
+        icons: ['curve', 'info', 'settings', 'history'],
+        highlights: [
+            'Use “All measurements AVG” in the chart menu to display the average of your measurements, including the subwoofer overlay.',
+            'Send questions, feature requests, and bug reports directly from the Contact form.',
+            'Improved mobile and tablet layouts put the chart first on phones and simplify the header and controls.',
+            'Redesigned release announcements with quick highlights; click the version number to browse release history.',
+        ],
+    },
+    {
         version: '0.9.6',
         date: '2026-10-20',
         icons: ['settings', 'info'],
