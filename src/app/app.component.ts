@@ -54,7 +54,7 @@ import {
 })
 export class AppComponent implements OnDestroy {
     readonly appVersion = version;
-    readonly basicInfoExpanded = !inject(BreakpointObserver).isMatched('(max-width: 680px)');
+    readonly isMobileLayout = inject(BreakpointObserver).isMatched('(max-width: 680px)');
     private dialog = inject(MatDialog);
     private destroyRef = inject(DestroyRef);
     private whatsNewOpen = false;

@@ -58,14 +58,33 @@
                 matTooltip="Send feedback or report a bug"
                 type="button"
             >
-                <svg
-                    fill="currentColor"
-                    height="20"
-                    viewBox="0 -960 960 960"
-                    width="20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/>
+                <svg viewBox="0 0 240.1 240.1" width="20" xmlns="http://www.w3.org/2000/svg">
+                    <linearGradient
+                        gradientTransform="matrix(1000 0 0 -1000 838161 660581)"
+                        gradientUnits="userSpaceOnUse"
+                        id="a"
+                        x1="-838"
+                        x2="-838"
+                        y1="660.6"
+                        y2="660.3"
+                    >
+                        <stop offset="0" stop-color="#424d58"/>
+                        <stop offset="1" stop-color="#272a2f"/>
+                    </linearGradient>
+                    <circle
+                        clip-rule="evenodd"
+                        cx="120.1"
+                        cy="120.1"
+                        fill="url(#a)"
+                        fill-rule="evenodd"
+                        r="120.1"
+                    />
+                    <path
+                        clip-rule="evenodd"
+                        d="M54.3 118.8c35-15.2 58.3-25.3 70-30.2 33.3-13.9 40.3-16.3 44.8-16.4 1 0 3.2.2 4.7 1.4 1.2 1 1.5 2.3 1.7 3.3s.4 3.1.2 4.7c-1.8 19-9.6 65.1-13.6 86.3-1.7 9-5 12-8.2 12.3-7 .6-12.3-4.6-19-9-10.6-6.9-16.5-11.2-26.8-18-11.9-7.8-4.2-12.1 2.6-19.1 1.8-1.8 32.5-29.8 33.1-32.3.1-.3.1-1.5-.6-2.1-.7-.6-1.7-.4-2.5-.2-1.1.2-17.9 11.4-50.6 33.5a22.5 22.5 0 0 1-13 4.8 86.6 86.6 0 0 1-18.7-4.4c-7.5-2.4-13.5-3.7-13-7.9.3-2.2 3.3-4.4 8.9-6.7z"
+                        fill="#FFF"
+                        fill-rule="evenodd"
+                    />
                 </svg>
                 <span style="color:#323842">Contact</span>
             </button>
@@ -132,7 +151,7 @@
                 Export
             </button>
             @if (hasInvalidEdits()) {
-                <span role="status">Fix invalid values before exporting.</span>
+                <output>Fix invalid values before exporting.</output>
             }
         </div>
     </mat-card-content>
@@ -143,7 +162,7 @@
 
 <main [attr.aria-busy]="isLoading" [attr.inert]="isLoading ? '' : null">
     <mat-accordion class="info-panels">
-        <mat-expansion-panel [expanded]="basicInfoExpanded">
+        <mat-expansion-panel [expanded]="!isMobileLayout">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     Basic info
@@ -168,10 +187,12 @@
                     <mat-option [value]="2">HF Rolloff 2</mat-option>
                 </mat-select>
             </mat-form-field>
-            <!--            <mat-form-field appearance="outline">-->
-            <!--                <mat-label>System Delay</mat-label>-->
-            <!--                <input matInput [(ngModel)]="audysseyData.systemDelay" readonly>-->
-            <!--            </mat-form-field>-->
+            <!--
+            <mat-form-field appearance="outline" matTooltip="Receiver measurement-path delay used by Audyssey to separate electronic latency from sound travel time to the microphone. Measured in samples at 48 kHz; milliseconds = samples / 48.">
+                <mat-label>System Delay</mat-label>
+                <input matInput [(ngModel)]="audysseyData.systemDelay" disabled>
+            </mat-form-field>
+            -->
 
             <mat-checkbox [(ngModel)]="audysseyData.dynamicEq" matTooltip="Maintains bass and treble when playback volume is reduced to compensate human hearing" style="padding-right: 16px">
                 Dynamic EQ
@@ -294,19 +315,22 @@
     </mat-card>
 </main>
 
-<footer class="about-footer">
-    <h2>Audyssey MultEQ .ady Calibration File Editor</h2>
-    <p>
-        ADY Web Editor is a free, open-source online tool for inspecting, editing, and exporting
-        <strong>Audyssey MultEQ</strong> <code>.ady</code> room-calibration files created with the
-        Audyssey MultEQ Editor mobile app for <strong>Denon</strong> and <strong>Marantz</strong> AV receivers
-        (MultEQ, MultEQ XT, and MultEQ XT32).
-    </p>
-    <p>
-        Analyze per-channel speaker and subwoofer frequency response (FFT), customize
-        <strong>target curve points</strong> and high-frequency rolloff, toggle
-        <strong>Midrange Compensation (MRC)</strong>, <strong>Dynamic EQ</strong>,
-        <strong>Dynamic Volume</strong>, and <strong>Audyssey LFC</strong>, adjust speaker distances,
-        trim levels, and crossovers, and save modified <code>.ady</code> configurations directly in your browser.
-    </p>
-</footer>
+@if (isMobileLayout) {
+    <footer class="about-footer">
+        <h2>Audyssey MultEQ .ady Calibration File Editor</h2>
+        <p>
+            ADY Web Editor is a free, open-source online tool for inspecting, editing, and exporting
+            <strong>Audyssey MultEQ</strong> <code>.ady</code> room-calibration files created with the
+            Audyssey MultEQ Editor mobile app for <strong>Denon</strong> and <strong>Marantz</strong> AV receivers
+            (MultEQ, MultEQ XT, and MultEQ XT32).
+        </p>
+        <p>
+            Analyze per-channel speaker and subwoofer frequency response (FFT), customize
+            <strong>target curve points</strong> and high-frequency rolloff, toggle
+            <strong>Midrange Compensation (MRC)</strong>, <strong>Dynamic EQ</strong>,
+            <strong>Dynamic Volume</strong>, and <strong>Audyssey LFC</strong>, adjust speaker distances,
+            trim levels, and crossovers, and save modified <code>.ady</code> configurations directly in your browser.
+        </p>
+    </footer>
+}
+
