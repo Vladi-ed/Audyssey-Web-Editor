@@ -1,0 +1,92 @@
+@use '@angular/material' as mat;
+
+:host {
+    --contact-text: light-dark(#172431, #f1f5fb);
+    --contact-muted: light-dark(#485b6a, #b4c5d7);
+    --contact-accent: light-dark(#334bb0, #45d7ff);
+    --contact-line: light-dark(#dce3eb, #33485f);
+    @include mat.dialog-overrides((
+        supporting-text-color: var(--contact-text),
+    ));
+    display: flex;
+    flex-direction: column;
+    max-height: inherit;
+    overflow: hidden;
+    color: var(--contact-text);
+    font-family: inherit;
+}
+
+.contact-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--contact-line);
+}
+
+.contact-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 650;
+    line-height: 1.25;
+    letter-spacing: -0.4px;
+}
+
+.contact-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    max-height: none;
+    padding: 20px 24px;
+    overscroll-behavior: contain;
+}
+
+.contact-type-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.contact-footer {
+    flex-shrink: 0;
+    gap: 10px;
+    padding: 12px 24px;
+    border-top: 1px solid var(--contact-line);
+}
+
+.flat-btn {
+    min-width: 104px;
+    height: 42px;
+    padding: 0 20px;
+    font: inherit;
+    border-radius: 8px;
+}
+
+.flat-btn.send-button {
+    color: light-dark(#fff, #071827);
+    border: 1px solid var(--contact-accent);
+    background: var(--contact-accent);
+    font-weight: 600;
+}
+
+.flat-btn.send-button:hover:not(:disabled) {
+    color: light-dark(#fff, #071827);
+    background: light-dark(#263b91, #7be4ff);
+    border-color: light-dark(#263b91, #7be4ff);
+    box-shadow: none;
+    transform: none;
+}
+
+.flat-btn.send-button:disabled {
+    opacity: 0.45;
+}
