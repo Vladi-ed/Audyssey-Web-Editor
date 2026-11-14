@@ -90,6 +90,7 @@
             </button>
 
             <a
+                (click)="onDonateClick()"
                 class="icon-link"
                 style="display: none"
                 href="https://ko-fi.com/vladi_ed"
@@ -156,7 +157,7 @@
         </div>
     </mat-card-content>
     @if (showSupportPrompt) {
-        <app-export-support (dismissed)="dismissSupportPrompt()"/>
+        <app-export-support (dismissed)="dismissSupportPrompt()" (donateClicked)="onDonateClick()"/>
     }
 </mat-card>
 

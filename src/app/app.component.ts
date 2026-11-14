@@ -665,6 +665,10 @@ export class AppComponent implements OnDestroy {
         this.showSupportPrompt = false;
     }
 
+    onDonateClick() {
+        navigator.sendBeacon('/donate.api', this.audysseyData.targetModelName);
+    }
+
     loadExample() {
         return this.fileLoader.loadExample();
     }

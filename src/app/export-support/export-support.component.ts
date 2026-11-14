@@ -6,5 +6,6 @@ import { Component, output } from '@angular/core';
     styleUrl: './export-support.component.scss',
 })
 export class ExportSupportComponent {
+    readonly donateClicked = output<void>();
     readonly dismissed = output<void>();
 }
