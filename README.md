@@ -1,6 +1,6 @@
 # ADY Web Editor
 
-ADY Web Editor is an independent, open-source web application for inspecting, editing, and exporting `.ady` room-calibration files compatible with Audyssey MultEQ.
+ADY Web Editor is an independent web application for inspecting, editing, and exporting `.ady` room-calibration files compatible with Audyssey MultEQ.
 
 ## 🎯 Overview
 
@@ -18,10 +18,26 @@ Available online at: **https://audyssey.pages.dev**
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W6MK9TT)
 
+## Using the editor
+
+1. Keep a backup of your original calibration. Choose **Import ADY File**, drop an
+   `.ady` file onto the editor, or choose **Load Example** to explore the interface.
+2. Select a channel and edit its settings or target curve.
+3. When editing the target-point list, click **Save** to apply those points before
+   exporting, changing channels, loading another file, or dragging graph points.
+   List edits remain a local draft until Save; there is currently no confirmation
+   before replacing that draft.
+4. Choose **Export** to save an `.ady` copy. Fix any highlighted invalid values
+   first. Browsers with a supported save-file picker show a save dialog; other
+   browsers download the file.
+5. Open the exported copy in MultEQ and check the calibration before transferring
+   it to your receiver. Reopening it in this editor alone does not verify receiver
+   compatibility.
+
 ## 🛠️ Technology Stack
 
 ### Core Framework
-- **Angular 22** - Latest Angular framework with modern build system
+- **Angular 22** - Application framework and build system
 - **TypeScript 6** - Type-safe development
 
 ### UI Components
@@ -39,61 +55,21 @@ Available online at: **https://audyssey.pages.dev**
 ```
 src/
 ├── app/
-│   ├── channel-selector/          # Audio channel selection component
-│   ├── target-curve-points/       # Target curve management with custom pipes
-│   ├── helper-functions/          # Audio processing utilities
-│   ├── interfaces/                # TypeScript type definitions
+│   ├── channel-info/              # Channel settings and validation
+│   ├── channel-selector/          # Audio channel selection
+│   ├── contact/                   # Feedback dialog
+│   ├── export-support/            # Contribution prompt
+│   ├── target-curve-points/       # Target-point list editor
+│   ├── whats-new/                 # Release dialog and highlights
+│   ├── helper-functions/          # Import, export, graph processing, Worker
+│   ├── interfaces/                # TypeScript data models
 │   └── app.component.*            # Main application component
-├── assets/
-│   ├── examples/                  # Sample .ady files
-│   ├── images/                    # Application images
-│   └── preview/                   # Preview content
-└── environments/                  # Environment configurations
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- **Node.js** (v24+)
-- **npm** (11+)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-   ```bash
-   ng serve
-   ```
-
-4. **Access the application**
-   Navigate to `http://localhost:4200/`
-
-The application will automatically reload when you make changes to source files.
-
-### Available Scripts
-
-```bash
-# Development server
-npm start
-# or
-ng serve
-
-# Production build
-npm run build
-# or
-ng build
-
-# Angular CLI commands
-npm run ng -- <command>
+└── assets/
+    ├── example-2-subs.ady         # Built-in sample calibration
+    ├── favicon-options/          # Alternative favicon assets
+    └── ...                       # Images, icons, and link previews
+functions/                        # Cloudflare Pages API handlers
+research/                         # Local research and release-planning material
 ```
 
 ## 🎵 Audio Processing Features
@@ -112,7 +88,8 @@ npm run ng -- <command>
 #### 2. Frequency Response Analysis
 - Real-time FFT processing
 - Frequency domain visualization
-- Phase and magnitude analysis
+- Magnitude response charts with optional smoothing
+- First-measurement and compatible-measurement averaging modes
 
 #### 3. Target Curve Management
 - Custom target curve creation
@@ -130,6 +107,14 @@ receiver-specific rounding. A custom crossover takes precedence.
 Custom gains use quadratic interpolation in logarithmic frequency.
 The rounded base/MRC anchors and measurement processing remain approximations;
 this does not reproduce Audyssey's native DSP or generate receiver filters.
+
+## Data sent by the current application
+
+The editor reads ADY files and calculates graphs locally. Its API requests do not
+upload the complete ADY file or measurement samples.
+
+The browser stores the theme, last acknowledged release version, and export
+counter in local storage. This is not automatic saving of the edited ADY document.
 
 
 ## 🔧 Development
@@ -175,10 +160,6 @@ Handles target curve data manipulation with custom pipes for audio processing.
 
 ### Release notes
 
-The version button in the header opens the **What's new** dialog. `MatDialog`
-is injected normally; its content component and release data load together
-through one dynamic import.
-
 For each release:
 
 1. Update `version` in `package.json` (and the lockfile through npm).
@@ -198,7 +179,7 @@ For each release:
 - Interactive frequency response charts
 - Real-time data updates
 - Zoom and pan functionality
-- Export capabilities (PNG, SVG, PDF)
+- Chart image export (PNG and SVG)
 
 ### Mathematical Processing
 - Fast Fourier Transform (FFT) analysis
@@ -208,15 +189,55 @@ For each release:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+For a bug report, use the in-app feedback form or
+[GitHub Issues](https://github.com/Vladi-ed/Audyssey-Editor/issues). Include the
+app version, browser and OS versions, steps to reproduce, and expected versus
+actual behavior. If a sample ADY is needed, share a copy with personal details and
+device identifiers removed; avoid publishing your original calibration.
+
+Before preparing a code contribution, contact the maintainer to agree in writing
+on permission to modify the code and on the rights needed to incorporate your
+contribution. Bug reports and suggestions are welcome without a code contribution.
+These instructions do not grant a general license to modify or redistribute the
+editor or automatically transfer ownership of contributions.
 
 ## 📄 License
 
-ADY Web Editor is an independent open-source project and is not affiliated with or endorsed by Audyssey Laboratories.
+Copyright (c) 2023-2026 Vladi Ed. **All rights reserved.**
+
+The maintainer's own project materials are covered by the
+[proprietary license](LICENSE). The official website at https://audyssey.pages.dev may be used by individuals for personal,
+non-commercial, non-professional purposes. Other use of the code or application,
+including local builds, modification, redistribution, separate hosting, and
+commercial or organizational use, requires prior written permission, subject to
+the exceptions stated in LICENSE. These terms do not restrict users' own ADY
+files or exported calibration data and chart images.
+
+Viewing and forking a public repository within GitHub remain subject to
+[GitHub's terms](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users).
+Public visibility does not grant a general reuse license. For permission beyond
+the official-site allowance, contact the maintainer through
+[GitHub Issues](https://github.com/Vladi-ed/Audyssey-Editor/issues).
+
+The Git history starts with a Vladi-authored initial commit (`9734833`) and
+includes contributions from
+[drumminj/Audyssey-Web-Editor](https://github.com/drumminj/Audyssey-Web-Editor).
+The proprietary license applies only to materials for which the maintainer holds
+the relevant rights; it does not relicense historical third-party contributions.
+
+The identified fork contributions have been reviewed and the remaining chart
+menu and target-point save implementations replaced. See
+[the code provenance review](CODE-PROVENANCE.md) for commit-by-commit findings,
+retained format/type definitions, and the limits of that review. Historical
+commits remain in Git; this review is not a project-wide ownership guarantee.
+
+Dependencies retain their own licenses. In particular,
+[Highcharts has separate licensing terms](https://shop.highcharts.com/license-eula-1.0);
+the editor license does not replace them. The production build copies LICENSE to
+`dist/browser/LICENSE` and emits `dist/3rdpartylicenses.txt`; retain applicable
+dependency notices when distributing a build.
+
+ADY Web Editor is independent and is not affiliated with or endorsed by Audyssey Laboratories.
 Audyssey and MultEQ are trademarks of Audyssey Laboratories, Inc.
 
 ## 👨‍💻 Author
