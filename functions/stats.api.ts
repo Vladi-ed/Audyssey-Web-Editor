@@ -2,7 +2,17 @@ import { classifyReceiver } from '../src/app/helper-functions/classify-receiver'
 import { getClientDevice } from '../src/app/helper-functions/get-client-device';
 import { decodeChannelName } from '../src/app/helper-functions/decode-channel-name';
 
-interface Env { TELEGRAM_BOT_TOKEN: string, TELEGRAM_CHAT_ID: string, STATS: AnalyticsEngineDataset; }
+interface Env {
+    TELEGRAM_BOT_TOKEN?: string;
+    TELEGRAM_CHAT_ID?: string;
+    STATS?: AnalyticsEngineDataset;
+}
+
+interface ImportStats {
+    model: string;
+    channels?: string[];
+    screenSize?: string;
+}
 
 interface ClientInfo {
     ip: string;
@@ -13,114 +23,97 @@ interface ClientInfo {
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promise<Response> => {
+    let data: unknown;
     try {
-        // 1. Check content type
-        const contentType = request.headers.get("content-type");
-        if (!contentType?.includes("application/json")) {
-            return new Response("Error: Expected JSON content type", { status: 400 });
-        }
+        const body = await request.arrayBuffer();
+        if (body.byteLength > 8192) return new Response('Request body is too large.', { status: 413 });
+        data = JSON.parse(new TextDecoder().decode(body));
+    } catch {
+        return new Response('Invalid JSON body.', { status: 400 });
+    }
+    if (!isImportStats(data)) {
+        return new Response('Invalid statistics payload.', { status: 400 });
+    }
 
-        // 2. Parse and validate the JSON
-        const data: {model: string, channels?: string[], screenSize?: string} = await request.json();
-
-        if (!data || typeof data !== "object" || Array.isArray(data) || Object.keys(data).length === 0) {
-            return new Response("Error: JSON body is empty or invalid", { status: 400 });
-        }
-
-        // Record the validated request
+    try {
         const { brand, model, tier } = classifyReceiver(data.model);
-
         env.STATS?.writeDataPoint({
-            blobs: [
-                brand,
-                model,
-                tier,
-                JSON.stringify(Array.isArray(data.channels) ? data.channels : [])
-            ]
+            blobs: [brand, model, tier, JSON.stringify(data.channels ?? [])]
         });
 
-        // 3. Send a notification to Telegram when configured
         if (env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_CHAT_ID) {
-            const clientInfo = {
-                ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "unknown",
-                country: request.cf?.country
-                    ? new Intl.DisplayNames(["en"], { type: "region" }).of(request.cf.country) ?? request.cf.country
-                    : "unknown",
-                city: request.cf?.city || "unknown",
-                ...getClientDevice(request.headers.get("user-agent"), request.headers.get("sec-ch-ua"))
+            const country = request.cf?.country;
+            const clientInfo: ClientInfo = {
+                ip: (request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || 'unknown').slice(0, 128),
+                country: country ? new Intl.DisplayNames(['en'], { type: 'region' }).of(country) ?? country : 'unknown',
+                city: (request.cf?.city || 'unknown').slice(0, 128),
+                ...getClientDevice(request.headers.get('user-agent'), request.headers.get('sec-ch-ua'))
             };
-            const receiverName = brand === "unknown" ? model : `${brand} ${model}`;
+            const receiverName = brand === 'unknown' ? model : `${brand} ${model}`;
             await sendToTelegram({ ...data, model: receiverName }, clientInfo, env);
         }
 
-        // 4. Return success response
-        return new Response(JSON.stringify({ success: true, message: "Record received" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 200
-        });
-    } catch (err: any) {
-        return new Response(`Server Error: ${err.message}`, { status: 500 });
+        return Response.json({ success: true, message: 'Record received' });
+    } catch {
+        console.error('Could not record import statistics.');
+        return new Response('Could not record statistics.', { status: 500 });
     }
 };
 
-async function sendToTelegram(data: any, clientInfo: ClientInfo, env: Env) {
-    const message = formatTelegramMessage(data, clientInfo);
-    const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: env.TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: "HTML",
-            link_preview_options: { is_disabled: true }
-        })
-    });
+function isImportStats(value: unknown): value is ImportStats {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const data = value as Record<string, unknown>;
+    if (typeof data.model !== 'string' || !data.model.trim() || data.model.length > 160) return false;
+    if (data.channels !== undefined && (!Array.isArray(data.channels) || data.channels.length > 64
+        || !data.channels.every(channel => typeof channel === 'string' && channel.length <= 32))) return false;
+    if (data.screenSize !== undefined && (typeof data.screenSize !== 'string' || data.screenSize.length > 32)) return false;
+    return true;
+}
 
-    if (!response.ok) {
-        console.error(`Telegram API error: ${response.status} ${await response.text()}`);
+async function sendToTelegram(data: ImportStats, clientInfo: ClientInfo, env: Env): Promise<void> {
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(5000),
+            body: JSON.stringify({
+                chat_id: env.TELEGRAM_CHAT_ID,
+                text: formatTelegramMessage(data, clientInfo),
+                parse_mode: 'HTML',
+                link_preview_options: { is_disabled: true }
+            })
+        });
+        if (!response.ok) console.warn(`Statistics Telegram delivery failed: HTTP ${response.status}.`);
+    } catch {
+        // Notification failure must not turn an accepted statistics record into an error.
+        console.warn('Statistics Telegram delivery failed or timed out.');
     }
 }
 
-function formatTelegramMessage(data: any, clientInfo: ClientInfo): string {
+function formatTelegramMessage(data: ImportStats, clientInfo: ClientInfo): string {
     const location = `${clientInfo.city}, ${clientInfo.country}`;
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}&utm_source=ADY-Web-Editor&utm_campaign=stats`;
-    const locationLink = clientInfo.city !== "unknown"
-        ? `<a href="${mapsUrl}">${location}</a>`
-        : location;
-
+    const locationLink = clientInfo.city !== 'unknown'
+        ? `<a href="${escapeHtml(mapsUrl)}">${escapeHtml(location)}</a>`
+        : escapeHtml(location);
     const lines = [
         `📍 ${locationLink}`,
-        `<code>${clientInfo.ip}</code>`,
+        `<code>${escapeHtml(clientInfo.ip)}</code>`,
         `🖥️ ${escapeHtml(clientInfo.device)} - ${escapeHtml(clientInfo.browser)}`
     ];
-
-    const { screenSize, ...stats } = data;
-    if (typeof screenSize === "string" && screenSize) {
-        lines.push(`📐 Screen: ${escapeHtml(screenSize)} CSS px`);
+    if (data.screenSize) lines.push(`📐 Screen: ${escapeHtml(data.screenSize)} CSS px`);
+    lines.push(`\n${escapeHtml(data.model)}`);
+    if (data.channels?.length) {
+        lines.push(`\n${data.channels.map(channel => escapeHtml(decodeChannelName(channel))).join('\n')}`);
     }
-
-    for (const value of Object.values(stats)) {
-        let displayValue: string;
-        if (Array.isArray(value)) {
-            displayValue = value
-                .map((item: string) => escapeHtml(decodeChannelName(item)))
-                .join("\n");
-        } else if (typeof value === "object" && value !== null) {
-            displayValue = escapeHtml(JSON.stringify(value));
-        } else {
-            displayValue = escapeHtml(String(value));
-        }
-
-        lines.push(`\n${displayValue}`);
-    }
-
-    return lines.join("\n").slice(0, 4096);
+    return lines.join('\n');
 }
 
 function escapeHtml(value: string): string {
     return value
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
 }
