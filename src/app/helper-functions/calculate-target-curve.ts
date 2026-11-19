@@ -1,5 +1,5 @@
 import type { PointOptionsObject } from 'highcharts';
-import { getTargetCurveBoundaryPoints } from './target-curve-boundaries';
+import { getTargetCurveBoundaryPoints, isImplicitBoundaryPoint } from './target-curve-boundaries';
 import { getTargetRolloff } from './target-curve-cutoff';
 
 // A few rounded anchors are enough for this approximate visual target.
@@ -68,7 +68,7 @@ export function calculateTargetCurve(curveType?: 1|2, midrangeComp?: boolean, cu
     .sort((a, b) => a - b).map(x => {
       const base = baseline(x);
       const userPoint = userPoints.find(point => point[0] === x);
-      const editable = !!userPoint && !((x === 20 || x === 20000) && userPoint[1] === 0);
+      const editable = !!userPoint && !isImplicitBoundaryPoint(x, userPoint[1]);
       return {
         x,
         y: base + getValueAtX(x, interpolationPoints, true),

@@ -341,47 +341,38 @@ export class AppComponent implements OnDestroy {
             },
         });
 
-        if (chart.options.exporting?.menuItemDefinitions) {
-            const menuItems = chart.options.exporting.menuItemDefinitions as Record<string, Highcharts.ExportingMenuObject>;
-            const scaleBtn = menuItems['xScaleBtn'];
-            const graphSmoothingBtn = menuItems['graphSmoothingBtn'];
-            const averageMeasurementsBtn = menuItems['averageMeasurementsBtn'];
-
-            scaleBtn.onclick = () => {
-                this.chartLogarithmicScale = !this.chartLogarithmicScale;
-                this.updateChart();
-                chart.update({ xAxis: { type: this.chartLogarithmicScale ? 'logarithmic' : 'linear' } });
-                this.updateChartMenuItems();
-            }
-            graphSmoothingBtn.onclick = () => {
-                this.graphSmoothEnabled = !this.graphSmoothEnabled;
-                chart.series[0].update({ type: this.graphSmoothEnabled ? 'spline' : 'line' });
-                this.updateChartMenuItems();
-            }
-            averageMeasurementsBtn.onclick = () => {
-                this.averageMeasurementsEnabled = !this.averageMeasurementsEnabled;
-                this.updateChart();
-                this.updateChartMenuItems();
-            }
-        }
         this.chartObj = chart;
-        this.updateChartMenuItems();
+        this.configureChartControls();
         this.applyChartTheme();
         this.syncLoading();
     }
 
-    private updateChartMenuItems() {
+    private configureChartControls() {
+        const controls = [
+            { key: 'chartLogarithmicScale', label: 'Logarithmic scale' },
+            { key: 'graphSmoothEnabled', label: 'Graph smoothing' },
+            { key: 'averageMeasurementsEnabled', label: 'All measurements AVG' },
+        ] as const;
+        const definitions: Record<string, Highcharts.ExportingMenuObject> = {};
+
+        for (const { key, label } of controls) {
+            definitions[key] = {
+                text: `${this[key] ? '✔️ ' : '⬜️ '}${label}`,
+                onclick: () => {
+                    this[key] = !this[key];
+                    this.updateChart();
+                    this.configureChartControls();
+                },
+            };
+        }
+
         this.chartObj?.update({
             exporting: {
-                menuItemDefinitions: {
-                    xScaleBtn: {
-                        text: `${this.chartLogarithmicScale ? '✔️ ' : '⬜️ '}Logarithmic scale`,
-                    },
-                    graphSmoothingBtn: {
-                        text: `${this.graphSmoothEnabled ? '✔️ ' : '⬜️ '}Graph smoothing`,
-                    },
-                    averageMeasurementsBtn: {
-                        text: `${this.averageMeasurementsEnabled ? '✔️ ' : '⬜️ '}All measurements AVG`,
+                menuItemDefinitions: definitions,
+                buttons: {
+                    contextButton: {
+                        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator',
+                            ...controls.map(control => control.key)],
                     },
                 },
             },
@@ -466,7 +457,7 @@ export class AppComponent implements OnDestroy {
                 channels: data.detectedChannels.map(channel => channel.commandId),
                 screenSize: `${window.screen.width} × ${window.screen.height}`
             })
-        }).catch(console.error);
+        }).catch(console.warn);
     }
 
     private syncLoading() {

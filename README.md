@@ -203,39 +203,10 @@ editor or automatically transfer ownership of contributions.
 
 ## 📄 License
 
-Copyright (c) 2023-2026 Vladi Ed. **All rights reserved.**
+Copyright (c) 2023-2026 Vladi Ed. **All rights reserved.** See [LICENSE](LICENSE).
 
-The maintainer's own project materials are covered by the
-[proprietary license](LICENSE). The official website at https://audyssey.pages.dev may be used by individuals for personal,
-non-commercial, non-professional purposes. Other use of the code or application,
-including local builds, modification, redistribution, separate hosting, and
-commercial or organizational use, requires prior written permission, subject to
-the exceptions stated in LICENSE. These terms do not restrict users' own ADY
-files or exported calibration data and chart images.
-
-Viewing and forking a public repository within GitHub remain subject to
-[GitHub's terms](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users).
-Public visibility does not grant a general reuse license. For permission beyond
-the official-site allowance, contact the maintainer through
-[GitHub Issues](https://github.com/Vladi-ed/Audyssey-Editor/issues).
-
-The Git history starts with a Vladi-authored initial commit (`9734833`) and
-includes contributions from
+The Git history includes contributions from
 [drumminj/Audyssey-Web-Editor](https://github.com/drumminj/Audyssey-Web-Editor).
-The proprietary license applies only to materials for which the maintainer holds
-the relevant rights; it does not relicense historical third-party contributions.
-
-The identified fork contributions have been reviewed and the remaining chart
-menu and target-point save implementations replaced. See
-[the code provenance review](CODE-PROVENANCE.md) for commit-by-commit findings,
-retained format/type definitions, and the limits of that review. Historical
-commits remain in Git; this review is not a project-wide ownership guarantee.
-
-Dependencies retain their own licenses. In particular,
-[Highcharts has separate licensing terms](https://shop.highcharts.com/license-eula-1.0);
-the editor license does not replace them. The production build copies LICENSE to
-`dist/browser/LICENSE` and emits `dist/3rdpartylicenses.txt`; retain applicable
-dependency notices when distributing a build.
 
 ADY Web Editor is independent and is not affiliated with or endorsed by Audyssey Laboratories.
 Audyssey and MultEQ are trademarks of Audyssey Laboratories, Inc.

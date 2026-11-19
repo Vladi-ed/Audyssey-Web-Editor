@@ -2,6 +2,7 @@
   "name": "ady-editor",
   "version": "0.9.7",
   "author": "Vladi Ed",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

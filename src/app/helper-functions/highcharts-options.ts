@@ -8,6 +8,9 @@ export const initOptions: Options = {
   palette: {
     colorScheme: 'light',
   },
+  credits: {
+    style: { opacity: 0.5 },
+  },
   responsive: {
     rules: [{
       chartOptions: {
@@ -44,21 +47,9 @@ export const initOptions: Options = {
   // },
   exporting: {
     sourceWidth: 1920,
-    menuItemDefinitions: {
-      // Custom definition
-      // play: {
-      //   onclick: function () {
-      //     this.toggleSonify()
-      //   },
-      //   text: 'Play'
-      // },
-      xScaleBtn: { text: '✔️ Logarithmic scale' },
-      graphSmoothingBtn: { text: 'Graph smoothing' },
-      averageMeasurementsBtn: { text: 'Average measurements' }
-    },
     buttons: {
       contextButton: {
-        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'separator', 'xScaleBtn', 'graphSmoothingBtn', 'averageMeasurementsBtn'],
+        menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG'],
         symbolStroke: '#666666',
         theme: {
           fill: 'transparent',

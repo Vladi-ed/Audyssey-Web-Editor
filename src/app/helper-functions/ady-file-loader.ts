@@ -114,6 +114,8 @@ export class AdyFileLoader {
     }
 
     private beginReading(): number {
+        this.activeWorker?.terminate();
+        this.activeWorker = undefined;
         this.readingFile = true;
         this.handlers.loadingChanged();
         return ++this.requestId;

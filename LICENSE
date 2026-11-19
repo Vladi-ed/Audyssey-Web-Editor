@@ -1,0 +1,62 @@
+ADY Web Editor - Proprietary License
+
+Copyright (c) 2023-2026 Vladi Ed. All rights reserved.
+
+1. Scope
+
+These terms apply only to the code, documentation, and other project materials
+for which Vladi Ed holds the relevant rights (the "Software"). They do not claim
+ownership of third-party materials or grant rights in them. This is not an
+open-source license.
+
+2. Limited permission to use the official website
+
+An individual may use the unmodified editor at https://audyssey.pages.dev for
+personal, non-commercial, non-professional purposes only. This permission covers
+running the application as delivered by that website in a browser, including
+the browser copies and caching necessary for that use. It does not permit
+business or organizational use, providing services to others, or operating a
+separate copy of the application.
+
+The copyright holder claims no ownership of users' calibration files or other
+user data. These terms impose no restrictions on the use or sharing of users'
+own ADY files or exported calibration data and chart images. Rights in any
+third-party content included in those files or images remain with its owners.
+
+3. All other rights reserved
+
+Except for section 2, rights that cannot be excluded by applicable law, rights
+required by the hosting platform's terms, or a separate written agreement, no
+permission is granted to use, copy, build, run, modify, adapt, create derivative
+works from, redistribute, publish, sublicense, sell, or host the Software or any
+part of it. This reservation applies to source code and compiled forms, whether
+the intended activity is commercial or non-commercial.
+
+Public availability of the repository is not a general permission to reuse the
+Software. Viewing and forking within GitHub remain subject to GitHub's terms;
+this license does not restrict rights granted under those terms. These terms do
+not revoke rights previously granted under another applicable license or a
+separate agreement.
+
+4. Third-party materials and historical contributions
+
+Dependencies and other third-party materials, including Highcharts and
+historical third-party contributions, remain subject to their respective rights
+and licenses. Nothing here relicenses them or grants permission that their
+rightsholders have not granted. Retain all applicable third-party notices.
+
+5. Permission requests
+
+Any use beyond section 2 requires prior written permission from the copyright
+holder, unless otherwise permitted under section 3. Request permission through
+the maintainer at https://github.com/Vladi-ed/Audyssey-Editor/issues. A request,
+silence, or publication of these materials does not constitute permission.
+
+6. Disclaimer
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE AND WEBSITE ARE
+PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NONINFRINGEMENT. THE COPYRIGHT HOLDER IS NOT LIABLE FOR CLAIMS, DAMAGES, OR
+OTHER LIABILITY ARISING FROM THE SOFTWARE OR ITS USE. NOTHING HERE EXCLUDES
+LIABILITY OR RIGHTS THAT CANNOT LAWFULLY BE EXCLUDED.

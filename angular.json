@@ -49,6 +49,7 @@
               "base": "dist/"
             },
             "assets": [
+              { "glob": "LICENSE", "input": ".", "output": "/" },
               "src/favicon.ico",
               "src/robots.txt",
               "src/sitemap.xml",

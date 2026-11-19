@@ -1,6 +1,7 @@
 # Rules
 
 Typescript should be simple and human-readable. No unit-tests required.
+Don't use python, only Node.js
 
 # HTML templates
 
