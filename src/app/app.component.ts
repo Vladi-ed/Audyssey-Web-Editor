@@ -68,6 +68,7 @@ export class AppComponent implements OnDestroy {
     private cdr = inject(ChangeDetectorRef);
     private document = inject(DOCUMENT);
     private readonly themeStorageKey = 'ady-editor.theme';
+    private readonly statsSentStorageKey = 'ady-editor.stats-sent';
     darkThemeEnabled = false;
     subwooferOverlayEnabled = false;
     showSupportPrompt = false;
@@ -83,12 +84,7 @@ export class AppComponent implements OnDestroy {
 
         afterNextRender(() => {
             const timer = setTimeout(() => {
-                let seenVersion: string | null = null;
-                try {
-                    seenVersion = localStorage.getItem(this.whatsNewStorageKey);
-                } catch {
-                    // The dialog still works when browser storage is unavailable.
-                }
+                const seenVersion = localStorage.getItem(this.whatsNewStorageKey);
                 if (seenVersion !== this.appVersion) void this.openWhatsNew(seenVersion, true);
             }, 1500);
             this.destroyRef.onDestroy(() => clearTimeout(timer));
@@ -149,11 +145,7 @@ export class AppComponent implements OnDestroy {
 
     private acknowledgeWhatsNew() {
         this.whatsNewOpen = false;
-        try {
-            localStorage.setItem(this.whatsNewStorageKey, this.appVersion);
-        } catch {
-            // Storage restrictions should not prevent dismissing the dialog.
-        }
+        localStorage.setItem(this.whatsNewStorageKey, this.appVersion);
     }
 
     chartOptions: Highcharts.Options = { series: seriesOptions.map(series => ({ ...series })) };
@@ -382,11 +374,7 @@ export class AppComponent implements OnDestroy {
     toggleColorScheme() {
         this.darkThemeEnabled = !this.darkThemeEnabled;
         this.syncColorScheme();
-        try {
-            localStorage.setItem(this.themeStorageKey, this.darkThemeEnabled ? 'dark' : 'light');
-        } catch {
-            // Theme switching still works when browser storage is unavailable.
-        }
+        localStorage.setItem(this.themeStorageKey, this.darkThemeEnabled ? 'dark' : 'light');
     }
 
     private syncColorScheme() {
@@ -449,12 +437,18 @@ export class AppComponent implements OnDestroy {
         const data = await this.fileLoader.loadFile(file);
         if (!data) return;
 
+        const channels = data.detectedChannels.map(channel => channel.commandId);
+        const signature = JSON.stringify([data.targetModelName?.trim() ?? '', [...channels].sort()]);
+        const sentStats: string[] = JSON.parse(sessionStorage.getItem(this.statsSentStorageKey) ?? '[]');
+        if (sentStats.includes(signature)) return;
+        sessionStorage.setItem(this.statsSentStorageKey, JSON.stringify([...sentStats, signature]));
+
         fetch('/stats.api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: data.targetModelName,
-                channels: data.detectedChannels.map(channel => channel.commandId),
+                channels,
                 screenSize: `${window.screen.width} × ${window.screen.height}`
             })
         }).catch(console.warn);
@@ -642,14 +636,10 @@ export class AppComponent implements OnDestroy {
             this.isSaving = false;
         }
 
-        try {
-            const key = 'ady-export-count';
-            const count = Number(localStorage.getItem(key)) + 1;
-            localStorage.setItem(key, String(count));
-            if (count % 2 == 0) this.showSupportPrompt = true;
-        } catch {
-            // Export still works when browser storage is unavailable.
-        }
+        const key = 'ady-export-count';
+        const count = Number(localStorage.getItem(key)) + 1;
+        localStorage.setItem(key, String(count));
+        if (count % 2 == 0) this.showSupportPrompt = true;
     }
 
     dismissSupportPrompt() {
